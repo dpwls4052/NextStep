@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Background,
   BackgroundVariant,
@@ -12,6 +12,7 @@ import '@xyflow/react/dist/style.css'
 import { initialNodes, initialEdges } from '../model/constants'
 import { useThemeStore } from '@/features/theme/model'
 import { useSelectNode } from '@/features/roadmap/selectNode/model'
+import { calculateTreeLayout } from '../lib'
 
 const Workspace = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
@@ -26,6 +27,12 @@ const Workspace = () => {
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   )
+
+  // 레이아웃 자동 업데이트
+  useEffect(() => {
+    const layoutedNodes = calculateTreeLayout(nodes, edges)
+    setNodes(layoutedNodes)
+  }, [edges, calculateTreeLayout])
 
   const { selectNode } = useSelectNode(selectedNode, setSelectedNode, setNodes)
   const onNodeClick = useCallback(
