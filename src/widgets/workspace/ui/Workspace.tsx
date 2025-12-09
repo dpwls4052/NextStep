@@ -5,22 +5,19 @@ import {
   BackgroundVariant,
   ReactFlow,
   addEdge,
-  useEdgesState,
-  useNodesState,
   useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { initialNodes, initialEdges } from '../model/constants'
 import { useThemeStore } from '@/features/theme/model'
 import { useSelectNode } from '@/features/roadmap/selectNode/model'
 import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
 import SearchSidebar from './SearchSidebar'
+import { useWorkspaceStore } from '../model'
 
 const Workspace = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
-  const [selectedNode, setSelectedNode] = useState<string | null>(null)
+  const { nodes, setNodes, edges, setEdges, selectedNode, setSelectedNode } =
+    useWorkspaceStore()
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
 
   // 테마에 따른 격자 무늬 색상 변경
@@ -42,11 +39,6 @@ const Workspace = () => {
 
     return () => observer.disconnect()
   }, [fitView])
-
-  const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  )
 
   // 레이아웃 자동 업데이트
   useEffect(() => {
@@ -88,9 +80,6 @@ const Workspace = () => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
           elementsSelectable={false}
           nodesDraggable={false}
           nodesConnectable={false}
