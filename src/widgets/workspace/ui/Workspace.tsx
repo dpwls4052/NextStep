@@ -4,7 +4,6 @@ import {
   Background,
   BackgroundVariant,
   ReactFlow,
-  addEdge,
   useReactFlow,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -14,6 +13,7 @@ import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
 import SearchSidebar from './SearchSidebar'
 import { useWorkspaceStore } from '../model'
+import { AddButton } from '@/features/roadmap/addNode/ui'
 
 const Workspace = () => {
   const { nodes, setNodes, edges, setEdges, selectedNode, setSelectedNode } =
@@ -44,6 +44,7 @@ const Workspace = () => {
   useEffect(() => {
     const layoutedNodes = calculateTreeLayout(nodes, edges)
     setNodes(layoutedNodes)
+    fitView()
   }, [edges, calculateTreeLayout])
 
   const { selectNode } = useSelectNode(selectedNode, setSelectedNode, setNodes)

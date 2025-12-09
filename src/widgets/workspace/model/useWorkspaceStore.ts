@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { Node, Edge } from '@xyflow/react'
-import { initialNodes, initialEdges } from './constants'
+import { initialNodes } from './constants'
 
 type WorkspaceStore = {
   nodes: Node[]
@@ -14,7 +14,7 @@ type WorkspaceStore = {
 
 const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   nodes: initialNodes,
-  edges: initialEdges,
+  edges: [],
   selectedNode: null,
 
   setNodes: (value) => {
