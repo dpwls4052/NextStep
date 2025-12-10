@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import Sidebar from '@/shared/ui/Sidebar'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
-import useSearchSimilar from '@/features/ai/model/searchSimilar'
+import useSearchSimilar from '@/features/ai/model/useSearchSimilar'
 
 interface SearchSidebarProps {
   open: boolean
