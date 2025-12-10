@@ -11,10 +11,9 @@ import { useThemeStore } from '@/features/theme/model'
 import { useSelectNode } from '@/features/roadmap/selectNode/model'
 import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
-import SearchSidebar from './SearchSidebar'
 import { useWorkspaceStore } from '../model'
 import { AddButton } from '@/features/roadmap/addNode/ui'
-import SearchSidebar from '../../../features/roadmap/searchTechStack/ui/SearchSidebar'
+import SearchSidebar from '@/features/roadmap/searchTechStack/ui/SearchSidebar'
 
 const Workspace = () => {
   const { nodes, setNodes, edges, setEdges, selectedNode, setSelectedNode } =
