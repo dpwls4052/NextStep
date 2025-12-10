@@ -58,7 +58,7 @@ const SelectedNodeToolbar = ({
         <div className="bg-secondary rounded-md p-4">
           <AddingPositionButton
             addingPosition={addingPosition}
-            position="preseding"
+            position="preceding"
             handleClick={handleTogglePosition}
           />
           <AddingPositionButton
