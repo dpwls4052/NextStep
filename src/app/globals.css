@@ -17,6 +17,10 @@
   --background: var(--color-secondary);
 }
 
+.point-gradient {
+  background: linear-gradient(45deg, #6e5aef, #8840ec);
+}
+
 @theme inline {
   --color-accent: var(--color-accent);
   --color-primary: var(--color-primary);
