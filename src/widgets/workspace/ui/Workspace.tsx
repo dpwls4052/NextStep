@@ -15,13 +15,14 @@ import { useThemeStore } from '@/features/theme/model'
 import { useSelectNode } from '@/features/roadmap/selectNode/model'
 import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
-import SearchSidebar from './SearchSidebar'
+import SearchSidebar from '../../../features/roadmap/searchTechStack/ui/SearchSidebar'
 
 const Workspace = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
+  const [searchKeyword, setSearchKeyword] = useState<string>('')
 
   // 테마에 따른 격자 무늬 색상 변경
   const { theme } = useThemeStore()
@@ -62,8 +63,9 @@ const Workspace = () => {
     [selectNode]
   )
 
-  // 검색한 이후 로직
-  const handleSearchTechStack = useCallback((searchKeyword: string) => {
+  const handleSearch = useCallback((keyword: string) => {
+    console.log('🎯 검색 실행:', keyword)
+    setSearchKeyword(keyword)
     setSidebarOpen(true)
   }, [])
 
@@ -100,9 +102,15 @@ const Workspace = () => {
           className={`h-full w-full`}
         />
         <Background variant={BackgroundVariant.Lines} color={gridColor} />
-        <SearchForm handleSearchTechStack={handleSearchTechStack} />
+
+        <SearchForm onSearch={handleSearch} />
       </div>
-      <SearchSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+
+      <SearchSidebar
+        open={sidebarOpen}
+        setOpen={setSidebarOpen}
+        searchKeyword={searchKeyword}
+      />
     </div>
   )
 }
