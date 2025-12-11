@@ -1,6 +1,4 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Sidebar from '@/shared/ui/Sidebar'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useSearchSimilar from '@/features/ai/model/useSearchSimilar'
@@ -8,16 +6,16 @@ import useTechRecommendation from '@/features/ai/model/useTechRecommendation'
 import { TechItem } from '@/features/ai/model/useTechRecommendation'
 
 interface SearchSidebarProps {
-  open: boolean
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen: boolean
+  toggleOpen: () => void
   searchKeyword: string
   mode: 'search' | 'recommendation' // 모드 추가: 검색 결과 vs AI 추천
   recommendationTechName?: string // AI 추천 시 기준이 되는 기술 이름
 }
 
 const SearchSidebar = ({
-  open,
-  setOpen,
+  isOpen,
+  toggleOpen,
   searchKeyword,
   mode,
   recommendationTechName,
@@ -45,10 +43,10 @@ const SearchSidebar = ({
 
   // AI 추천 모드일 때 자동으로 추천 API 호출
   useEffect(() => {
-    if (mode === 'recommendation' && recommendationTechName && open) {
+    if (mode === 'recommendation' && recommendationTechName && isOpen) {
       fetchRecommendations(recommendationTechName)
     }
-  }, [mode, recommendationTechName, open, fetchRecommendations])
+  }, [mode, recommendationTechName, isOpen, fetchRecommendations])
 
   // 🎯 New 버튼 클릭 핸들러 (추천 API 호출)
   const handleNewTech = (item: TechItem) => {
@@ -67,7 +65,7 @@ const SearchSidebar = ({
     : searchData?.message || '검색 결과가 없습니다'
 
   return (
-    <Sidebar open={open} setOpen={setOpen}>
+    <Sidebar isOpen={isOpen} toggleOpen={toggleOpen}>
       {/* title */}
       <div className="point-gradient flex gap-10 p-10 text-white">
         <div className="h-30 w-30 rounded-full border-2 border-white"></div>
