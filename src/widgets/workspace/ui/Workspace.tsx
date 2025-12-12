@@ -13,11 +13,16 @@ import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
 import { useWorkspaceStore } from '../model'
 import SearchSidebar from '@/widgets/workspace/ui/SearchSidebar'
+import { useOpen } from '@/shared/model'
 
 const Workspace = () => {
-  const { nodes, setNodes, edges, setEdges, selectedNode, setSelectedNode } =
+  const { nodes, setNodes, edges, selectedNode, setSelectedNode } =
     useWorkspaceStore()
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
+  const {
+    isOpen: isSidebarOpen,
+    open: openSidebar,
+    toggleOpen: toggleSidebarOpen,
+  } = useOpen()
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const [sidebarMode, setSidebarMode] = useState<'search' | 'recommendation'>(
     'search'
@@ -61,20 +66,26 @@ const Workspace = () => {
   )
 
   // 검색 핸들러 (검색 모드)
-  const handleSearch = useCallback((keyword: string) => {
-    console.log(' 검색 실행:', keyword)
-    setSearchKeyword(keyword)
-    setSidebarMode('search')
-    setSidebarOpen(true)
-  }, [])
+  const handleSearch = useCallback(
+    (keyword: string) => {
+      console.log(' 검색 실행:', keyword)
+      setSearchKeyword(keyword)
+      setSidebarMode('search')
+      openSidebar()
+    },
+    [openSidebar]
+  )
 
   // AI 추천 핸들러 (추천 모드)
-  const handleRecommendation = useCallback((techName: string) => {
-    console.log(' AI 추천 실행:', techName)
-    setRecommendationTechName(techName)
-    setSidebarMode('recommendation')
-    setSidebarOpen(true)
-  }, [])
+  const handleRecommendation = useCallback(
+    (techName: string) => {
+      console.log(' AI 추천 실행:', techName)
+      setRecommendationTechName(techName)
+      setSidebarMode('recommendation')
+      openSidebar()
+    },
+    [openSidebar]
+  )
 
   return (
     <div className="flex h-full w-full overflow-x-hidden">
@@ -112,10 +123,10 @@ const Workspace = () => {
           onRecommendation={handleRecommendation}
         />
       </div>
-
+      {/* <AddButton /> */}
       <SearchSidebar
-        open={sidebarOpen}
-        setOpen={setSidebarOpen}
+        isOpen={isSidebarOpen}
+        toggleOpen={toggleSidebarOpen}
         searchKeyword={searchKeyword}
         mode={sidebarMode}
         recommendationTechName={recommendationTechName}
