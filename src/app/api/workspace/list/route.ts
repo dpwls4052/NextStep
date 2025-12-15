@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/shared/libs/supabaseClient'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '../../auth/[...nextauth]/route'
 
 export const GET = async () => {
   try {
     // 유저 검증
-    const session = await getServerSession(authOption)
+    const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json(
         { error: 'Unauthorized', data: {} },

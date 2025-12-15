@@ -1,4 +1,4 @@
-import UsersTabs from '@/features/users/ui/UsersTabs'
+import UsersTabs from '@/widgets/user/ui/UsersTabs'
 
 const Users = () => {
   return (

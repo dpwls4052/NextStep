@@ -3,6 +3,7 @@ import './globals.css'
 import ThemeProvider from './providers/ThemeProvider'
 import AuthProvider from './providers/AuthProvider'
 import ReactQueryProviders from './providers/ReactQueryProviders'
+import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
   title: 'Next Step',
@@ -20,6 +21,7 @@ export default function RootLayout({
         <ReactQueryProviders>
           <AuthProvider>
             <ThemeProvider>{children}</ThemeProvider>
+            <Toaster />
           </AuthProvider>
         </ReactQueryProviders>
       </body>

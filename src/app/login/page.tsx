@@ -42,7 +42,7 @@ const LoginPage = () => {
           <div className="mt-50 flex flex-col gap-10">
             <button
               onClick={handleGithubLogin}
-              className="text-md flex cursor-pointer items-center justify-center gap-20 rounded-md bg-[#24292f] px-50 py-15 font-medium text-white transition hover:bg-[#1b1f23]"
+              className="text-md flex items-center justify-center gap-20 rounded-md bg-[#24292f] px-50 py-15 font-medium text-white transition hover:cursor-pointer hover:bg-[#1b1f23]"
             >
               <Image
                 src={githubIcon}
@@ -55,7 +55,7 @@ const LoginPage = () => {
 
             <button
               onClick={handleGoogleLogin}
-              className="text-md flex cursor-pointer items-center justify-center gap-20 rounded-md border border-gray-300 bg-white px-50 py-15 font-medium text-black transition hover:bg-gray-50"
+              className="text-md flex items-center justify-center gap-20 rounded-md border border-gray-300 bg-white px-50 py-15 font-medium text-black transition hover:cursor-pointer hover:bg-gray-50"
             >
               <Image src={googleIcon} alt="구글 로고" width={25} height={25} />
               <span>Google로 로그인</span>
