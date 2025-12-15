@@ -1,15 +1,8 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  Background,
-  BackgroundVariant,
-  ReactFlow,
-  useReactFlow,
-} from '@xyflow/react'
+import { useCallback, useEffect, useState } from 'react'
+import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useThemeStore } from '@/features/theme/model'
-import { useSelectNode } from '@/features/roadmap/selectNode/model'
-import { calculateTreeLayout } from '../lib'
 import { SearchForm } from '@/features/roadmap/searchTechStack/ui'
 import { useWorkspaceStore } from '../model'
 import SearchSidebar from '@/widgets/workspace/ui/SearchSidebar'
@@ -17,8 +10,7 @@ import { useOpen } from '@/shared/model'
 import WorkspaceList from './WorkspaceList'
 
 const Workspace = () => {
-  const { nodes, setNodes, edges, selectedNode, setSelectedNode } =
-    useWorkspaceStore()
+  const { nodes, edges, selectedNode } = useWorkspaceStore()
   const {
     isOpen: isSidebarOpen,
     open: openSidebar,
@@ -37,34 +29,26 @@ const Workspace = () => {
 
   // 사이드바가 열렸다가 닫히면서 ReactFlow가 차지하는 영역이 달라지기 때문에
   // 그때마다 fitView로 로드맵을 재정렬
-  const { fitView } = useReactFlow()
-  const wrapperRef = useRef<HTMLDivElement>(null)
+  // const { fitView } = useReactFlow()
+  // const wrapperRef = useRef<HTMLDivElement>(null)
+  // useEffect(() => {
+  //   if (!wrapperRef.current) return
+
+  //   const observer = new ResizeObserver(() => {
+  //     fitView()
+  //   })
+
+  //   observer.observe(wrapperRef.current)
+
+  //   return () => observer.disconnect()
+  // }, [fitView])
+
+  // 노드 선택됐을 때 사이드바 열기
   useEffect(() => {
-    if (!wrapperRef.current) return
-
-    const observer = new ResizeObserver(() => {
-      fitView()
-    })
-
-    observer.observe(wrapperRef.current)
-
-    return () => observer.disconnect()
-  }, [fitView])
-
-  // 레이아웃 자동 업데이트
-  useEffect(() => {
-    const layoutedNodes = calculateTreeLayout(nodes, edges)
-    setNodes(layoutedNodes)
-    fitView()
-  }, [edges, calculateTreeLayout])
-
-  const { selectNode } = useSelectNode(selectedNode, setSelectedNode, setNodes)
-  const onNodeClick = useCallback(
-    (event: any, node: any) => {
-      selectNode(node.id)
-    },
-    [selectNode]
-  )
+    if (selectedNode) {
+      openSidebar()
+    }
+  }, [selectedNode])
 
   // 검색 핸들러 (검색 모드)
   const handleSearch = useCallback(
@@ -92,8 +76,26 @@ const Workspace = () => {
     <div className="flex h-full w-full overflow-x-hidden">
       <style>{`
         .react-flow__handle {
-          opacity: 0 !important;
-          pointer-events: none !important;
+          width: 4px;
+          height: 4px;
+          min-width: 4px;
+          min-height: 4px;
+          background-color: #000;
+          border: none;
+        }
+        .dark .react-flow__handle {
+          background-color: #fff;
+          border: none;
+        }
+        .react-flow__handle-top {
+          top: -3px;
+          left: 50%;
+          transform: translateX(-50%)
+        }
+        .react-flow__handle-bottom {
+          bottom: -3px;
+          left: 50%;
+          transform: translateX(-50%)
         }
         .react-flow__viewport {
           transition: transform 0.2s ease-out;
@@ -110,11 +112,8 @@ const Workspace = () => {
           nodes={nodes}
           edges={edges}
           elementsSelectable={false}
-          nodesDraggable={false}
-          nodesConnectable={false}
           fitView
-          onNodeClick={onNodeClick}
-          ref={wrapperRef}
+          // ref={wrapperRef}
           className={`h-full w-full`}
         />
         <Background variant={BackgroundVariant.Lines} color={gridColor} />
@@ -125,7 +124,6 @@ const Workspace = () => {
         />
         <WorkspaceList />
       </div>
-      {/* <AddButton /> */}
       <SearchSidebar
         isOpen={isSidebarOpen}
         toggleOpen={toggleSidebarOpen}
