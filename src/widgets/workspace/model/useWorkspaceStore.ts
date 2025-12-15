@@ -1,48 +1,64 @@
 import { create } from 'zustand'
-import { Edge } from '@xyflow/react'
+import {
+  applyEdgeChanges,
+  applyNodeChanges,
+  Edge,
+  EdgeChange,
+  NodeChange,
+} from '@xyflow/react'
 import { initialNodes } from './constants'
 import { CustomNode } from './types'
-import { AddingPositionType } from '@/features/roadmap/selectNode/model/types'
 
 type WorkspaceStore = {
   // ReactFlow의 노드와 엣지
   nodes: CustomNode[]
   edges: Edge[]
-  setNodes: React.Dispatch<React.SetStateAction<CustomNode[]>>
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>
+  setNodes: (
+    nodes: CustomNode[] | ((nodes: CustomNode[]) => CustomNode[])
+  ) => void
+  setEdges: (edges: Edge[] | ((edges: Edge[]) => Edge[])) => void
+  onNodesChange: (changes: NodeChange<CustomNode>[]) => void
+  onEdgesChange: (changes: EdgeChange[]) => void
 
   // 선택된 노드
-  selectedNode: string | null
-  setSelectedNode: (id: string | null) => void
-
-  // 현재 노드에서 추가할 방향
-  // preceding -> 부모에 추가(선행 학습)
-  // following -> 자식에 추가(후행 학습)
-  addingPosition: AddingPositionType
-  setAddingPosition: (position: AddingPositionType) => void
+  selectedNode: CustomNode | null
+  setSelectedNode: (node: CustomNode | null) => void
 }
 
 const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   nodes: initialNodes,
   edges: [],
 
-  setNodes: (value) => {
-    const newNodes = typeof value === 'function' ? value(get().nodes) : value
-    set({ nodes: newNodes })
-  },
-  setEdges: (value) => {
-    const newEdges = typeof value === 'function' ? value(get().edges) : value
-    set({ edges: newEdges })
-  },
+  setNodes: (nodes) =>
+    set({ nodes: typeof nodes === 'function' ? nodes(get().nodes) : nodes }),
+  setEdges: (edges) =>
+    set({ edges: typeof edges === 'function' ? edges(get().edges) : edges }),
+
+  onNodesChange: (changes) =>
+    set((state) => ({
+      nodes: applyNodeChanges<CustomNode>(changes, state.nodes),
+    })),
+  onEdgesChange: (changes) =>
+    set((state) => ({
+      edges: applyEdgeChanges(changes, state.edges),
+    })),
 
   selectedNode: null,
-  setSelectedNode: (id) => set({ selectedNode: id }),
-
-  // 기본 추가 방향은 자식 방향
-  addingPosition: 'following',
-  setAddingPosition: (position) => {
-    set({ addingPosition: position })
-  },
+  setSelectedNode: (node) =>
+    set((state) => ({
+      selectedNode: node,
+      nodes: state.nodes.map((n) => ({
+        ...n,
+        selected: n.id === node?.id,
+        style: {
+          ...n.style,
+          border:
+            n.id === node?.id
+              ? '1px solid var(--color-accent)'
+              : '1px solid  var(--color-primary)',
+        },
+      })),
+    })),
 }))
 
 export default useWorkspaceStore
