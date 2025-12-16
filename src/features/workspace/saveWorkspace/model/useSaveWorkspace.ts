@@ -24,7 +24,7 @@ const useSaveWorkspace = () => {
 
     onSuccess: (data) => {
       useWorkspaceStore.setState({
-        workspaceId: data.id,
+        workspaceId: data.workspaceId,
         workspaceTitle: data.title,
         lastSaved: data.createdAt,
       })
