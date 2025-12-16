@@ -3,11 +3,13 @@
 import { useParams } from 'next/navigation'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import useOpen from '@/shared/model/useOpen'
+import { useRouter } from 'next/navigation'
 
 export default function CommunityDetailPage() {
   const params = useParams()
   const postId = params.id
   const { isOpen, toggleOpen } = useOpen()
+  const router = useRouter()
 
   return (
     <div className="flex w-full overflow-x-hidden">
@@ -29,7 +31,10 @@ export default function CommunityDetailPage() {
               <button className="bg-secondary text-foreground hover:bg-secondary/70 rounded-lg px-12 py-6 shadow-sm transition-colors">
                 ⤴
               </button>
-              <button className="bg-secondary text-foreground hover:bg-secondary/70 rounded-lg px-12 py-6 shadow-sm transition-colors">
+              <button
+                className="bg-secondary text-foreground hover:bg-secondary/70 rounded-lg px-12 py-6 shadow-sm transition-colors"
+                onClick={() => router.push('/community')}
+              >
                 ✕
               </button>
             </div>
