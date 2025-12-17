@@ -1,4 +1,4 @@
-// features/comment/ui/CommentForm.tsx
+//[경로] features/comment/ui/CommentForm.tsx
 'use client'
 
 interface Props {

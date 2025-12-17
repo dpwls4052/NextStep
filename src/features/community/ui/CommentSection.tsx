@@ -1,4 +1,4 @@
-// features/comment/ui/CommentSection.tsx
+// [경로] features/comment/ui/CommentSection.tsx
 'use client'
 
 import CommentForm from './CommentForm'

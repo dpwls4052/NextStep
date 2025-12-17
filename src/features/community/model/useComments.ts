@@ -1,4 +1,4 @@
-// features/comment/hooks/useComments.ts
+// [경로] features/comment/hooks/useComments.ts
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 

@@ -1,4 +1,4 @@
-// api/community/news/[id]/comments/route.ts
+// [경로] api/community/news/[id]/comments/route.ts
 import { supabase } from '@/shared/libs/supabaseClient'
 import { NextRequest, NextResponse } from 'next/server'
 
