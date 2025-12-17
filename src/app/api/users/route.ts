@@ -35,7 +35,7 @@ export async function GET() {
     // 사용자 정보 조회
     const { data: user, error: userErr } = await supabase
       .from('users')
-      .select('user_id, email, name, avatar, status')
+      .select('user_id, email, name, avatar, point, status')
       .eq('user_id', userId)
       .eq('status', true)
       .single()
@@ -61,6 +61,7 @@ export async function GET() {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
+      point: user.point ?? 0,
       experiences: (experiences ?? []).map((e) => ({
         experienceId: e.experience_id,
         field: e.field,
@@ -186,7 +187,7 @@ export async function PATCH(req: Request) {
     //  변경 후 최신 데이터 다시 내려주기(프론트 react-query 갱신에 편함)
     const { data: updatedUser, error: updatedErr } = await supabase
       .from('users')
-      .select('user_id, email, name, avatar, status')
+      .select('user_id, email, name, avatar, point, status')
       .eq('user_id', userId)
       .single()
 
@@ -211,6 +212,7 @@ export async function PATCH(req: Request) {
       email: updatedUser.email,
       name: updatedUser.name,
       avatar: updatedUser.avatar,
+      point: updatedUser.point ?? 0,
       experiences: (experiences ?? []).map((e) => ({
         experienceId: e.experience_id,
         field: e.field,
