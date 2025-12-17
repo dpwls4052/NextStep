@@ -2,11 +2,14 @@
 
 import { ReactFlow, Background } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import ProfileAvatar from '@/shared/ui/profile/ProfileAvatar'
 
 type CommunityCardProps = {
   title?: string
   nodes?: any[]
   edges?: any[]
+  userName?: string | null
+  userImage?: string | null
   onClick?: () => void
 }
 
@@ -14,6 +17,8 @@ export default function CommunityCard({
   title,
   nodes = [],
   edges = [],
+  userName,
+  userImage,
   onClick,
 }: CommunityCardProps) {
   return (
@@ -43,7 +48,7 @@ export default function CommunityCard({
       <div className="bg-primary flex items-center gap-12 px-4 py-14">
         {/* 왼쪽 프로필 자리 (+ 아이콘 자리) */}
         <div className="bg-accent flex h-30 w-30 items-center justify-center rounded-2xl text-xl font-bold text-white">
-          +
+          <ProfileAvatar name={userName} image={userImage} size={30} />
         </div>
 
         {/* 제목 */}

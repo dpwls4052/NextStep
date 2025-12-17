@@ -14,18 +14,20 @@ export const GET = async () => {
         nodes,
         edges,
         like_count,
-        created_at
+        created_at,
+        users (
+          user_id,
+          name,
+          avatar
+        )
       `
       )
       .eq('status', true)
       .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    if (error) throw error
 
-    return NextResponse.json({ data })
+    return NextResponse.json(data)
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json(
