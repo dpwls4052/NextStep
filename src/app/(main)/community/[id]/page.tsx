@@ -7,6 +7,8 @@ import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { useOpen } from '@/shared/model'
 import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { useThemeStore } from '@/features/theme/model'
+import { Plus } from 'lucide-react'
 
 type Post = {
   posts_id: string
@@ -31,6 +33,13 @@ export default function CommunityDetailPage() {
   const [post, setPost] = useState<Post | null>(null)
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [loading, setLoading] = useState(true)
+  const [isActionOpen, setIsActionOpen] = useState(false)
+
+  const { theme } = useThemeStore()
+  const isDark = theme === 'dark'
+
+  const bgColor = isDark ? '#1f2937' : '#e5e5e5'
+  const gridColor = isDark ? '#374151' : '#d1d5db'
 
   // ✅ 분야 기준으로 카드 목록 fetch
   useEffect(() => {
@@ -169,7 +178,7 @@ export default function CommunityDetailPage() {
             {/* ===== 워크스페이스 ===== */}
             <div
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
-              style={{ backgroundColor: '#1f2937' }}
+              style={{ backgroundColor: bgColor }}
             >
               <ReactFlow
                 nodes={post.nodes ?? []}
@@ -185,19 +194,32 @@ export default function CommunityDetailPage() {
                 proOptions={{ hideAttribution: true }}
                 className="h-full w-full"
               >
-                <Background variant={BackgroundVariant.Lines} color="#374151" />
+                <Background
+                  variant={BackgroundVariant.Lines}
+                  color={gridColor}
+                />
               </ReactFlow>
 
               {/* 우측 하단 버튼 */}
-              <div className="absolute right-24 bottom-16 flex flex-col gap-8">
-                <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white">
-                  이미지로 저장하기
-                </button>
-                <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white">
-                  내 워크스페이스에 불러오기
-                </button>
-                <button className="bg-accent flex h-48 w-48 items-center justify-center rounded-full text-xl text-white">
-                  +
+              <div className="absolute right-12 bottom-16 flex flex-col items-end gap-8">
+                {/* 액션 버튼들 (토글) */}
+                {isActionOpen && (
+                  <div className="flex flex-col gap-8">
+                    <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
+                      이미지로 저장하기
+                    </button>
+                    <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
+                      내 워크스페이스에 불러오기
+                    </button>
+                  </div>
+                )}
+
+                {/* + 버튼 */}
+                <button
+                  onClick={() => setIsActionOpen((prev) => !prev)}
+                  className="bg-accent flex h-50 w-50 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105"
+                >
+                  <Plus size={24} className="text-white" />
                 </button>
               </div>
             </div>
