@@ -9,6 +9,7 @@ import {
   Close,
   ExternalLink,
 } from '@/shared/ui/icon'
+import CommunitySidebar from './CommunitySidebar'
 
 interface Article {
   article_id: string
@@ -173,8 +174,7 @@ export default function CommunityNewsDetail({
         </div>
       </div>
 
-      {/* 사이드바 - CommunitySidebar 컴포넌트가 있다고 가정 */}
-      {/* <CommunitySidebar isOpen={isOpen} toggleOpen={toggleOpen} /> */}
+      <CommunitySidebar isOpen={isOpen} toggleOpen={toggleOpen} />
     </div>
   )
 }
