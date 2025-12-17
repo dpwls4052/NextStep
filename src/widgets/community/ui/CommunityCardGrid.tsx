@@ -79,7 +79,7 @@ export default function CommunityCardGrid({ listId }: CommunityCardGridProps) {
           userName={post.users?.name}
           userImage={post.users?.avatar}
           onClick={() => {
-            router.push(`/community/${post.posts_id}`)
+            router.push(`/community/${post.posts_id}?list=${listId}`)
           }}
         />
       ))}

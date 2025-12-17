@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Close } from '@/shared/ui/icon'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { useOpen } from '@/shared/model'
@@ -21,23 +21,37 @@ type Post = {
 
 export default function CommunityDetailPage() {
   const { id } = useParams<{ id: string }>()
+  const searchParams = useSearchParams()
+  const listId = searchParams.get('list') // ⭐ 분야
+  const [resolvedListId, setResolvedListId] = useState<string | null>(null)
   const router = useRouter()
   const { isOpen, toggleOpen } = useOpen()
 
+  const [posts, setPosts] = useState<Post[]>([])
   const [post, setPost] = useState<Post | null>(null)
+  const [currentIndex, setCurrentIndex] = useState(-1)
   const [loading, setLoading] = useState(true)
 
-  // ✅ 카드그리드랑 동일한 방식
+  // ✅ 분야 기준으로 카드 목록 fetch
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchPosts = async () => {
       try {
-        const res = await fetch('/api/community/posts')
+        setLoading(true)
+
+        const res = await fetch(
+          resolvedListId
+            ? `/api/community/posts?list=${resolvedListId}`
+            : `/api/community/posts`
+        )
+
         const json = await res.json()
-
         const list: Post[] = Array.isArray(json) ? json : []
-        const found = list.find((p) => p.posts_id === id)
 
-        setPost(found ?? null)
+        setPosts(list)
+
+        const idx = list.findIndex((p) => p.posts_id === id)
+        setCurrentIndex(idx)
+        setPost(list[idx] ?? null)
       } catch (e) {
         console.error(e)
         setPost(null)
@@ -46,8 +60,51 @@ export default function CommunityDetailPage() {
       }
     }
 
-    fetchPost()
-  }, [id])
+    fetchPosts()
+  }, [id, resolvedListId])
+
+  useEffect(() => {
+    if (!listId) {
+      setResolvedListId(null)
+      return
+    }
+
+    const resolveListId = async () => {
+      try {
+        const res = await fetch('/api/community/lists')
+        const lists = await res.json()
+
+        const matched = lists.find(
+          (l: any) =>
+            l.list_id === listId || // 이미 uuid인 경우
+            l.name.toLowerCase() === listId.toLowerCase() // name인 경우
+        )
+
+        setResolvedListId(matched?.list_id ?? null)
+      } catch (e) {
+        console.error(e)
+        setResolvedListId(null)
+      }
+    }
+
+    resolveListId()
+  }, [listId])
+
+  const goPrev = () => {
+    if (currentIndex > 0) {
+      router.push(
+        `/community/${posts[currentIndex - 1].posts_id}?list=${resolvedListId}`
+      )
+    }
+  }
+
+  const goNext = () => {
+    if (currentIndex < posts.length - 1) {
+      router.push(
+        `/community/${posts[currentIndex + 1].posts_id}?list=${resolvedListId}`
+      )
+    }
+  }
 
   if (loading) {
     return <p className="py-40 text-center">불러오는 중...</p>
@@ -64,13 +121,31 @@ export default function CommunityDetailPage() {
           {/* ===== 상단 헤더 ===== */}
           <div className="point-gradient flex items-center justify-between rounded-tl-xl rounded-tr-xl px-24 py-12">
             <div className="flex gap-8">
-              <button className="bg-secondary rounded-lg px-12 py-6">
+              <button
+                onClick={goPrev}
+                disabled={currentIndex <= 0}
+                className={`rounded-lg px-12 py-6 ${
+                  currentIndex <= 0
+                    ? 'bg-secondary/40 cursor-not-allowed'
+                    : 'bg-secondary'
+                }`}
+              >
                 <ChevronLeft />
               </button>
-              <button className="bg-secondary rounded-lg px-12 py-6">
+
+              <button
+                onClick={goNext}
+                disabled={currentIndex >= posts.length - 1}
+                className={`rounded-lg px-12 py-6 ${
+                  currentIndex >= posts.length - 1
+                    ? 'bg-secondary/40 cursor-not-allowed'
+                    : 'bg-secondary'
+                }`}
+              >
                 <ChevronRight />
               </button>
             </div>
+
             <button
               className="bg-secondary rounded-lg px-12 py-6"
               onClick={() => router.push('/community')}
@@ -91,11 +166,10 @@ export default function CommunityDetailPage() {
               </p>
             </div>
 
-            {/* ===== 워크스페이스 (카드랑 동일 데이터) ===== */}
-            {/* ===== 워크스페이스 (CommunityCard와 동일 렌더링) ===== */}
+            {/* ===== 워크스페이스 ===== */}
             <div
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
-              style={{ backgroundColor: '#1f2937' }} // 카드 dark 기준
+              style={{ backgroundColor: '#1f2937' }}
             >
               <ReactFlow
                 nodes={post.nodes ?? []}
