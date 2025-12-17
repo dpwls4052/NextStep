@@ -21,7 +21,7 @@ type Post = {
   created_at?: string
 }
 
-export default function CommunityDetailPage() {
+const CommunityPage = () => {
   const { id } = useParams<{ id: string }>()
   const searchParams = useSearchParams()
   const listId = searchParams.get('list') // ⭐ 분야
@@ -239,3 +239,4 @@ export default function CommunityDetailPage() {
     </div>
   )
 }
+export default CommunityPage

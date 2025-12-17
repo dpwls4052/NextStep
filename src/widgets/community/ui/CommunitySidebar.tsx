@@ -14,10 +14,7 @@ interface Community {
   name: string
 }
 
-export default function CommunitySidebar({
-  isOpen,
-  toggleOpen,
-}: CommunitySidebarProps) {
+const CommunitySidebar = ({ isOpen, toggleOpen }: CommunitySidebarProps) => {
   const [communityList, setCommunityList] = useState<Community[]>([])
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -26,7 +23,7 @@ export default function CommunitySidebar({
   useEffect(() => {
     const fetchCommunityList = async () => {
       const res = await fetch('/api/community/lists')
-      const list: Community[] = await res.json() // ⭐ 배열 그대로
+      const list: Community[] = await res.json()
       setCommunityList(list)
     }
 
@@ -75,7 +72,7 @@ export default function CommunitySidebar({
                 />
               </div>
 
-              {/* 하단 (UI 유지용 – 실데이터 붙이기 전) */}
+              {/* 하단 */}
               <p
                 className={`text-12 ${
                   isActive ? 'text-white/80' : 'text-foreground-light'
@@ -90,3 +87,4 @@ export default function CommunitySidebar({
     </Sidebar>
   )
 }
+export default CommunitySidebar

@@ -20,7 +20,7 @@ interface CommunityCardGridProps {
   listId?: string | null
 }
 
-export default function CommunityCardGrid({ listId }: CommunityCardGridProps) {
+const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,7 +38,6 @@ export default function CommunityCardGrid({ listId }: CommunityCardGridProps) {
 
         const json = await res.json()
 
-        // ✅ 무조건 배열로 보정
         const list: Post[] = Array.isArray(json) ? json : []
         setPosts(list)
       } catch (e) {
@@ -50,16 +49,16 @@ export default function CommunityCardGrid({ listId }: CommunityCardGridProps) {
     }
 
     fetchPosts()
-  }, [listId]) // ⭐ listId 바뀔 때마다 다시 fetch
+  }, [listId])
 
-  // 🔹 로딩 중
+  // 로딩 중
   if (loading) {
     return (
       <p className="text-foreground-light py-40 text-center">불러오는 중...</p>
     )
   }
 
-  // 🔹 해당 list에 글이 없는 경우
+  // 해당 list에 글이 없는 경우
   if (posts.length === 0) {
     return (
       <p className="text-foreground-light py-40 text-center">
@@ -86,3 +85,4 @@ export default function CommunityCardGrid({ listId }: CommunityCardGridProps) {
     </div>
   )
 }
+export default CommunityCardGrid

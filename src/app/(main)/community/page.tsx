@@ -15,7 +15,7 @@ export default function CommunityPage() {
   const searchParams = useSearchParams()
 
   const tab = searchParams.get('tab') || 'post'
-  const listId = searchParams.get('list') // ⭐⭐⭐ 이게 핵심
+  const listId = searchParams.get('list')
 
   return (
     <div className="relative flex w-full overflow-x-hidden">
@@ -28,7 +28,7 @@ export default function CommunityPage() {
             {tab === 'news' ? (
               <CommunityNewsList />
             ) : (
-              <CommunityCardGrid listId={listId} /> // ⭐⭐⭐ 전달
+              <CommunityCardGrid listId={listId} />
             )}
           </div>
         </div>
@@ -45,8 +45,6 @@ export default function CommunityPage() {
       >
         <CommunitySidebar isOpen={isOpen} toggleOpen={toggleOpen} />
       </aside>
-
-      {/* 🔹 사이드바 자리 확보 */}
       <div
         className="shrink-0 transition-[width] duration-300"
         style={{
