@@ -14,3 +14,10 @@ export type WorkspaceData = {
   edges: Edge[]
   updatedAt: string
 }
+
+// 워크스페이스 리스트 아이템 타입
+export type WorkspaceListItem = {
+  workspaceId: string
+  title: string
+  updatedAt: string
+}

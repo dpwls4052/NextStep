@@ -1,26 +1,10 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/shared/libs/supabaseClient'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { requireUser } from '@/shared/libs/requireUser'
 
 export const GET = async () => {
   try {
-    // 유저 검증
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized', data: {} },
-        { status: 401 }
-      )
-    }
-
-    const userId = session.user?.id
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Invalid session', data: {} },
-        { status: 400 }
-      )
-    }
+    const { userId } = await requireUser()
 
     const { data, error } = await supabase
       .from('workspaces')
@@ -36,7 +20,13 @@ export const GET = async () => {
 
     return NextResponse.json({
       error: null,
-      data,
+      content: [
+        ...data.map((workspace) => ({
+          workspaceId: workspace.workspace_id,
+          title: workspace.title,
+          updatedAt: workspace.updated_at,
+        })),
+      ],
     })
   } catch (error) {
     return NextResponse.json(
