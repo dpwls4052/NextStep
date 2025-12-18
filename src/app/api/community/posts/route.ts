@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/shared/libs/supabaseClient'
 import { requireUser } from '@/shared/libs/requireUser'
+import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
 
 // 커뮤니티 카드 목록 조회
 export const GET = async (req: NextRequest) => {
@@ -13,16 +14,12 @@ export const GET = async (req: NextRequest) => {
       .select(
         `
         posts_id,
+        user_id,
         title,
         nodes,
         edges,
         like_count,
-        created_at,
-        users (
-          user_id,
-          name,
-          avatar
-        )
+        created_at
       `
       )
       .eq('status', true)
@@ -33,10 +30,35 @@ export const GET = async (req: NextRequest) => {
       query = query.eq('list_id', listId)
     }
 
-    const { data, error } = await query
+    const { data: posts, error } = await query
     if (error) throw error
 
-    return NextResponse.json(data)
+    const safePosts = posts ?? []
+    if (safePosts.length === 0) return NextResponse.json([])
+
+    // 2) post에 있는 user_id들만 뽑아서 users 조회
+    const userIds = Array.from(
+      new Set(safePosts.map((p) => p.user_id).filter(Boolean))
+    )
+
+    const { data: users, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('user_id, name, avatar')
+      .in('user_id', userIds)
+
+    if (userError) throw userError
+
+    const userMap = new Map(
+      (users ?? []).map((u) => [
+        u.user_id,
+        { user_id: u.user_id, name: u.name, avatar: u.avatar },
+      ])
+    )
+    const result = safePosts.map((p) => ({
+      ...p,
+      users: userMap.get(p.user_id) ?? null,
+    }))
+    return NextResponse.json(result)
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json(
