@@ -15,7 +15,7 @@ const PROFILETAB_LIST = [
 type TabKey = (typeof PROFILETAB_LIST)[number]['key']
 
 const Profile = () => {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
@@ -33,26 +33,21 @@ const Profile = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // 1️⃣ 로컬 미리보기
     const previewUrl = URL.createObjectURL(file)
     setPreviewImage(previewUrl)
 
-    // 2️⃣ 서버 업로드 (예시는 API 호출)
     const fd = new FormData()
     fd.append('avatar', file)
-    const res = await fetch('/api/users', {
-      method: 'PATCH',
-      body: fd,
-    })
-    if (!res.ok) {
-      // 실패 시 미리보기 되돌리고 싶으면 여기서 처리
-      return
-    }
-    const data = await res.json()
-    // ✅ 서버가 내려준 avatar(=DB에 저장된 URL)로 교체
-    if (data?.avatar) setPreviewImage(data.avatar)
 
-    // 같은 파일 다시 선택해도 change 이벤트 뜨게
+    const res = await fetch('/api/users', { method: 'PATCH', body: fd })
+    const text = await res.text()
+    console.log('PATCH /api/users status:', res.status)
+    console.log('PATCH /api/users body:', text)
+
+    if (!res.ok) return
+
+    const data = JSON.parse(text)
+    if (data?.avatar) setPreviewImage(data.avatar)
     e.target.value = ''
   }
   return (

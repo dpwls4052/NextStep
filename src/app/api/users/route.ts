@@ -133,30 +133,45 @@ export async function PATCH(req: Request) {
         )
       }
 
-      const ext = avatarFile.name.split('.').pop()?.toLowerCase() || 'png'
-      const filePath = `avatars/${userId}/${crypto.randomUUID()}.${ext}`
+      // ✅ "덮어쓰기"를 위해 경로를 고정
+      // 확장자 통일(예: png)해버리면 관리가 쉬움
+      const filePath = `${userId}/avatar.png`
 
       const { error: uploadErr } = await supabase.storage
         .from(AVATAR_BUCKET)
         .upload(filePath, avatarFile, {
           contentType: avatarFile.type,
-          upsert: false,
+          upsert: true, // ✅ 같은 경로면 덮어쓰기
         })
 
-      if (uploadErr) throw uploadErr
+      if (uploadErr) {
+        console.error('Storage upload error:', uploadErr)
+        return NextResponse.json(
+          { message: 'Upload failed', detail: uploadErr.message },
+          { status: 400 }
+        )
+      }
 
       const { data: urlData } = supabase.storage
         .from(AVATAR_BUCKET)
         .getPublicUrl(filePath)
 
-      const avatarUrl = urlData.publicUrl
+      // ✅ 같은 URL이면 브라우저/CDN 캐시 때문에 안 바뀐 것처럼 보일 수 있음
+      // 그래서 쿼리로 버전 붙여서 DB에 저장
+      const avatarUrl = `${urlData.publicUrl}?v=${Date.now()}`
 
       const { error: avatarUpdateErr } = await supabase
         .from('users')
-        .update({ avatar: avatarUrl })
+        .update({ avatar: avatarUrl }) // ✅ DB에 최신 URL 저장
         .eq('user_id', userId)
 
-      if (avatarUpdateErr) throw avatarUpdateErr
+      if (avatarUpdateErr) {
+        console.error('DB update error:', avatarUpdateErr)
+        return NextResponse.json(
+          { message: 'DB update failed', detail: avatarUpdateErr.message },
+          { status: 400 }
+        )
+      }
     }
 
     //  1) 이름 업데이트(옵션) — name만 보내도 동작
@@ -291,6 +306,10 @@ export async function PATCH(req: Request) {
     if (e?.message === 'INVALID_YEAR') {
       return NextResponse.json({ message: 'Invalid year' }, { status: 400 })
     }
-    return NextResponse.json({ message: 'Server error' }, { status: 500 })
+    console.error('PATCH /api/users error:', e)
+    return NextResponse.json(
+      { message: 'Server error', detail: e?.message ?? String(e) },
+      { status: 500 }
+    )
   }
 }

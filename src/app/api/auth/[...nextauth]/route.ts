@@ -64,14 +64,14 @@ export const authOptions: NextAuthOptions = {
      *    - 여기서 "이 토큰을 유지할 것인지 / 버릴 것인지" 결정
      *    - return null 하면 NextAuth가 세션을 끊음(로그아웃 처리)
      */
-    async jwt({ token }) {
+    async jwt({ token, trigger, session }) {
       // email 정보가 없으면 그냥 토큰 그대로 돌려보냄
       if (!token?.email) return token
 
       // Supabase에서 해당 이메일 유저가 아직 존재하는지 확인
       const { data, error } = await supabase
         .from('users')
-        .select('user_id')
+        .select('user_id, avatar')
         .eq('email', token.email)
         .single()
 
@@ -87,6 +87,15 @@ export const authOptions: NextAuthOptions = {
 
       // 유저 존재하면 userId를 토큰에 실어둠
       token.userId = data.user_id
+      // DB에 있는 avatar를 토큰에 싣기 (헤더가 session.user.image로 쓰도록)
+      ;(token as any).picture = data.avatar ?? (token as any).picture
+
+      // 클라에서 update() 호출 시 즉시 반영
+      if (trigger === 'update' && session?.user) {
+        if ((session.user as any).image) {
+          ;(token as any).picture = (session.user as any).image
+        }
+      }
       return token
     },
 
@@ -96,8 +105,13 @@ export const authOptions: NextAuthOptions = {
      *    - 여기서는 "항상 객체를 리턴"만 하고, 세션 끊는 건 jwt에서 처리
      */
     async session({ session, token }) {
-      if (session.user && token?.userId) {
-        session.user.userId = token.userId as string
+      if (session.user) {
+        if (token?.userId)
+          session.user.userId = token.userId as string
+
+          // 헤더에서 바로 쓰는 값
+        ;(session.user as any).image =
+          (token as any).picture ?? session.user.image
       }
       return session
     },
