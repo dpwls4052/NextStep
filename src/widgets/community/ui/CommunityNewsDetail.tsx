@@ -90,7 +90,7 @@ const CommunityNewsDetail = ({ articleId, isOpen, toggleOpen }: Props) => {
   return (
     <div className="flex h-[calc(100vh-80px)] overflow-hidden">
       {/* 메인 콘텐츠 영역 */}
-      <div className="flex-1 overflow-y-auto px-40 py-40">
+      <div className="scrollbar-hide flex-1 overflow-y-auto px-40 py-40">
         <div className="bg-primary mx-auto w-full max-w-1200 rounded-xl">
           {/* 헤더 */}
           <div className="point-gradient flex items-center justify-between rounded-tl-xl rounded-tr-xl px-24 py-12">
