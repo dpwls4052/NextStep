@@ -4,7 +4,7 @@ import CommunityNewsDetail from '@/widgets/community/ui/CommunityNewsDetail'
 import { useOpen } from '@/shared/model'
 import { useParams } from 'next/navigation'
 
-export default function CommunityNewsDetailPage() {
+const CommunityNewsDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const { isOpen, toggleOpen } = useOpen()
 
@@ -18,3 +18,5 @@ export default function CommunityNewsDetailPage() {
     />
   )
 }
+
+export default CommunityNewsDetailPage
