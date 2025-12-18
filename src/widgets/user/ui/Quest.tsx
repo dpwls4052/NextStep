@@ -61,7 +61,7 @@ const initialQuests: QuestUI[] = [
   {
     id: 4,
     title: '새로운 워크스페이스 만들기',
-    description: '새로운 워크스페이스를 생성해 작업 환경을 만들어보세요.',
+    description: '새로운 작업 환경을 만들어보세요.',
     targetCount: 1,
     rewardPoint: 200,
     variant: 'locked',
@@ -168,7 +168,7 @@ const Quest = () => {
               <div className="text-3xl font-bold text-white">
                 내 포인트 : {point === null ? '...' : point.toLocaleString()}P
               </div>
-              <Button className="rounded-sm px-12 py-4 font-semibold hover:opacity-80 hover:transition">
+              <Button className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition">
                 포인트 지급 내역
               </Button>
             </div>
