@@ -1,18 +1,20 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Sidebar from '@/shared/ui/Sidebar'
-import { useCommunityList } from '@/features/community/model/useCommunityList'
 
 interface CommunitySidebarProps {
   isOpen: boolean
   toggleOpen: () => void
 }
 
-export default function CommunitySidebar({
-  isOpen,
-  toggleOpen,
-}: CommunitySidebarProps) {
+interface Community {
+  list_id: string
+  name: string
+}
+
+const CommunitySidebar = ({ isOpen, toggleOpen }: CommunitySidebarProps) => {
   const [communityList, setCommunityList] = useState<Community[]>([])
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -21,8 +23,8 @@ export default function CommunitySidebar({
   useEffect(() => {
     const fetchCommunityList = async () => {
       const res = await fetch('/api/community/lists')
-      const data = await res.json()
-      setCommunityList(data)
+      const list: Community[] = await res.json()
+      setCommunityList(list)
     }
 
     fetchCommunityList()
@@ -38,8 +40,9 @@ export default function CommunitySidebar({
 
       {/* ===== 커뮤니티 리스트 ===== */}
       <div className="flex w-full flex-col gap-16 p-16">
-        {communityList!.map((item) => {
+        {communityList.map((item) => {
           const isActive = currentList === item.list_id
+
           return (
             <button
               key={item.list_id}
@@ -51,22 +54,29 @@ export default function CommunitySidebar({
                 isActive
                   ? 'bg-accent text-white'
                   : 'bg-secondary hover:shadow-md'
-              }`}
+              } `}
             >
+              {/* 상단 */}
               <div className="flex items-center justify-between">
                 <p
-                  className={`text-16 font-semibold ${isActive ? 'text-white' : 'text-foreground'}`}
+                  className={`text-16 font-semibold ${
+                    isActive ? 'text-white' : 'text-foreground'
+                  }`}
                 >
                   {item.name}
                 </p>
                 <div
-                  className={`h-30 w-30 rounded-full ${isActive ? 'bg-white/30' : 'bg-accent'}`}
+                  className={`h-30 w-30 rounded-full ${
+                    isActive ? 'bg-white/30' : 'bg-accent'
+                  }`}
                 />
               </div>
 
-              {/* 하단 (UI 유지용 – 실데이터 붙이기 전) */}
+              {/* 하단 */}
               <p
-                className={`text-12 ${isActive ? 'text-white/80' : 'text-foreground-light'}`}
+                className={`text-12 ${
+                  isActive ? 'text-white/80' : 'text-foreground-light'
+                }`}
               >
                 Community
               </p>
