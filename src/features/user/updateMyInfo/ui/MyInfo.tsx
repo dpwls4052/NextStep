@@ -3,18 +3,21 @@ import { Button } from '@/shared/ui'
 import { Check, Close, Edit } from '@/shared/ui/icon'
 import { toast } from 'sonner'
 import ExperienceRow from '@/features/user/updateMyInfo/ui/ExperienceRow'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useGetUserInfo } from '@/features/user/updateMyInfo/model/useGetUserInfo'
 import { useUpdateUserInfo } from '@/features/user/updateMyInfo/model/useUpdateUserInfo'
 import { useCreateExperience } from '@/features/user/updateMyInfo/model/useCreateExperience'
 
 const MyInfo = () => {
+  // 사용자 정보 조회
   const { data: userInfo } = useGetUserInfo()
+  // 사용자 정보 수정
   const { mutateAsync: updateUserInfo, isPending: isUpdatingName } =
     useUpdateUserInfo()
 
   const [isEditingName, setIsEditingName] = useState(false)
   const [draftName, setDraftName] = useState('')
+  // 커리어/경험 추가
   const {
     draft,
     submit,
