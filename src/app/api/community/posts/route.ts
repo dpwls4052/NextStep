@@ -51,12 +51,13 @@ export const POST = async (req: NextRequest) => {
   try {
     const { userId } = await requireUser()
     const body = await req.json()
-    const { workspaceId, title, content, nodes, edges } = body
+    const { workspaceId, title, content, nodes, edges, listId } = body
 
     if (!title || title.trim() === '') {
       return NextResponse.json({ error: 'title is required' }, { status: 400 })
     }
 
+    // 워크스페이스를 workspaces에 저장
     let newWorkspaceData = {
       workspace_id: '',
       title: '',
@@ -93,6 +94,7 @@ export const POST = async (req: NextRequest) => {
       newWorkspaceData = data
     }
 
+    // 워크스페이스를 posts에 저장
     const { data: postData, error: postError } = await supabase
       .from('posts')
       .insert({
@@ -101,7 +103,7 @@ export const POST = async (req: NextRequest) => {
         content,
         nodes: nodes || [],
         edges: edges || [],
-        list_id: 'a61e69b3-d55d-49da-b614-066dfcdc36be',
+        list_id: listId,
       })
       .select()
       .single()
