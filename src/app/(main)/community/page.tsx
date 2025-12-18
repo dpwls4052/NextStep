@@ -10,7 +10,10 @@ import { useSearchParams } from 'next/navigation'
 export default function CommunityPage() {
   const { isOpen, toggleOpen } = useOpen()
   const searchParams = useSearchParams()
+
   const tab = searchParams.get('tab') || 'post'
+  const listId = searchParams.get('list')
+
   return (
     <div className="flex w-full overflow-x-hidden">
       <div className="w-full">
