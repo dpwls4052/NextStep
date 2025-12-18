@@ -13,7 +13,7 @@ type Post = {
     user_id: string
     name?: string | null
     avatar?: string | null
-  }
+  } | null
 }
 
 interface CommunityCardGridProps {
@@ -75,8 +75,8 @@ const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
           title={post.title}
           nodes={post.nodes}
           edges={post.edges}
-          userName={post.users?.name}
-          userImage={post.users?.avatar}
+          userName={post.users?.name ?? null}
+          userImage={post.users?.avatar ?? null}
           onClick={() => {
             router.push(`/community/${post.posts_id}?list=${listId}`)
           }}

@@ -8,12 +8,9 @@ interface Props {
   size?: number // 반지름 크기 설정
 }
 
-const ProfileAvatar = ({
-  name = '사용자',
-  image = null,
-  size = 100,
-}: Props) => {
-  const initial = name.charAt(0)
+const ProfileAvatar = ({ name, image, size = 100 }: Props) => {
+  const safeName = name?.trim()
+  const initial = safeName ? safeName.charAt(0).toUpperCase() : '?'
 
   return (
     <div>
