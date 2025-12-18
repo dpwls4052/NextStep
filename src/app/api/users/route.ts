@@ -6,13 +6,7 @@ const MAX_EXPERIENCES_PER_USER = 3
 
 const AVATAR_BUCKET = 'avatars'
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-function extractStoragePathFromPublicUrl(url: string) {
-  // 예: .../storage/v1/object/public/avatars/<path...>
-  const marker = `/storage/v1/object/public/${AVATAR_BUCKET}/`
-  const idx = url.indexOf(marker)
-  if (idx === -1) return null
-  return url.slice(idx + marker.length) // bucket 뒤의 path만 추출
-}
+
 type PatchBody = {
   name?: string
 

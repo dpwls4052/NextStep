@@ -82,15 +82,13 @@ const Profile = () => {
       <section className="flex-1 shadow-lg">
         <div className="flex h-full flex-col rounded-md bg-white">
           <div className="h-30 rounded-t-md bg-gradient-to-r from-[#6e5aef] to-[#8840ec]" />
-
-          {/* 안쪽 컨텐츠  */}
+          {/* 안쪽 컨텐츠 */}
           <div className="p-60 px-80">
-            {/* 내 정보 수정 */}
+            {/* 내 정보 수정 */}{' '}
             <section className="flex flex-col justify-between lg:flex-row">
               <h2 className="text-xl font-semibold">내 정보 수정</h2>
               <MyInfo />
             </section>
-
             {/* 프로필 꾸미기 */}
             <section className="mt-100 flex justify-between gap-50">
               <h3 className="mb-4 text-lg font-semibold">프로필 꾸미기</h3>
