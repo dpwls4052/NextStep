@@ -10,6 +10,9 @@ import '@xyflow/react/dist/style.css'
 import { useThemeStore } from '@/features/theme/model'
 import { Plus } from 'lucide-react'
 import CommunityCommentSection from '@/widgets/community/comments/CommunityCommentSection'
+import { useRef } from 'react'
+import { exportWorkspaceAsImage } from '@/features/community/model/exportWorkspaceAsImage'
+import type { ReactFlowInstance } from '@xyflow/react'
 
 type Post = {
   posts_id: string
@@ -41,6 +44,9 @@ const CommunityPage = () => {
 
   const bgColor = isDark ? '#1f2937' : '#e5e5e5'
   const gridColor = isDark ? '#374151' : '#d1d5db'
+
+  const workspaceRef = useRef<HTMLDivElement>(null)
+  const [rf, setRf] = useState<ReactFlowInstance | null>(null)
 
   // 분야 기준으로 카드 목록 fetch
   useEffect(() => {
@@ -178,16 +184,21 @@ const CommunityPage = () => {
 
             {/* ===== 워크스페이스 ===== */}
             <div
+              ref={workspaceRef}
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
               style={{ backgroundColor: bgColor }}
             >
               <ReactFlow
+                onInit={setRf}
                 nodes={post.nodes ?? []}
                 edges={post.edges ?? []}
                 fitView
                 fitViewOptions={{ padding: 0.4 }}
                 nodesDraggable={false}
                 nodesConnectable={false}
+                elementsSelectable={false}
+                selectNodesOnDrag={false}
+                selectionOnDrag={false}
                 zoomOnScroll={false}
                 zoomOnDoubleClick={false}
                 panOnScroll={false}
@@ -197,18 +208,33 @@ const CommunityPage = () => {
               >
                 <Background
                   variant={BackgroundVariant.Lines}
-                  color={gridColor}
+                  gap={24}
+                  size={1}
+                  color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'}
                 />
               </ReactFlow>
 
               {/* 우측 하단 버튼 */}
-              <div className="absolute right-12 bottom-16 flex flex-col items-end gap-8">
+              <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
                 {/* 액션 버튼들 (토글) */}
                 {isActionOpen && (
                   <div className="flex flex-col gap-8">
-                    <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
+                    <button
+                      onClick={() => {
+                        if (workspaceRef.current && rf) {
+                          exportWorkspaceAsImage({
+                            container: workspaceRef.current,
+                            rf,
+                            fileName: `${post.title}.png`,
+                            backgroundColor: bgColor, // 너가 쓰는 배경색 그대로
+                          })
+                        }
+                      }}
+                      className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
+                    >
                       이미지로 저장하기
                     </button>
+
                     <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
                       내 워크스페이스에 불러오기
                     </button>
