@@ -52,9 +52,9 @@ const PointHistoryTable = () => {
         <span className="text-12 text-gray-500">최신순</span>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="custom-scroll max-h-[500px] overflow-x-auto overflow-y-auto">
         <table className="w-full min-w-[680px] text-left">
-          <thead className="text-12 bg-gray-50 text-gray-600">
+          <thead className="text-12 sticky top-0 z-10 bg-gray-50 text-gray-600">
             <tr className="text-center">
               <th className="px-20 py-10 font-medium">번호</th>
               <th className="px-20 py-10 font-medium">내용</th>
