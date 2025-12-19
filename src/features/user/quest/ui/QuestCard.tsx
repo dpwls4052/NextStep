@@ -42,7 +42,7 @@ const QuestCard = ({
       <div>
         <div className="flex items-center gap-10">
           {leftIcon && <div>{leftIcon}</div>}
-          <h3 className="text-20 font-bold">{title}</h3>
+          <h3 className="text-20 font-bold text-black">{title}</h3>
         </div>
 
         {description && (

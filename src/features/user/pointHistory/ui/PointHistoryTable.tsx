@@ -49,12 +49,12 @@ const PointHistoryTable = () => {
     <>
       <div className="flex items-center justify-between border-b px-20 py-16">
         <h2 className="text-2xl font-semibold">포인트 내역</h2>
-        <span className="text-12 text-gray-500">최신순</span>
+        <span className="text-12 text-gray-500 dark:text-white">최신순</span>
       </div>
 
       <div className="custom-scroll max-h-[500px] overflow-x-auto overflow-y-auto">
         <table className="w-full min-w-[680px] text-left">
-          <thead className="text-12 sticky top-0 z-10 bg-gray-50 text-gray-600">
+          <thead className="text-12 sticky top-0 z-10 bg-gray-50 text-gray-600 dark:bg-[#414962] dark:text-white">
             <tr className="text-center">
               <th className="px-20 py-10 font-medium">번호</th>
               <th className="px-20 py-10 font-medium">내용</th>
@@ -69,7 +69,9 @@ const PointHistoryTable = () => {
               const isEarn = r.amount > 0
               return (
                 <tr key={r.id} className="border-t text-center">
-                  <td className="px-20 py-16 text-gray-500">{r.no}</td>
+                  <td className="px-20 py-16 text-gray-500 dark:text-white">
+                    {r.no}
+                  </td>
                   <td className="px-20 py-16 text-left font-medium">
                     {r.content}
                   </td>
@@ -86,11 +88,11 @@ const PointHistoryTable = () => {
                     </span>
                   </td>
 
-                  <td className="px-20 py-16 text-gray-700">
+                  <td className="px-20 py-16 text-gray-700 dark:text-white">
                     {r.running_total.toLocaleString()}P
                   </td>
 
-                  <td className="px-20 py-16 text-gray-500">
+                  <td className="px-20 py-16 text-gray-500 dark:text-white">
                     {formatDate(r.date)}
                   </td>
                 </tr>
