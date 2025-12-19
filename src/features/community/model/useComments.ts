@@ -25,7 +25,9 @@ interface Comment {
   replies?: Comment[]
 }
 
-export const useComments = (articleId: string) => {
+type CommentType = 'news' | 'post'
+
+export const useComments = (postId: string, type: CommentType = 'news') => {
   const [comments, setComments] = useState<Comment[]>([])
   const [currentUserId, setCurrentUserId] = useState<string>('')
   const [newComment, setNewComment] = useState('')
@@ -34,20 +36,35 @@ export const useComments = (articleId: string) => {
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
 
+  // API 경로 결정
+  const getApiPath = () => {
+    return type === 'news'
+      ? `/api/community/news/${postId}/comments`
+      : `/api/community/posts/${postId}/comments`
+  }
+
+  // 사용법 :: features/comment/ui/CommentSection.tsx 참고
+
+  // // 뉴스 댓글
+  // const { ... } = useComments(articleId, 'news')
+
+  // // 일반 게시글 댓글
+  // const { ... } = useComments(postId, 'post')
+
+  // // 기본값이 'news'라서 생략 가능
+  // const { ... } = useComments(articleId)
+
   useEffect(() => {
     fetchComments()
     fetchCurrentUser()
-  }, [articleId])
+  }, [postId])
 
   const fetchCurrentUser = async () => {
     try {
       const res = await fetch('/api/users/me')
       if (res.ok) {
         const userData = await res.json()
-        console.log('User data:', userData)
         setCurrentUserId(userData.user_id)
-      } else {
-        console.error('Failed to fetch user, status:', res.status)
       }
     } catch (err) {
       console.error('Failed to fetch user:', err)
@@ -56,14 +73,13 @@ export const useComments = (articleId: string) => {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`/api/community/news/${articleId}/comments`)
+      const res = await fetch(getApiPath())
       if (!res.ok) {
         setComments([])
         return
       }
 
       const data = await res.json()
-      console.log('Fetched comments:', data) // 디버깅
 
       // 댓글을 부모-자식 구조로 변환
       const parentComments = data.filter((c: Comment) => !c.parent_comment_id)
@@ -76,7 +92,6 @@ export const useComments = (articleId: string) => {
         ),
       }))
 
-      console.log('Processed comments:', commentsWithReplies) // 디버깅
       setComments(commentsWithReplies)
     } catch (err) {
       console.error('Failed to fetch comments:', err)
@@ -87,20 +102,18 @@ export const useComments = (articleId: string) => {
   const handleAddComment = async () => {
     if (!newComment.trim()) return
 
-    console.log('Current user ID:', currentUserId)
-
     if (!currentUserId) {
       toast.error('로그인이 필요합니다.')
       return
     }
 
     try {
-      const res = await fetch(`/api/community/news/${articleId}/comments`, {
+      const res = await fetch(getApiPath(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: newComment,
-          post_id: articleId,
+          post_id: postId,
           user_id: currentUserId,
         }),
       })
@@ -125,12 +138,12 @@ export const useComments = (articleId: string) => {
     }
 
     try {
-      const res = await fetch(`/api/community/news/${articleId}/comments`, {
+      const res = await fetch(getApiPath(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: replyContent,
-          post_id: articleId,
+          post_id: postId,
           parent_comment_id: parentId,
           user_id: currentUserId,
         }),
@@ -152,17 +165,14 @@ export const useComments = (articleId: string) => {
     if (!editContent.trim()) return
 
     try {
-      const res = await fetch(
-        `/api/community/news/${articleId}/comments/${commentId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content: editContent,
-            user_id: currentUserId,
-          }),
-        }
-      )
+      const res = await fetch(`${getApiPath()}/${commentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: editContent,
+          user_id: currentUserId,
+        }),
+      })
 
       if (!res.ok) throw new Error('Failed to edit comment')
 
@@ -180,14 +190,11 @@ export const useComments = (articleId: string) => {
     if (!confirm('정말 삭제하시겠습니까?')) return
 
     try {
-      const res = await fetch(
-        `/api/community/news/${articleId}/comments/${commentId}`,
-        {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: currentUserId }),
-        }
-      )
+      const res = await fetch(`${getApiPath()}/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUserId }),
+      })
 
       if (!res.ok) throw new Error('Failed to delete comment')
 
