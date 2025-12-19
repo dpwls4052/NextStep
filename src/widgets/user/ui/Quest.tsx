@@ -3,6 +3,7 @@
 import QuestCard, { QuestCardVariant } from '@/features/user/quest/ui/QuestCard'
 import { Button } from '@/shared/ui'
 import { Add, Comment, Like, Send } from '@/shared/ui/icon'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 type QuestStatus = 'locked' | 'ready' | 'completed'
@@ -80,6 +81,7 @@ function toCurrentCount(status: QuestStatus) {
 }
 
 const Quest = () => {
+  const router = useRouter()
   const [quests, setQuests] = useState<QuestUI[]>(initialQuests)
   const [point, setPoint] = useState<number | null>(null)
   const [claimingId, setClaimingId] = useState<1 | 2 | 3 | 4 | null>(null)
@@ -168,7 +170,10 @@ const Quest = () => {
               <div className="text-3xl font-bold text-white">
                 내 포인트 : {point === null ? '...' : point.toLocaleString()}P
               </div>
-              <Button className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition">
+              <Button
+                onClick={() => router.push('/users?tab=quest&sub=point')}
+                className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition"
+              >
                 포인트 내역 확인하기
               </Button>
             </div>
