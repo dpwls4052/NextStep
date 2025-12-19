@@ -7,6 +7,7 @@ import {
 import { MoreVertical } from '@/shared/ui/icon'
 import { useOpen } from '@/shared/model'
 import { UpdateWorkspaceTitleModal } from '@/features/workspace/updateWorkspaceTitle/ui'
+import { DeleteWorkspaceModal } from '@/features/workspace/deleteWorkspace/ui'
 
 const ListDropdownMenu = ({
   title,
@@ -17,6 +18,7 @@ const ListDropdownMenu = ({
 }) => {
   const { isOpen, setIsOpen } = useOpen()
   const { isOpen: isOpenTitleEdit, setIsOpen: setIsOpenTitleEdit } = useOpen()
+  const { isOpen: isOpenDelete, setIsOpen: setIsOpenDelete } = useOpen()
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -33,7 +35,10 @@ const ListDropdownMenu = ({
           >
             이름 변경
           </DropdownMenuItem>
-          <DropdownMenuItem className="focus:bg-primary h-35 px-5">
+          <DropdownMenuItem
+            className="focus:bg-primary h-35 px-5"
+            onSelect={() => setIsOpenDelete(true)}
+          >
             삭제
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -43,6 +48,12 @@ const ListDropdownMenu = ({
         isOpen={isOpenTitleEdit}
         setIsOpen={setIsOpenTitleEdit}
         title={title}
+        workspaceId={workspaceId}
+      />
+      {/* 워크스페이스 삭제 알림 모달 */}
+      <DeleteWorkspaceModal
+        isOpen={isOpenDelete}
+        setIsOpen={setIsOpenDelete}
         workspaceId={workspaceId}
       />
     </div>
