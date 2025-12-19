@@ -6,9 +6,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { MoreVertical } from '@/shared/ui/icon'
 import { useOpen } from '@/shared/model'
+import { UpdateWorkspaceTitleModal } from '@/features/workspace/updateWorkspaceTitle/ui'
 
-const ListDropdownMenu = () => {
+const ListDropdownMenu = ({
+  title,
+  workspaceId,
+}: {
+  title: string
+  workspaceId: string
+}) => {
   const { isOpen, setIsOpen } = useOpen()
+  const { isOpen: isOpenTitleEdit, setIsOpen: setIsOpenTitleEdit } = useOpen()
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -19,7 +27,10 @@ const ListDropdownMenu = () => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem className="focus:bg-primary h-35 px-5">
+          <DropdownMenuItem
+            className="focus:bg-primary h-35 px-5"
+            onSelect={() => setIsOpenTitleEdit(true)}
+          >
             이름 변경
           </DropdownMenuItem>
           <DropdownMenuItem className="focus:bg-primary h-35 px-5">
@@ -27,6 +38,13 @@ const ListDropdownMenu = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      {/* 워크스페이스 이름 변경 모달 */}
+      <UpdateWorkspaceTitleModal
+        isOpen={isOpenTitleEdit}
+        setIsOpen={setIsOpenTitleEdit}
+        title={title}
+        workspaceId={workspaceId}
+      />
     </div>
   )
 }
