@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server'
 import { requireUser } from '@/shared/libs/requireUser'
 import { getTodayDate } from '@/features/user/quest/api/getTodayDate'
 import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
+import { QUEST_META } from '@/features/user/quest/model/questMeta'
 
 /**
  * 퀘스트 번호
- * - 1, 2, 3 만 허용 (타입으로 실수 방지)
+ * - 1, 2, 3, 4 만 허용 (타입으로 실수 방지)
  */
 type QuestNo = 1 | 2 | 3 | 4
 
@@ -186,7 +187,12 @@ export async function PATCH(req: Request) {
     /**
      * 2️. ready → completed (+ 포인트 지급)
      */
-    const rewardPoint = Number.isFinite(body.reward) ? Number(body.reward) : 200
+
+    const meta = QUEST_META[body.questNo]
+    const rewardPoint = Number.isFinite(body.reward)
+      ? Number(body.reward)
+      : meta.reward
+    const content = meta.title
 
     const { data: updatedQuest, error: questError } = await supabaseAdmin
       .from('quests')
@@ -232,6 +238,22 @@ export async function PATCH(req: Request) {
     if (updateUserErr || !updatedUser) {
       return NextResponse.json(
         { message: 'Point update failed' },
+        { status: 500 }
+      )
+    }
+
+    const { error: historyErr } = await supabaseAdmin
+      .from('point_history')
+      .insert({
+        user_id: userId,
+        content,
+        amount: rewardPoint,
+        running_total: updatedUser.point ?? nextPoint,
+      })
+
+    if (historyErr) {
+      return NextResponse.json(
+        { message: 'Point history insert failed' },
         { status: 500 }
       )
     }

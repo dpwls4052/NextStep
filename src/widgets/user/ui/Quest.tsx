@@ -1,7 +1,9 @@
 'use client'
 
 import QuestCard, { QuestCardVariant } from '@/features/user/quest/ui/QuestCard'
+import { Button } from '@/shared/ui'
 import { Add, Comment, Like, Send } from '@/shared/ui/icon'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 type QuestStatus = 'locked' | 'ready' | 'completed'
@@ -35,7 +37,7 @@ const initialQuests: QuestUI[] = [
     title: '나의 로드맵 공유하기',
     description: '로드맵을 커뮤니티에 공유해보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Send />,
   },
@@ -44,7 +46,7 @@ const initialQuests: QuestUI[] = [
     title: '인상적인 로드맵 하트 누르기',
     description: '다른 사람의 로드맵에 하트를 눌러보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Like />,
   },
@@ -53,16 +55,16 @@ const initialQuests: QuestUI[] = [
     title: '커뮤니티에 댓글 작성하기',
     description: '커뮤니티 게시글에 댓글을 작성해보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Comment />,
   },
   {
     id: 4,
     title: '새로운 워크스페이스 만들기',
-    description: '새로운 워크스페이스를 생성해 작업 환경을 만들어보세요.',
+    description: '새로운 작업 환경을 만들어보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Add />,
   },
@@ -79,6 +81,7 @@ function toCurrentCount(status: QuestStatus) {
 }
 
 const Quest = () => {
+  const router = useRouter()
   const [quests, setQuests] = useState<QuestUI[]>(initialQuests)
   const [point, setPoint] = useState<number | null>(null)
   const [claimingId, setClaimingId] = useState<1 | 2 | 3 | 4 | null>(null)
@@ -153,9 +156,9 @@ const Quest = () => {
   }
 
   return (
-    <main className="flex gap-80 px-50 py-30">
+    <main className="flex gap-80 px-50 pt-20">
       <section className="flex-1 shadow-lg">
-        <div className="flex h-full flex-col rounded-md bg-white">
+        <div className="flex h-full flex-col rounded-md bg-white dark:bg-[#313b51]">
           <div className="flex items-center justify-between rounded-t-md bg-gradient-to-r from-[#6e5aef] to-[#8840ec] px-50 py-40">
             <div className="flex flex-col gap-15 text-white">
               <h2 className="text-3xl font-bold">🔥 오늘의 퀘스트!</h2>
@@ -163,9 +166,16 @@ const Quest = () => {
                 데일리 퀘스트를 달성하고 포인트를 얻어봐요.
               </span>
             </div>
-
-            <div className="text-3xl font-bold text-white">
-              내 포인트 : {point === null ? '...' : point.toLocaleString()}P
+            <div className="flex flex-col items-end gap-12">
+              <div className="text-3xl font-bold text-white">
+                내 포인트 : {point === null ? '...' : point.toLocaleString()}P
+              </div>
+              <Button
+                onClick={() => router.push('/users?tab=quest&sub=point')}
+                className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition"
+              >
+                포인트 내역 확인하기
+              </Button>
             </div>
           </div>
 

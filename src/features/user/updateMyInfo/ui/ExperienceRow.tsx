@@ -23,10 +23,10 @@ export default function ExperienceRow({ exp }: Props) {
         value={row.isEditing ? row.draftField : exp.field}
         onChange={(e) => row.setDraftField(e.target.value)}
         disabled={!row.isEditing || row.isPending}
-        className={`h-40 w-250 rounded-md border border-[#E4DDFD] p-5 ${
+        className={`dark:bg-primary h-40 w-250 rounded-md border border-[#E4DDFD] p-5 dark:text-white ${
           !row.isEditing
-            ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500'
-            : 'bg-white'
+            ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500 opacity-80'
+            : ''
         }`}
       />
 
@@ -37,10 +37,10 @@ export default function ExperienceRow({ exp }: Props) {
             row.setDraftYear(e.target.value.replace(/[^\d]/g, ''))
           }
           disabled={!row.isEditing || row.isPending}
-          className={`h-40 w-50 rounded-md border border-[#E4DDFD] p-5 text-left ${
+          className={`dark:bg-primary h-40 w-50 rounded-md border border-[#E4DDFD] p-5 text-left dark:text-white ${
             !row.isEditing
-              ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500'
-              : 'bg-white'
+              ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500 opacity-80'
+              : ''
           }`}
         />
         <span className="text-md">년차</span>
