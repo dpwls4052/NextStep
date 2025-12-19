@@ -10,7 +10,7 @@ type QuestCardProps = {
   // UI 표시용
   currentCount: number // 0 or 1
   targetCount: number // 1
-  rewardPoint: number // 200
+  rewardPoint: number // 50
 
   // 상태
   variant?: QuestCardVariant

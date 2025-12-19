@@ -36,7 +36,7 @@ const initialQuests: QuestUI[] = [
     title: '나의 로드맵 공유하기',
     description: '로드맵을 커뮤니티에 공유해보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Send />,
   },
@@ -45,7 +45,7 @@ const initialQuests: QuestUI[] = [
     title: '인상적인 로드맵 하트 누르기',
     description: '다른 사람의 로드맵에 하트를 눌러보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Like />,
   },
@@ -54,7 +54,7 @@ const initialQuests: QuestUI[] = [
     title: '커뮤니티에 댓글 작성하기',
     description: '커뮤니티 게시글에 댓글을 작성해보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Comment />,
   },
@@ -63,7 +63,7 @@ const initialQuests: QuestUI[] = [
     title: '새로운 워크스페이스 만들기',
     description: '새로운 작업 환경을 만들어보세요.',
     targetCount: 1,
-    rewardPoint: 200,
+    rewardPoint: 50,
     variant: 'locked',
     leftIcon: <Add />,
   },
@@ -169,7 +169,7 @@ const Quest = () => {
                 내 포인트 : {point === null ? '...' : point.toLocaleString()}P
               </div>
               <Button className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition">
-                포인트 지급 내역
+                포인트 내역 확인하기
               </Button>
             </div>
           </div>
