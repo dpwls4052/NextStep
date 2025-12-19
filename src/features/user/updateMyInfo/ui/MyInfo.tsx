@@ -41,7 +41,7 @@ const MyInfo = () => {
             value={isEditingName ? draftName : (userInfo?.name ?? '')}
             onChange={(e) => setDraftName(e.target.value)}
             disabled={!isEditingName} // 기본은 클릭/포커스 안 되는 disabled
-            className={`h-40 w-250 flex-1 rounded-md border border-[#E4DDFD] p-5 text-sm ${!isEditingName ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500' : 'bg-white'} `}
+            className={`dark:bg-primary h-40 w-250 flex-1 rounded-md border border-[#E4DDFD] p-5 text-sm dark:text-white ${!isEditingName ? 'cursor-not-allowed bg-[#F9F8FD] text-gray-500 opacity-80' : 'bg-white'} `}
           />
           {!isEditingName ? (
             <Button
@@ -107,7 +107,7 @@ const MyInfo = () => {
                 onChange={(e) => draft.setField(e.target.value)}
                 placeholder="ex) 프론트엔드, 백엔드"
                 disabled={isCreatingExperience}
-                className="h-40 w-250 flex-1 rounded-md border border-[#E4DDFD] bg-white p-5"
+                className="dark:bg-primary h-40 w-250 flex-1 rounded-md border border-[#E4DDFD] bg-white p-5 dark:text-white"
               />
 
               <div className="flex items-center gap-1">
@@ -118,7 +118,7 @@ const MyInfo = () => {
                   }
                   placeholder="0"
                   disabled={isCreatingExperience}
-                  className="h-40 w-50 rounded-md border border-[#E4DDFD] bg-white p-5 text-left"
+                  className="dark:bg-primary h-40 w-50 rounded-md border border-[#E4DDFD] bg-white p-5 text-left dark:text-white"
                 />
                 <span className="text-md">년차</span>
               </div>
@@ -158,7 +158,7 @@ const MyInfo = () => {
             setIsAddingBelow(true)
           }}
           disabled={isCreatingExperience || isAddingBelow}
-          className="w-full rounded-md border border-[#E4DDFD] bg-white px-10 py-5 hover:opacity-60 hover:transition"
+          className="dark:bg-primary w-full rounded-md border border-[#E4DDFD] px-10 py-5 hover:opacity-60 hover:transition dark:text-white"
         >
           추가 +
         </Button>

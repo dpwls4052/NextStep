@@ -10,7 +10,7 @@ type QuestCardProps = {
   // UI 표시용
   currentCount: number // 0 or 1
   targetCount: number // 1
-  rewardPoint: number // 200
+  rewardPoint: number // 50
 
   // 상태
   variant?: QuestCardVariant
@@ -42,13 +42,11 @@ const QuestCard = ({
       <div>
         <div className="flex items-center gap-10">
           {leftIcon && <div>{leftIcon}</div>}
-          <h3 className="font-bold">{title}</h3>
+          <h3 className="text-20 font-bold text-black">{title}</h3>
         </div>
 
         {description && (
-          <p className="mt-5 text-sm font-medium text-gray-600">
-            {description}
-          </p>
+          <p className="text-16 mt-5 font-light text-gray-600">{description}</p>
         )}
       </div>
 

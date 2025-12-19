@@ -5,7 +5,6 @@ import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
 const MAX_EXPERIENCES_PER_USER = 3
 
 const AVATAR_BUCKET = 'avatars'
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 type PatchBody = {
   name?: string
@@ -76,12 +75,12 @@ export async function GET() {
   }
 }
 
-// PATCH: 사용자 프로필(이름) 및 커리어 리스트 수정
+// PATCH: 사용자 프로필(이름) 및 커리어 리스트 수정 + 아바타 업로드
 export async function PATCH(req: Request) {
   try {
     const { userId } = await requireUser()
 
-    //  비활성/없는 유저 방지 (PATCH는 특히 더 안전하게)
+    // 존재하는 유저인지 확인(토큰은 있지만 DB에서 삭제되었을 수도 있음)
     const { data: user, error: userErr } = await supabaseAdmin
       .from('users')
       .select('user_id, status')
@@ -102,7 +101,8 @@ export async function PATCH(req: Request) {
     if (contentType.includes('multipart/form-data')) {
       const formData = await req.formData()
 
-      // 폼데이터로 name/experiences를 같이 받을 경우 (선택)
+      // 폼데이터로 name/experiences를 같이 받을 경우
+      // File은 JSON으로 못보냄
       const name = formData.get('name')
       const experiences = formData.get('experiences') // JSON string
 
@@ -118,18 +118,12 @@ export async function PATCH(req: Request) {
       body = (await req.json()) as PatchBody
     }
 
-    // 0) avatar 업로드(옵션) — 파일이 있을 때만 처리
+    // PDF, exe, txt업로드 방지
     if (avatarFile) {
       if (!avatarFile.type.startsWith('image/')) {
         return NextResponse.json(
           { message: 'Only image files allowed' },
           { status: 400 }
-        )
-      }
-      if (avatarFile.size > MAX_FILE_SIZE) {
-        return NextResponse.json(
-          { message: 'File too large (max 5MB)' },
-          { status: 413 }
         )
       }
 
