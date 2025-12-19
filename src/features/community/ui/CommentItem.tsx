@@ -1,5 +1,6 @@
-// features/comment/ui/CommentItem.tsx
 'use client'
+
+import ProfileAvatar from '@/shared/ui/profile/ProfileAvatar'
 
 interface User {
   user_id: string
@@ -20,7 +21,7 @@ interface Comment {
   created_at: string
   updated_at: string
   status: boolean
-  user: User
+  user?: User | null
   replies?: Comment[]
 }
 
@@ -61,34 +62,31 @@ const CommentItem = ({
   onEditContentChange,
   onReplyContentChange,
 }: Props) => {
-  const avatarSize = isReply ? 'h-32 w-32' : 'h-40 w-40'
+  // user가 없으면 기본값 사용
+  const userName = comment.user?.name || '익명'
+  const userAvatar = comment.user?.avatar || null
+  const userExperience = comment.user?.experience
+
+  console.log(comment.user, '커멘트')
 
   return (
     <div className="bg-secondary flex gap-12 rounded-lg p-16">
       {/* 프로필 이미지 */}
       <div className="flex-shrink-0">
-        {comment.user.avatar ? (
-          <img
-            src={comment.user.avatar}
-            alt={comment.user.name}
-            className={`${avatarSize} rounded-full object-cover`}
-          />
-        ) : (
-          <div
-            className={`bg-primary text-foreground-light flex ${avatarSize} items-center justify-center rounded-full ${isReply ? 'text-xs' : ''}`}
-          >
-            {comment.user.name[0]}
-          </div>
-        )}
+        <ProfileAvatar
+          name={userName}
+          image={userAvatar}
+          size={isReply ? 32 : 40}
+        />
       </div>
 
       {/* 댓글 내용 */}
       <div className="flex flex-1 flex-col gap-8">
         <div className="flex items-center gap-8">
-          <span className="text-sm font-medium">{comment.user.name}</span>
-          {comment.user.experience && (
+          <span className="text-sm font-medium">{userName}</span>
+          {userExperience && (
             <span className="text-foreground-light text-xs">
-              {comment.user.experience.field} {comment.user.experience.year}년차
+              {userExperience.field} {userExperience.year}년차
             </span>
           )}
           <span className="text-foreground-light text-xs">
