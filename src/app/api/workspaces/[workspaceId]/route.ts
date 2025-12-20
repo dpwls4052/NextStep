@@ -15,9 +15,18 @@ export async function GET(
       .select('*')
       .eq('workspace_id', workspaceId)
       .eq('user_id', userId)
-      .single()
+      .eq('status', true)
+      .maybeSingle()
 
     if (error) {
+      return NextResponse.json(
+        { error: 'Workspace not found' },
+        { status: 404 }
+      )
+    }
+
+    // 데이터가 없는 경우
+    if (!data) {
       return NextResponse.json(
         { error: 'Workspace not found' },
         { status: 404 }
@@ -31,7 +40,7 @@ export async function GET(
         title: data.title,
         nodes: data.nodes,
         edges: data.edges,
-        updatedAd: data.updated_at,
+        updatedAt: data.updated_at,
       },
     })
   } catch (error) {
