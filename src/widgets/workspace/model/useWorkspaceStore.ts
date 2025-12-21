@@ -7,22 +7,22 @@ import {
   NodeChange,
 } from '@xyflow/react'
 import { initialNodes } from './constants'
-import { CustomNode, WorkspaceData } from './types'
+import { CustomNodeType, WorkspaceData } from './types'
 
 type WorkspaceStore = {
   // ReactFlow의 노드와 엣지
-  nodes: CustomNode[]
+  nodes: CustomNodeType[]
   edges: Edge[]
   setNodes: (
-    nodes: CustomNode[] | ((nodes: CustomNode[]) => CustomNode[])
+    nodes: CustomNodeType[] | ((nodes: CustomNodeType[]) => CustomNodeType[])
   ) => void
   setEdges: (edges: Edge[] | ((edges: Edge[]) => Edge[])) => void
-  onNodesChange: (changes: NodeChange<CustomNode>[]) => void
+  onNodesChange: (changes: NodeChange<CustomNodeType>[]) => void
   onEdgesChange: (changes: EdgeChange[]) => void
 
   // 선택된 노드
-  selectedNode: CustomNode | null
-  setSelectedNode: (node: CustomNode | null) => void
+  selectedNode: CustomNodeType | null
+  setSelectedNode: (node: CustomNodeType | null) => void
 
   // 현재 워크스페이스 정보
   workspaceId: string | null
@@ -48,7 +48,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
 
   onNodesChange: (changes) =>
     set((state) => ({
-      nodes: applyNodeChanges<CustomNode>(changes, state.nodes),
+      nodes: applyNodeChanges<CustomNodeType>(changes, state.nodes),
     })),
   onEdgesChange: (changes) =>
     set((state) => ({

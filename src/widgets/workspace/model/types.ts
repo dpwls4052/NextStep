@@ -1,16 +1,17 @@
 import { Edge, Node } from '@xyflow/react'
 
-type CustomNodeData = {
+export type CustomNodeDataType = {
   label: string
+  iconUrl?: string
 }
 
-export type CustomNode = Node<CustomNodeData>
+export type CustomNodeType = Node<CustomNodeDataType>
 
 // 워크스페이스 정보 타입
 export type WorkspaceData = {
   workspaceId: string
   title: string
-  nodes: CustomNode[]
+  nodes: CustomNodeType[]
   edges: Edge[]
   updatedAt: string
 }

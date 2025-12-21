@@ -6,13 +6,13 @@ import useTechRecommendation from '@/features/ai/model/useTechRecommendation'
 import { TechItem } from '@/features/ai/model/useTechRecommendation'
 import { Pencil } from '@/shared/ui/icon'
 import { Button } from '@/shared/ui'
-import { CustomNode } from '../model/types'
+import { CustomNodeType } from '../model/types'
 import { useWorkspaceStore } from '../model'
 
 interface SearchSidebarProps {
   isOpen: boolean
   toggleOpen: () => void
-  selectedNode: CustomNode | null
+  selectedNode: CustomNodeType | null
   // mode: 'search' | 'recommendation' // 모드 추가: 검색 결과 vs AI 추천
   // recommendationTechName?: string // AI 추천 시 기준이 되는 기술 이름
 }
@@ -120,6 +120,7 @@ const SearchSidebar = ({
             data: {
               ...node.data,
               label: techItem.name,
+              iconUrl: techItem.icon_url,
             },
           }
         }
