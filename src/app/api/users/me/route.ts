@@ -12,16 +12,31 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // 이메일로 user 찾기
+    // 이메일로 user 찾기 + experience 조인
     const { data, error } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .select(
+        `
+        *,
+        experience:experiences!user_id (
+          field,
+          year
+        )
+      `
+      )
       .eq('email', session.user.email)
+      .eq('status', true)
       .single()
 
     if (error) throw error
 
-    return NextResponse.json(data)
+    // experience 배열을 단일 객체로 변환 (첫 번째 것만 사용)
+    const userData = {
+      ...data,
+      experience: data.experience?.[0] || null,
+    }
+
+    return NextResponse.json(userData)
   } catch (error) {
     console.error('Failed to fetch user:', error)
     return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 })
