@@ -3,7 +3,7 @@ import { CustomNodeType } from '../model/types'
 import { useState } from 'react'
 import { formatKoreaTime } from '@/shared/libs/formatKoreaTime'
 import Trash from '@/shared/ui/icon/Trash'
-import { MemoForm } from '@/features/roadmap/memoNode/ui'
+import { MemoForm } from '@/features/roadmap/postNodeMemo/ui'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
