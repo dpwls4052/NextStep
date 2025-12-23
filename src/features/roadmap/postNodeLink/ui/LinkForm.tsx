@@ -26,7 +26,7 @@ const LinkForm = ({
   }
 
   const { postNodeLink, isSaving } = usePostNodeLink()
-  const handleAddLink = () => {
+  const handleAdd = () => {
     if (!techId) return
     postNodeLink(
       { techId, linkTitle, linkUrl },
@@ -76,7 +76,7 @@ const LinkForm = ({
         <Button
           variant="accent"
           className="px-20 py-8"
-          onClick={handleAddLink}
+          onClick={handleAdd}
           disabled={isSaving}
         >
           {isSaving ? '추가 중...' : '추가'}

@@ -1,5 +1,5 @@
 import { requireUser } from '@/shared/libs/requireUser'
-import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
+import { supabase } from '@/shared/libs/supabaseClient'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const POST = async (req: NextRequest) => {
@@ -14,7 +14,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     // Supabase에 저장
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('node_memos')
       .upsert(
         {

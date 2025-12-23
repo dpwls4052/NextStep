@@ -9,7 +9,7 @@ import { TroubleshootingForm } from '@/features/roadmap/postNodeTroubleshooting/
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
-  handleTechEdit: () => void
+  handleEditTech: () => void
 }
 
 const NodeInformationMenu = [
@@ -20,7 +20,7 @@ const NodeInformationMenu = [
 
 const NodeInformation = ({
   selectedNode,
-  handleTechEdit,
+  handleEditTech,
 }: NodeInformationProps) => {
   const [mode, setMode] = useState<string>(NodeInformationMenu[0].key)
 
@@ -30,11 +30,6 @@ const NodeInformation = ({
   const [isTroubleshootingFormOpen, setIsTroubleshootingFormOpen] =
     useState<boolean>(false)
   const [troubleshootings, setTroubleshootings] = useState<any[]>([])
-
-  // 모드 변경
-  const handleModeChange = (mode: string) => {
-    setMode(mode)
-  }
 
   // 자료 삭제
   const handleDeleteLink = (id: number) => {
@@ -60,7 +55,7 @@ const NodeInformation = ({
           />
           <p className="text-20">{selectedNode.data.label}</p>
         </div>
-        <Button className="shrink-0 px-10 py-2" onClick={handleTechEdit}>
+        <Button className="shrink-0 px-10 py-2" onClick={handleEditTech}>
           변경
         </Button>
       </div>
@@ -72,7 +67,7 @@ const NodeInformation = ({
             <li
               key={item.key}
               className={`text-14 box-content flex h-50 w-full items-center justify-center text-center ${item.key === mode && 'border-b-accent text-accent border-b-2 font-bold'} hover:cursor-pointer`}
-              onClick={() => handleModeChange(item.key)}
+              onClick={() => setMode(item.key)}
             >
               {item.label}
             </li>

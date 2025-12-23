@@ -296,7 +296,7 @@ const SearchSidebar = ({
               // 노드 정보
               <NodeInformation
                 selectedNode={selectedNode}
-                handleTechEdit={() => setIsEditingMode(true)}
+                handleEditTech={() => setIsEditingMode(true)}
               />
             )}
           </>
