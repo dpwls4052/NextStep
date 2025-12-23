@@ -5,6 +5,7 @@ import { formatKoreaTime } from '@/shared/libs/formatKoreaTime'
 import Trash from '@/shared/ui/icon/Trash'
 import { MemoForm } from '@/features/roadmap/postNodeMemo/ui'
 import { LinkForm } from '@/features/roadmap/postNodeLink/ui'
+import { TroubleshootingForm } from '@/features/roadmap/postNodeTroubleshooting/ui'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
@@ -14,30 +15,7 @@ interface NodeInformationProps {
 const NodeInformationMenu = [
   { key: 'memo', label: '메모' },
   { key: 'link', label: '자료' },
-  { key: 'troubleShooting', label: '트러블슈팅' },
-]
-const TROUBLE_SHOOTING = [
-  {
-    troubleShootingId: 4,
-    troubleShooting: '트러블슈팅4',
-    createdAt: '2025-12-20 05:34:43.326738+00',
-  },
-  {
-    troubleShootingId: 3,
-    troubleShooting: '트러블슈팅3',
-    createdAt: '2025-12-20 05:34:43.326738+00',
-  },
-  {
-    troubleShootingId: 2,
-    troubleShooting: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    createdAt: '2025-12-20 05:34:43.326738+00',
-  },
-  {
-    troubleShootingId: 1,
-    troubleShooting:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut cursus nibh eget lorem posuere finibus. Vestibulum sapien erat, cursus in rutrum a, varius non leo.',
-    createdAt: '2025-12-20 05:34:43.326738+00',
-  },
+  { key: 'troubleshooting', label: '트러블슈팅' },
 ]
 
 const NodeInformation = ({
@@ -49,17 +27,12 @@ const NodeInformation = ({
   const [isLinkFormOpen, setIsLinkFormOpen] = useState<boolean>(false)
   const [links, setLinks] = useState<any[]>([])
 
-  const [isTroubleShootingAddOpen, setIsTroubleShootingAddOpen] =
+  const [isTroubleshootingFormOpen, setIsTroubleshootingFormOpen] =
     useState<boolean>(false)
-  const [troubleShooting, setTroubleShooting] =
-    useState<any[]>(TROUBLE_SHOOTING)
-  const [troubleShootingInput, setTroubleShootingInput] = useState<string>('')
+  const [troubleshootings, setTroubleshootings] = useState<any[]>([])
 
   // 모드 변경
   const handleModeChange = (mode: string) => {
-    // 모든 폼 초기화
-    // initDataAdd()
-    initTroubleShootingAdd()
     setMode(mode)
   }
 
@@ -68,27 +41,10 @@ const NodeInformation = ({
     setLinks(links.filter((link) => link.linkId !== id))
   }
 
-  // 트러블슈팅 추가 초기화
-  const initTroubleShootingAdd = () => {
-    setTroubleShootingInput('')
-    setIsTroubleShootingAddOpen(false)
-  }
-  // 트러블슈팅 추가
-  const handleAddTroubleShooting = () => {
-    setTroubleShooting([
-      {
-        troubleShootingId: troubleShooting.length + 1,
-        troubleShooting: troubleShootingInput,
-        createdAt: new Date().toISOString(),
-      },
-      ...troubleShooting,
-    ])
-    initTroubleShootingAdd()
-  }
   // 트러블슈팅 삭제
-  const handleDeleteTroubleShooting = (id: number) => {
-    setTroubleShooting(
-      troubleShooting.filter((item) => item.troubleShootingId !== id)
+  const handleDeleteTroubleshooting = (id: number) => {
+    setTroubleshootings(
+      troubleshootings.filter((item) => item.troubleshootingId !== id)
     )
   }
 
@@ -183,34 +139,34 @@ const NodeInformation = ({
         )}
 
         {/* 트러블슈팅 탭 */}
-        {mode === 'troubleShooting' && (
+        {mode === 'troubleshooting' && (
           <>
-            {!isTroubleShootingAddOpen ? (
+            {!isTroubleshootingFormOpen ? (
               <>
                 <Button
                   variant="accent"
                   className="w-full py-10"
-                  onClick={() => setIsTroubleShootingAddOpen(true)}
+                  onClick={() => setIsTroubleshootingFormOpen(true)}
                 >
                   추가하기
                 </Button>
                 <ul className="mt-10 flex flex-col gap-10">
-                  {troubleShooting.map((item) => (
+                  {troubleshootings.map((item) => (
                     <li
-                      key={item.troubleShootingId}
+                      key={item.troubleshootingId}
                       className="bg-secondary group flex justify-between gap-10 rounded-md p-10"
                     >
                       <div>
                         <p className="text-12 mb-5">
                           {formatKoreaTime(item.createdAt, 'date')}
                         </p>
-                        <div>{item.troubleShooting}</div>
+                        <div>{item.troubleshooting}</div>
                       </div>
                       <Button
                         variant="secondary"
                         className="opacity-0 transition-opacity group-hover:opacity-100"
                         onClick={() =>
-                          handleDeleteTroubleShooting(item.troubleShootingId)
+                          handleDeleteTroubleshooting(item.troubleshootingId)
                         }
                       >
                         <Trash />
@@ -220,29 +176,12 @@ const NodeInformation = ({
                 </ul>
               </>
             ) : (
-              <div className="flex h-full flex-col">
-                <textarea
-                  value={troubleShootingInput}
-                  onChange={(e) => setTroubleShootingInput(e.target.value)}
-                  placeholder="문제 상황과 해결 방법을 기록하세요."
-                  className="bg-background h-full w-full resize-none rounded-md p-10 outline-none"
-                />
-                <div className="mt-5 flex gap-5">
-                  <Button
-                    className="w-[calc(50%-2.5px)] py-8"
-                    onClick={initTroubleShootingAdd}
-                  >
-                    취소
-                  </Button>
-                  <Button
-                    variant="accent"
-                    className="w-[calc(50%-2.5px)] py-8"
-                    onClick={handleAddTroubleShooting}
-                  >
-                    추가
-                  </Button>
-                </div>
-              </div>
+              <TroubleshootingForm
+                techId={selectedNode.data.techId}
+                handleCloseForm={() => setIsTroubleshootingFormOpen(false)}
+                troubleshootings={troubleshootings}
+                setTroubleshootings={setTroubleshootings}
+              />
             )}
           </>
         )}
