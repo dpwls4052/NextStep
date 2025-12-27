@@ -42,7 +42,7 @@ const MenuTab = () => {
       </TabsList>
 
       <TabsContent value={tab}>
-        <div className="mt-50 grid grid-cols-4 gap-50">
+        <div className="custom-scroll mt-30 grid max-h-400 grid-cols-4 gap-30 overflow-x-hidden overflow-y-auto">
           {items.map((item) => (
             <TabContentDetail key={item.id} item={item} />
           ))}

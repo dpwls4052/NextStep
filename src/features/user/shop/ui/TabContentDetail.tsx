@@ -24,7 +24,7 @@ const TabContentDetail = ({ item }: Props) => {
       {!isTitle && (
         <div
           className={`relative my-25 h-150 w-150 rounded-full ${
-            isNickname ? '' : 'bg-accent'
+            isNickname ? '' : 'bg-[#DBCFFF]'
           }`}
           style={
             isNickname
@@ -45,10 +45,12 @@ const TabContentDetail = ({ item }: Props) => {
       {/* 텍스트 영역 */}
       <div className="flex flex-col items-center gap-5">
         {isNickname ? (
-          <div className="text-lg font-medium">{item.name}</div>
+          <div className="text-lg font-medium text-black">{item.name}</div>
         ) : (
           <>
-            <div className={`mt-10 text-lg font-medium ${item.source ?? ''}`}>
+            <div
+              className={`mt-10 text-lg font-medium text-black ${item.source ?? ''}`}
+            >
               {item.name}
             </div>
           </>
