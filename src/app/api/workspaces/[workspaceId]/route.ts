@@ -2,7 +2,7 @@ import { requireUser } from '@/shared/libs/requireUser'
 import { supabase } from '@/shared/libs/supabaseClient'
 import { NextRequest, NextResponse } from 'next/server'
 
-// GET 요청 시, memo, link, trounbleshooting을 tech_id로 묶기
+// GET 요청 시, link, trounbleshooting을 tech_id로 묶기
 const groupByTechId = <T extends { tech_id: string }>(rows: T[]) =>
   rows.reduce<Record<string, T[]>>((acc, row) => {
     const techId = row.tech_id
@@ -82,33 +82,23 @@ export async function GET(
           .in('tech_id', techIds),
       ])
 
+    const sanitizedMemos = Object.fromEntries(
+      (memos ?? []).map((memo) => [
+        memo.tech_id,
+        {
+          nodeMemoId: memo.node_memo_id,
+          memo: memo.memo,
+          createdAt: memo.created_at,
+          updatedAt: memo.updated_at,
+        },
+      ])
+    )
+
     // tech_id 기준 group
-    const memosByTechId = groupByTechId(memos ?? [])
     const linksByTechId = groupByTechId(links ?? [])
     const troubleshootingsByTechId = groupByTechId(troubleshootings ?? [])
 
     // user_id 제거 + 응답용 구조로 정제
-    const sanitizedMemos = Object.fromEntries(
-      Object.entries(memosByTechId).map(([techId, rows]) => [
-        techId,
-        rows.map(
-          ({
-            node_memo_id,
-            user_id,
-            tech_id,
-            memo,
-            created_at,
-            updated_at,
-          }) => ({
-            nodeMemoId: node_memo_id,
-            memo,
-            createdAt: created_at,
-            updatedAt: updated_at,
-          })
-        ),
-      ])
-    )
-
     const sanitizedLinks = Object.fromEntries(
       Object.entries(linksByTechId).map(([techId, rows]) => [
         techId,

@@ -1,13 +1,19 @@
 import { useState } from 'react'
 import { usePostNodeMemo } from '../model'
 import { toast } from 'sonner'
+import { useWorkspaceStore } from '@/widgets/workspace/model'
 
 interface MemoFormProps {
   techId: string | null
 }
 
 const MemoForm = ({ techId }: MemoFormProps) => {
-  const [memoInput, setMemoInput] = useState<string>('')
+  const getNodeMemo = useWorkspaceStore((state) => state.getNodeMemo)
+
+  // 초기값: store에서 가져온 메모 (없으면 빈 문자열)
+  const initialMemo = getNodeMemo(techId)
+  const [memoInput, setMemoInput] = useState<string>(initialMemo?.memo || '')
+
   const { postNodeMemo } = usePostNodeMemo()
   const handleSave = () => {
     if (!techId) return
