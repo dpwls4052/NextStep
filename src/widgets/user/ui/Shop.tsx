@@ -5,7 +5,7 @@ import { Button } from '@/shared/ui'
 import ProfileAvatar from '@/shared/ui/profile/ProfileAvatar'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 type Category = 'accessory' | 'border' | 'title' | 'nickname'
 type Position = 'top' | 'bottom-right' | 'bottom-left'
@@ -39,9 +39,14 @@ const EMPTY_PREVIEW: PreviewState = {
 const Shop = () => {
   const router = useRouter()
   const { data: session } = useSession()
-  const { point } = useMyPoint()
-
   const [preview, setPreview] = useState<PreviewState>(EMPTY_PREVIEW)
+  const { point } = useMyPoint()
+  const [displayPoint, setDisplayPoint] = useState<number | null>(null)
+  const shownPoint = displayPoint ?? point
+
+  const handlePurchased = (newPoint: number) => {
+    setDisplayPoint(newPoint)
+  }
 
   if (!session?.user) return null
 
@@ -154,8 +159,10 @@ const Shop = () => {
             </div>
             <div className="flex flex-col items-end gap-12">
               <div className="text-3xl font-bold text-white">
-                내 포인트 : {point === null ? '...' : point.toLocaleString()}P
+                내 포인트 :{' '}
+                {shownPoint === null ? '...' : shownPoint.toLocaleString()}P
               </div>
+
               <Button
                 onClick={() => router.push('/users?tab=quest&sub=point')}
                 className="rounded-sm px-12 py-4 font-medium hover:opacity-80 hover:transition"
@@ -166,7 +173,10 @@ const Shop = () => {
           </div>
           <div className="p-40">
             {/* 콜백을 MenuTab에 내려줌 */}
-            <MenuTab onSelectPreview={handlePreviewSelect} />
+            <MenuTab
+              onSelectPreview={handlePreviewSelect}
+              onPurchased={handlePurchased}
+            />
           </div>
         </div>
       </section>

@@ -17,9 +17,10 @@ type DecorationItem = {
 
 interface Props {
   onSelectPreview: (item: DecorationItem) => void
+  onPurchased: (newPoint: number) => void
 }
 
-const MenuTab = ({ onSelectPreview }: Props) => {
+const MenuTab = ({ onSelectPreview, onPurchased }: Props) => {
   const [tab, setTab] = useState<TabValue>('accessory')
   const [items, setItems] = useState<DecorationItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -54,6 +55,7 @@ const MenuTab = ({ onSelectPreview }: Props) => {
               key={item.id}
               item={item}
               onClickPreview={() => onSelectPreview(item)}
+              onPurchased={onPurchased}
             />
           ))}
         </div>
