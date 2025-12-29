@@ -8,6 +8,7 @@ import { TroubleshootingForm } from '@/features/roadmap/postNodeTroubleshooting/
 import { useWorkspaceStore } from '../model'
 import { DeleteNodeLinkButton } from '@/features/roadmap/deleteNodeLink/ui'
 import DeleteNodeTroubleshootingButton from '@/features/roadmap/deleteNodeTroubleshooting/ui/DeleteNodeLinkButton'
+import { useSession } from 'next-auth/react'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
@@ -24,6 +25,8 @@ const NodeInformation = ({
   selectedNode,
   handleEditTech,
 }: NodeInformationProps) => {
+  const { status } = useSession()
+  const isLogin = status === 'authenticated'
   const [mode, setMode] = useState<string>(NodeInformationMenu[0].key)
   const getNodeLinks = useWorkspaceStore((s) => s.getNodeLinks)
   const getNodeTroubleshootings = useWorkspaceStore(
@@ -68,105 +71,109 @@ const NodeInformation = ({
           ))}
         </ul>
       </div>
+      {isLogin ? (
+        <div className="h-full p-10">
+          {/* 메모 탭 */}
+          {mode === 'memo' && <MemoForm techId={selectedNode.data.techId} />}
 
-      {/* 탭별 항목 */}
-      <div className="h-full p-10">
-        {/* 메모 탭 */}
-        {mode === 'memo' && <MemoForm techId={selectedNode.data.techId} />}
-
-        {/* 자료 탭 */}
-        {mode === 'link' && (
-          <>
-            {!isLinkFormOpen ? (
-              <Button
-                variant="accent"
-                className="w-full py-10"
-                onClick={() => setIsLinkFormOpen(true)}
-              >
-                추가하기
-              </Button>
-            ) : (
-              <LinkForm
-                techId={selectedNode.data.techId}
-                handleCloseForm={() => setIsLinkFormOpen(false)}
-                links={links}
-              />
-            )}
-            {links.length > 0 && (
-              <ul className="mt-10 flex flex-col gap-10">
-                {links.map((link) => (
-                  <li
-                    key={link.nodeLinkId}
-                    className="bg-secondary group flex justify-between gap-10 rounded-md p-10"
-                  >
-                    <div>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-accent break-all underline hover:cursor-pointer"
-                      >
-                        {link.title}
-                      </a>
-                      <p className="text-12 text-foreground-light">
-                        {link.url}
-                      </p>
-                    </div>
-                    <DeleteNodeLinkButton
-                      techId={selectedNode.data.techId}
-                      nodeLinkId={link.nodeLinkId}
-                      links={links}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-
-        {/* 트러블슈팅 탭 */}
-        {mode === 'troubleshooting' && (
-          <>
-            {!isTroubleshootingFormOpen ? (
-              <>
+          {/* 자료 탭 */}
+          {mode === 'link' && (
+            <>
+              {!isLinkFormOpen ? (
                 <Button
                   variant="accent"
                   className="w-full py-10"
-                  onClick={() => setIsTroubleshootingFormOpen(true)}
+                  onClick={() => setIsLinkFormOpen(true)}
                 >
                   추가하기
                 </Button>
+              ) : (
+                <LinkForm
+                  techId={selectedNode.data.techId}
+                  handleCloseForm={() => setIsLinkFormOpen(false)}
+                  links={links}
+                />
+              )}
+              {links.length > 0 && (
                 <ul className="mt-10 flex flex-col gap-10">
-                  {troubleshootings.map((item) => (
+                  {links.map((link) => (
                     <li
-                      key={item.nodeTroubleshootingId}
+                      key={link.nodeLinkId}
                       className="bg-secondary group flex justify-between gap-10 rounded-md p-10"
                     >
                       <div>
-                        <p className="text-12 mb-5">
-                          {formatKoreaTime(item.createdAt, 'date')}
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-accent break-all underline hover:cursor-pointer"
+                        >
+                          {link.title}
+                        </a>
+                        <p className="text-12 text-foreground-light">
+                          {link.url}
                         </p>
-                        <div>{item.troubleshooting}</div>
                       </div>
-                      <DeleteNodeTroubleshootingButton
+                      <DeleteNodeLinkButton
                         techId={selectedNode.data.techId}
-                        nodeTroubleshootingId={item.nodeTroubleshootingId}
-                        troubleshootings={troubleshootings}
+                        nodeLinkId={link.nodeLinkId}
+                        links={links}
                       />
                     </li>
                   ))}
                 </ul>
-              </>
-            ) : (
-              <TroubleshootingForm
-                techId={selectedNode.data.techId}
-                handleCloseForm={() => setIsTroubleshootingFormOpen(false)}
-                troubleshootings={troubleshootings}
-              />
-            )}
-          </>
-        )}
-      </div>
+              )}
+            </>
+          )}
+
+          {/* 트러블슈팅 탭 */}
+          {mode === 'troubleshooting' && (
+            <>
+              {!isTroubleshootingFormOpen ? (
+                <>
+                  <Button
+                    variant="accent"
+                    className="w-full py-10"
+                    onClick={() => setIsTroubleshootingFormOpen(true)}
+                  >
+                    추가하기
+                  </Button>
+                  <ul className="mt-10 flex flex-col gap-10">
+                    {troubleshootings.map((item) => (
+                      <li
+                        key={item.nodeTroubleshootingId}
+                        className="bg-secondary group flex justify-between gap-10 rounded-md p-10"
+                      >
+                        <div>
+                          <p className="text-12 mb-5">
+                            {formatKoreaTime(item.createdAt, 'date')}
+                          </p>
+                          <div>{item.troubleshooting}</div>
+                        </div>
+                        <DeleteNodeTroubleshootingButton
+                          techId={selectedNode.data.techId}
+                          nodeTroubleshootingId={item.nodeTroubleshootingId}
+                          troubleshootings={troubleshootings}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <TroubleshootingForm
+                  techId={selectedNode.data.techId}
+                  handleCloseForm={() => setIsTroubleshootingFormOpen(false)}
+                  troubleshootings={troubleshootings}
+                />
+              )}
+            </>
+          )}
+        </div>
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <p>로그인이 필요합니다.</p>
+        </div>
+      )}
     </div>
   )
 }
