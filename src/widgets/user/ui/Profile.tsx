@@ -7,37 +7,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import MyProfile from '@/features/user/updateMyInfo/ui/MyProfile'
 import { DecorationImage } from '@/features/user/shop/ui/DecorationImage'
+import {
+  type PurchasedItem,
+  type AppliedState,
+  EMPTY_APPLIED,
+  findPurchasedItem,
+} from '@/features/user/shop/model/decorations'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
-
-type PurchasedItem = {
-  orderId: string
-  decorationId: string
-  name: string
-  price: number
-  category: 'accessory' | 'border' | 'title' | 'nickname'
-  style: string | null
-  source: string | null
-  scale: number | null
-}
-
-type AppliedState = {
-  borderId: string | null
-  titleId: string | null
-  nicknameColorId: string | null
-  topId: string | null
-  bottomLeftId: string | null
-  bottomRightId: string | null
-}
-
-const EMPTY_APPLIED: AppliedState = {
-  borderId: null,
-  titleId: null,
-  nicknameColorId: null,
-  topId: null,
-  bottomLeftId: null,
-  bottomRightId: null,
-}
 
 const Profile = () => {
   const { data: session } = useSession()
@@ -71,18 +48,12 @@ const Profile = () => {
     fetchUserProfile()
   }, [user, fetchUserProfile])
 
-  // applied의 decorationId로 orders에서 아이템 찾아오기
-  const findItem = (decorationId: string | null) => {
-    if (!decorationId) return null
-    return orders.find((o) => o.decorationId === decorationId) ?? null
-  }
-
-  const appliedBorder = findItem(applied.borderId)
-  const appliedTop = findItem(applied.topId)
-  const appliedBottomLeft = findItem(applied.bottomLeftId)
-  const appliedBottomRight = findItem(applied.bottomRightId)
-  const appliedTitle = findItem(applied.titleId)
-  const appliedNickname = findItem(applied.nicknameColorId)
+  const appliedBorder = findPurchasedItem(orders, applied.borderId)
+  const appliedTop = findPurchasedItem(orders, applied.topId)
+  const appliedBottomLeft = findPurchasedItem(orders, applied.bottomLeftId)
+  const appliedBottomRight = findPurchasedItem(orders, applied.bottomRightId)
+  const appliedTitle = findPurchasedItem(orders, applied.titleId)
+  const appliedNickname = findPurchasedItem(orders, applied.nicknameColorId)
 
   const handleEditClick = () => {
     fileInputRef.current?.click()
@@ -179,7 +150,7 @@ const Profile = () => {
 
             <button
               onClick={handleEditClick}
-              className="absolute top-20 right-20 flex items-center justify-center rounded-full bg-white p-12 shadow-md hover:cursor-pointer"
+              className="absolute top-20 right-0 flex items-center justify-center rounded-full bg-white p-12 shadow-md hover:cursor-pointer"
             >
               ✏️
             </button>

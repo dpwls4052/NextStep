@@ -3,6 +3,14 @@ import { Button } from '@/shared/ui'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import {
+  type PurchasedItem,
+  type AppliedState,
+  EMPTY_APPLIED,
+  type AccessoryPosition,
+  isAccessoryPosition,
+  isApplied,
+} from '@/features/user/shop/model/decorations'
 
 type Props = {
   onApplied?: () => void
@@ -17,64 +25,11 @@ const PROFILETAB_LIST = [
 
 type TabKey = (typeof PROFILETAB_LIST)[number]['key']
 
-type PurchasedItem = {
-  orderId: string
-  decorationId: string
-  name: string
-  price: number
-  category: 'accessory' | 'border' | 'title' | 'nickname'
-  style: string | null
-  source: string | null
-  scale: number | null
-}
-
-type AppliedState = {
-  borderId: string | null
-  titleId: string | null
-  nicknameColorId: string | null
-  topId: string | null
-  bottomLeftId: string | null
-  bottomRightId: string | null
-}
-
-const EMPTY_APPLIED: AppliedState = {
-  borderId: null,
-  titleId: null,
-  nicknameColorId: null,
-  topId: null,
-  bottomLeftId: null,
-  bottomRightId: null,
-}
-
 const tabToCategoryMap: Record<TabKey, PurchasedItem['category']> = {
   accessory: 'accessory',
   borderline: 'border',
   title: 'title',
   nickname: 'nickname',
-}
-
-type AccessoryPosition = 'top' | 'bottom-left' | 'bottom-right'
-function isAccessoryPosition(v: any): v is AccessoryPosition {
-  return v === 'top' || v === 'bottom-left' || v === 'bottom-right'
-}
-
-function isApplied(item: PurchasedItem, applied: AppliedState) {
-  if (item.category === 'border') return applied.borderId === item.decorationId
-  if (item.category === 'title') return applied.titleId === item.decorationId
-  if (item.category === 'nickname')
-    return applied.nicknameColorId === item.decorationId
-
-  // accessory는 위치별로 비교
-  if (item.category === 'accessory') {
-    if (!isAccessoryPosition(item.style)) return false
-    if (item.style === 'top') return applied.topId === item.decorationId
-    if (item.style === 'bottom-left')
-      return applied.bottomLeftId === item.decorationId
-    if (item.style === 'bottom-right')
-      return applied.bottomRightId === item.decorationId
-  }
-
-  return false
 }
 
 const MyProfile = ({ onApplied }: Props) => {
@@ -114,9 +69,9 @@ const MyProfile = ({ onApplied }: Props) => {
 
     // 해제 시 accessory는 "어느 슬롯을 비울지"가 필요함
     // (decorationId를 보내도 되지만, 서버는 slot을 알아야 컬럼을 null로 만들 수 있음)
-    const style =
+    const style: AccessoryPosition | null =
       item.category === 'accessory' && isAccessoryPosition(item.style)
-        ? item.style
+        ? (item.style as AccessoryPosition)
         : null
 
     const res = await fetch('/api/users', {
@@ -124,9 +79,10 @@ const MyProfile = ({ onApplied }: Props) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: appliedNow ? 'clearDecoration' : 'applyDecoration',
-        decorationId: item.decorationId, // apply에선 필수, clear에선 선택(서버 구현 따라)
+        // 서버가 현재 decorationId를 요구하도록 되어있으면 항상 보내도 됨
+        decorationId: item.decorationId,
         category: item.category,
-        style, // accessory만 사용
+        style, // accessory만 의미 있음
       }),
     })
 
