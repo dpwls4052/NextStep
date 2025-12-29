@@ -9,7 +9,7 @@ export default function CommunityCommentSection({
 }: {
   postId: string
 }) {
-  // 🔥 훅 전체를 하나의 객체로 받는다
+  // 훅 전체를 하나의 객체로 받는다
   const commentsHook = useComments(postId)
 
   const { comments, newComment, setNewComment, handleAddComment } = commentsHook
@@ -31,7 +31,7 @@ export default function CommunityCommentSection({
           <CommunityCommentItem
             key={comment.comment_id}
             comment={comment}
-            commentsHook={commentsHook} // ⭐ 같은 훅 인스턴스 전달
+            commentsHook={commentsHook} // 같은 훅 인스턴스 전달
           />
         ))}
       </div>

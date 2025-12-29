@@ -2,61 +2,49 @@
 
 import type { ReactFlowInstance } from '@xyflow/react'
 
-export async function exportWorkspaceAsImage({
-  container,
-  fileName = 'workspace.png',
-  backgroundColor = '#1f2937',
-}: {
+type ExportWorkspaceAsImageArgs = {
   container: HTMLElement
-  rf?: ReactFlowInstance
+  rf: ReactFlowInstance
   fileName?: string
   backgroundColor?: string
-}) {
-  // ✅ 브라우저에서만 실행 보장
-  if (typeof window === 'undefined') return
+}
 
-  // ✅ 여기서 동적 import (중요)
-  const domtoimage = (await import('dom-to-image-more')).default
+export const exportWorkspaceAsImage = async ({
+  container,
+  rf,
+  fileName = 'community-workspace',
+  backgroundColor,
+}: ExportWorkspaceAsImageArgs) => {
+  if (!container || !rf) return
 
-  // ✅ ReactFlow 실제 렌더 레이어
-  const renderer = container.querySelector(
-    '.react-flow__renderer'
-  ) as HTMLElement | null
+  // 🔹 ReactFlow에게만 현재 화면 정렬 맡김
+  // (레이아웃/transform 직접 조작 ❌)
+  rf.fitView({ padding: 0.4 })
 
-  if (!renderer) {
-    console.error('react-flow__renderer not found')
-    return
-  }
+  // fitView 렌더 반영 대기
+  await new Promise((r) => setTimeout(r, 50))
 
-  // ✅ + 버튼 숨기기
-  const actions = container.querySelectorAll('.workspace-action')
-  actions.forEach((el) => ((el as HTMLElement).style.display = 'none'))
+  const domtoimage = await import('dom-to-image-more')
 
-  const panes = renderer.querySelectorAll(
-    '.react-flow__pane, .react-flow__selection'
-  )
-  panes.forEach((el) => {
-    ;(el as HTMLElement).style.outline = 'none'
-    ;(el as HTMLElement).style.border = 'none'
+  const dataUrl = await domtoimage.toPng(container, {
+    cacheBust: true,
+    pixelRatio: 2,
+
+    // 배경색은 container에 이미 있으므로
+    // 여기서는 덮어쓰지 않음 (옵션으로만 가능)
+    ...(backgroundColor ? { bgcolor: backgroundColor } : {}),
+
+    // ❗ SVG(격자/엣지)는 건드리지 않고
+    // UI 버튼만 캡처에서 제외
+    filter: (node) => {
+      const el = node as HTMLElement
+      if (el.classList?.contains('workspace-action')) return false
+      return true
+    },
   })
 
-  try {
-    const dataUrl = await domtoimage.toPng(renderer, {
-      bgcolor: backgroundColor,
-      width: renderer.scrollWidth,
-      height: renderer.scrollHeight,
-      style: {
-        transform: 'none', // SVG/edge 깨짐 방지
-      },
-    })
-
-    const link = document.createElement('a')
-    link.download = fileName
-    link.href = dataUrl
-    link.click()
-  } catch (e) {
-    console.error('이미지 저장 실패', e)
-  } finally {
-    actions.forEach((el) => ((el as HTMLElement).style.display = ''))
-  }
+  const link = document.createElement('a')
+  link.href = dataUrl
+  link.download = `${fileName}-${Date.now()}.png`
+  link.click()
 }

@@ -1,31 +1,28 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Close } from '@/shared/ui/icon'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { useOpen } from '@/shared/model'
 import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react'
+import type { ReactFlowInstance } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useThemeStore } from '@/features/theme/model'
 import { Plus } from 'lucide-react'
 import CommunityCommentSection from '@/widgets/community/comments/CommunityCommentSection'
-import { useRef } from 'react'
 import { exportWorkspaceAsImage } from '@/features/community/model/exportWorkspaceAsImage'
-import type { ReactFlowInstance } from '@xyflow/react'
 
 type Post = {
   posts_id: string
   title: string
   nodes: any[]
   edges: any[]
-  users?: {
-    name?: string | null
-  }
+  users?: { name?: string | null }
   created_at?: string
 }
 
-const CommunityPage = () => {
+export default function CommunityPage() {
   const { id } = useParams<{ id: string }>()
   const searchParams = useSearchParams()
   const listId = searchParams.get('list')
@@ -38,17 +35,15 @@ const CommunityPage = () => {
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [loading, setLoading] = useState(true)
   const [isActionOpen, setIsActionOpen] = useState(false)
+  const [isCapturing, setIsCapturing] = useState(false)
 
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
-
   const bgColor = isDark ? '#1f2937' : '#e5e5e5'
-  const gridColor = isDark ? '#374151' : '#d1d5db'
 
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
 
-  // 분야 기준으로 카드 목록 fetch
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -122,19 +117,30 @@ const CommunityPage = () => {
     }
   }
 
-  if (loading) {
-    return <p className="py-40 text-center">불러오는 중...</p>
+  const handleExportImage = async () => {
+    if (!workspaceRef.current || !rf || !post) return
+
+    setIsCapturing(true)
+    // 버튼 숨김/렌더 반영 기다리기
+    await new Promise((r) => setTimeout(r, 50))
+
+    await exportWorkspaceAsImage({
+      container: workspaceRef.current,
+      rf,
+      fileName: post.title,
+      backgroundColor: bgColor,
+    })
+
+    setIsCapturing(false)
   }
 
-  if (!post) {
-    return <p className="py-40 text-center">글을 찾을 수 없습니다.</p>
-  }
+  if (loading) return <p className="py-40 text-center">불러오는 중...</p>
+  if (!post) return <p className="py-40 text-center">글을 찾을 수 없습니다.</p>
 
   return (
     <div className="flex">
       <div className="flex w-full justify-center px-40 py-40">
         <div className="bg-primary w-full max-w-1200 rounded-xl">
-          {/* ===== 상단 헤더 ===== */}
           <div className="point-gradient flex items-center justify-between rounded-tl-xl rounded-tr-xl px-24 py-12">
             <div className="flex gap-8">
               <button
@@ -170,9 +176,7 @@ const CommunityPage = () => {
             </button>
           </div>
 
-          {/* ===== 본문 ===== */}
           <div className="p-24">
-            {/* 제목 + 메타 */}
             <div className="mb-20 flex items-center justify-between">
               <p className="text-lg font-semibold">{post.title}</p>
               <p className="text-foreground-light text-right text-sm">
@@ -182,13 +186,12 @@ const CommunityPage = () => {
               </p>
             </div>
 
-            {/* ===== 워크스페이스 ===== */}
             <div
-              ref={workspaceRef}
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
               style={{ backgroundColor: bgColor }}
             >
               <ReactFlow
+                ref={workspaceRef}
                 onInit={setRf}
                 nodes={post.nodes ?? []}
                 edges={post.edges ?? []}
@@ -197,8 +200,6 @@ const CommunityPage = () => {
                 nodesDraggable={false}
                 nodesConnectable={false}
                 elementsSelectable={false}
-                selectNodesOnDrag={false}
-                selectionOnDrag={false}
                 zoomOnScroll={false}
                 zoomOnDoubleClick={false}
                 panOnScroll={false}
@@ -214,47 +215,34 @@ const CommunityPage = () => {
                 />
               </ReactFlow>
 
-              {/* 우측 하단 버튼 */}
-              <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
-                {/* 액션 버튼들 (토글) */}
-                {isActionOpen && (
-                  <div className="flex flex-col gap-8">
-                    <button
-                      onClick={() => {
-                        if (workspaceRef.current && rf) {
-                          exportWorkspaceAsImage({
-                            container: workspaceRef.current,
-                            rf,
-                            fileName: `${post.title}.png`,
-                            backgroundColor: bgColor, // 너가 쓰는 배경색 그대로
-                          })
-                        }
-                      }}
-                      className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
-                    >
-                      이미지로 저장하기
-                    </button>
+              {!isCapturing && (
+                <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
+                  {isActionOpen && (
+                    <div className="flex flex-col gap-8">
+                      <button
+                        onClick={handleExportImage}
+                        className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
+                      >
+                        이미지로 저장하기
+                      </button>
 
-                    <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
-                      내 워크스페이스에 불러오기
-                    </button>
-                  </div>
-                )}
+                      <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
+                        내 워크스페이스에 불러오기
+                      </button>
+                    </div>
+                  )}
 
-                {/* + 버튼 */}
-                <button
-                  onClick={() => setIsActionOpen((prev) => !prev)}
-                  className="bg-accent flex h-50 w-50 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105"
-                >
-                  <Plus size={24} className="text-white" />
-                </button>
-              </div>
+                  <button
+                    onClick={() => setIsActionOpen((prev) => !prev)}
+                    className="bg-accent flex h-50 w-50 items-center justify-center rounded-full shadow-xl transition-transform hover:scale-105"
+                  >
+                    <Plus size={24} className="text-white" />
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* 댓글 */}
-            <div className="flex flex-col gap-12">
-              <CommunityCommentSection postId={post.posts_id} />
-            </div>
+            <CommunityCommentSection postId={post.posts_id} />
           </div>
         </div>
       </div>
@@ -263,4 +251,3 @@ const CommunityPage = () => {
     </div>
   )
 }
-export default CommunityPage
