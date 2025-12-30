@@ -16,12 +16,14 @@ export const GET = async () => {
         roadmaps!inner (
           roadmap_id,
           visibility,
-          user_id
+          user_id,
+          status
         )
       `
       )
       .eq('roadmaps.user_id', userId)
       .eq('roadmaps.visibility', 'private')
+      .eq('roadmaps.status', true)
       .eq('status', true)
       .order('updated_at', { ascending: false })
 

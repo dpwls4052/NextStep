@@ -468,40 +468,73 @@ export async function DELETE(
     }
 
     // 워크스페이스 소유자 확인
-    const { data: existingWorkspace, error: checkError } = await supabase
+    const { data: workspace, error: workspaceError } = await supabase
       .from('workspaces')
-      .select('user_id')
+      .select('workspace_id, roadmap_id')
       .eq('workspace_id', workspaceId)
-      .single()
+      .eq('status', true)
+      .maybeSingle()
 
-    if (checkError || !existingWorkspace) {
+    if (workspaceError || !workspace) {
       return NextResponse.json(
         { error: 'Workspace not found' },
         { status: 404 }
       )
     }
 
-    if (existingWorkspace.user_id !== userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    const { data: roadmap, error: roadmapError } = await supabase
+      .from('roadmaps')
+      .select('roadmap_id, user_id')
+      .eq('roadmap_id', workspace.roadmap_id)
+      .eq('status', true)
+      .maybeSingle()
+
+    if (roadmapError || !roadmap || roadmap.user_id !== userId) {
+      return NextResponse.json(
+        { error: 'Roadmap not found or access denied' },
+        { status: 403 }
+      )
     }
 
     // soft delete
-    const { data, error } = await supabase
-      .from('workspaces')
+    const { data: deletedRoadmap, error: deleteRoadmapError } = await supabase
+      .from('roadmaps')
       .update({
         status: false,
         updated_at: new Date().toISOString(),
       })
-      .eq('workspace_id', workspaceId)
+      .eq('roadmap_id', roadmap.roadmap_id)
       .select()
       .single()
 
-    if (error) {
-      console.error('Supabase error:', error)
+    if (deleteRoadmapError || !deletedRoadmap) {
+      console.error('Supabase error:', deleteRoadmapError)
+      return NextResponse.json(
+        {
+          error: 'Failed to delete roadmap',
+          details: deleteRoadmapError?.message,
+        },
+        { status: 500 }
+      )
+    }
+
+    const { data: deletedWorkspace, error: deleteWorkspaceError } =
+      await supabase
+        .from('workspaces')
+        .update({
+          status: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('workspace_id', workspace.workspace_id)
+        .select()
+        .single()
+
+    if (deleteWorkspaceError || !deletedWorkspace) {
+      console.error('Supabase error:', deleteWorkspaceError)
       return NextResponse.json(
         {
           error: 'Failed to delete workspace',
-          details: error.message,
+          details: deleteWorkspaceError?.message,
         },
         { status: 500 }
       )
@@ -510,7 +543,7 @@ export async function DELETE(
     return NextResponse.json({
       success: true,
       content: {
-        workspaceId: data.workspace_id,
+        workspaceId: workspace.workspace_id,
       },
     })
   } catch (error) {
