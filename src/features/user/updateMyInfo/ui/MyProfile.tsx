@@ -173,8 +173,10 @@ const MyProfile = ({ onApplied }: Props) => {
 
                 {/* 텍스트 */}
                 <div
-                  className={`text-md mb-3 font-semibold ${
-                    item.category === 'title' ? (item.source ?? '') : ''
+                  className={`text-md mb-3 font-medium ${
+                    item.category === 'title'
+                      ? (item.source ?? '')
+                      : 'text-black'
                   }`}
                   style={
                     item.category === 'nickname'
