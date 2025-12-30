@@ -18,6 +18,7 @@ type Post = {
   title: string
   nodes: any[]
   edges: any[]
+  like_count?: number
   users?: { name?: string | null }
   created_at?: string
 }
@@ -43,6 +44,14 @@ export default function CommunityPage() {
 
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
+  // 좋아요 UI용 state
+  const [liked, setLiked] = useState(false)
+  const [likeCount, setLikeCount] = useState(0)
+
+  useEffect(() => {
+    if (!post) return
+    setLikeCount(post.like_count ?? 0)
+  }, [post])
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -116,6 +125,20 @@ export default function CommunityPage() {
       )
     }
   }
+  const toggleLike = async () => {
+    if (!post) return
+
+    const res = await fetch('/api/community/posts/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId: post.posts_id }),
+    })
+
+    const json = await res.json()
+
+    setLiked(json.liked)
+    setLikeCount((prev) => (json.liked ? prev + 1 : prev - 1))
+  }
 
   const handleExportImage = async () => {
     if (!workspaceRef.current || !rf || !post) return
@@ -142,6 +165,7 @@ export default function CommunityPage() {
       <div className="flex w-full justify-center px-40 py-40">
         <div className="bg-primary w-full max-w-1200 rounded-xl">
           <div className="point-gradient flex items-center justify-between rounded-tl-xl rounded-tr-xl px-24 py-12">
+            {/* 좌측 이전 / 다음 */}
             <div className="flex gap-8">
               <button
                 onClick={goPrev}
@@ -168,12 +192,29 @@ export default function CommunityPage() {
               </button>
             </div>
 
-            <button
-              className="bg-secondary rounded-lg px-12 py-6"
-              onClick={() => router.push('/community')}
-            >
-              <Close />
-            </button>
+            {/* 우측 좋아요 + 닫기 */}
+            <div className="flex items-center gap-8">
+              {/* 좋아요 버튼 */}
+              <button
+                onClick={toggleLike}
+                className={`flex items-center gap-6 rounded-lg px-12 py-4 transition ${
+                  liked
+                    ? 'bg-red-500 text-white'
+                    : 'bg-secondary text-foreground'
+                }`}
+              >
+                <span className="text-m">{liked ? '❤️' : '🤍'}</span>
+                <span className="text-sm font-semibold">{likeCount}</span>
+              </button>
+
+              {/* 닫기 버튼 */}
+              <button
+                className="bg-secondary rounded-lg px-12 py-6"
+                onClick={() => router.push('/community')}
+              >
+                <Close />
+              </button>
+            </div>
           </div>
 
           <div className="p-24">
