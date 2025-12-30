@@ -80,19 +80,22 @@ export async function GET(
           .from('node_memos')
           .select('*')
           .eq('status', true)
-          .in('tech_id', techIds),
+          .in('tech_id', techIds)
+          .in('roadmap_id', [roadmapId]),
 
         supabase
           .from('node_links')
           .select('*')
           .eq('status', true)
-          .in('tech_id', techIds),
+          .in('tech_id', techIds)
+          .in('roadmap_id', [roadmapId]),
 
         supabase
           .from('node_troubleshootings')
           .select('*')
           .eq('status', true)
-          .in('tech_id', techIds),
+          .in('tech_id', techIds)
+          .in('roadmap_id', [roadmapId]),
       ])
 
     const sanitizedMemos = Object.fromEntries(
