@@ -19,24 +19,40 @@ export async function GET(
     const { userId } = await requireUser()
     const { workspaceId } = await params
 
-    // 워크스페이스 조회
-    const { data: workspace, error } = await supabase
+    // 1. workspace 조회
+    const { data: workspace, error: workspaceError } = await supabase
       .from('workspaces')
-      .select('*')
+      .select('workspace_id, roadmap_id, title, updated_at')
       .eq('workspace_id', workspaceId)
-      .eq('user_id', userId)
       .eq('status', true)
       .maybeSingle()
 
-    if (error || !workspace) {
+    if (workspaceError || !workspace) {
       return NextResponse.json(
         { error: 'Workspace not found' },
         { status: 404 }
       )
     }
 
+    // 2. roadmap 조회(실제 데이터)
+    const { data: roadmap, error: roadmapError } = await supabase
+      .from('roadmaps')
+      .select('roadmap_id, user_id, nodes, edges')
+      .eq('roadmap_id', workspace.roadmap_id)
+      .eq('status', true)
+      .maybeSingle()
+
+    if (roadmapError || !roadmap || roadmap.user_id !== userId) {
+      return NextResponse.json(
+        { error: 'Roadmap not found or access denied' },
+        { status: 403 }
+      )
+    }
+
+    const roadmapId = roadmap.roadmap_id
+
     // techId 추출
-    const techIds = (workspace.nodes ?? [])
+    const techIds = (roadmap.nodes ?? [])
       .map((node: any) => node.data?.techId)
       .filter((id: string) => id && id !== 'start')
 
@@ -47,8 +63,8 @@ export async function GET(
         content: {
           workspaceId: workspace.workspace_id,
           title: workspace.title,
-          nodes: workspace.nodes,
-          edges: workspace.edges,
+          nodes: roadmap.nodes,
+          edges: roadmap.edges,
           memos: [],
           links: [],
           troubleshootings: [],
@@ -63,21 +79,18 @@ export async function GET(
         supabase
           .from('node_memos')
           .select('*')
-          .eq('user_id', userId)
           .eq('status', true)
           .in('tech_id', techIds),
 
         supabase
           .from('node_links')
           .select('*')
-          .eq('user_id', userId)
           .eq('status', true)
           .in('tech_id', techIds),
 
         supabase
           .from('node_troubleshootings')
           .select('*')
-          .eq('user_id', userId)
           .eq('status', true)
           .in('tech_id', techIds),
       ])
@@ -146,8 +159,8 @@ export async function GET(
       content: {
         workspaceId: workspace.workspace_id,
         title: workspace.title,
-        nodes: workspace.nodes,
-        edges: workspace.edges,
+        nodes: roadmap.nodes,
+        edges: roadmap.edges,
         memos: sanitizedMemos,
         links: sanitizedLinks,
         troubleshootings: sanitizedTroubleshootings,

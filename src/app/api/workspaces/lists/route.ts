@@ -8,8 +8,20 @@ export const GET = async () => {
 
     const { data, error } = await supabase
       .from('workspaces')
-      .select('*')
-      .eq('user_id', userId)
+      .select(
+        `
+        workspace_id,
+        title,
+        updated_at,
+        roadmaps!inner (
+          roadmap_id,
+          visibility,
+          user_id
+        )
+      `
+      )
+      .eq('roadmaps.user_id', userId)
+      .eq('roadmaps.visibility', 'private')
       .eq('status', true)
       .order('updated_at', { ascending: false })
 
