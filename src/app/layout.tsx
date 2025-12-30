@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import ThemeProvider from './providers/ThemeProvider'
 import AuthProvider from './providers/AuthProvider'
 import ReactQueryProviders from './providers/ReactQueryProviders'
 import { Toaster } from '@/components/ui/sonner'
@@ -12,15 +11,34 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function () {
+  try {
+    const theme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (theme === 'dark' || (!theme && systemDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (_) {}
+})();
+            `,
+          }}
+        />
+      </head>
+
       <body>
         <ReactQueryProviders>
           <AuthProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            {children}
             <Toaster />
           </AuthProvider>
         </ReactQueryProviders>
