@@ -7,9 +7,10 @@ import Profile from '@/widgets/user/ui/Profile'
 import TAB_LIST from '@/widgets/user/model/constants'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Point from '@/widgets/user/ui/Point'
+import Order from './Order'
 
 type TabKey = 'profile' | 'quest' | 'shop' | 'point'
-type SubKey = 'point' | null
+type SubKey = 'point' | 'order' | null
 
 const UsersTabs = () => {
   const router = useRouter()
@@ -25,7 +26,9 @@ const UsersTabs = () => {
     if (activeTab === 'quest' && subFromUrl === 'point') {
       return <Point />
     }
-
+    if (activeTab === 'shop' && subFromUrl === 'order') {
+      return <Order />
+    }
     switch (activeTab) {
       case 'profile':
         return <Profile />

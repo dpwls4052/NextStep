@@ -1,18 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import ProfileAvatar from '@/shared/ui/profile/ProfileAvatar'
 import {
   type PurchasedItem,
   AppliedState,
-  EMPTY_APPLIED,
 } from '@/features/user/shop/model/decorations'
 import { useQuery } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
-import { useAppliedPurchasedItems } from '@/features/user/shop/model/useAppliedPurchasedItems'
+import { useAvatarDecorations } from '@/features/user/updateMyInfo/model/useAvatarDecorations'
 
 type UserRes = {
   name: string | null
@@ -26,56 +24,13 @@ async function getUserProfileForButton() {
   return res.data
 }
 
-function buildAvatarDecorations(args: {
-  border: PurchasedItem | null
-  top: PurchasedItem | null
-  bottomLeft: PurchasedItem | null
-  bottomRight: PurchasedItem | null
-}) {
-  return {
-    border: args.border?.source
-      ? {
-          source: args.border.source,
-          style: args.border.style,
-          scale: args.border.scale ?? 1.2,
-        }
-      : null,
-
-    accessories: {
-      top: args.top?.source
-        ? {
-            source: args.top.source,
-            style: args.top.style ?? 'top',
-            scale: args.top.scale ?? 1,
-          }
-        : undefined,
-
-      'bottom-left': args.bottomLeft?.source
-        ? {
-            source: args.bottomLeft.source,
-            style: args.bottomLeft.style ?? 'bottom-left',
-            scale: args.bottomLeft.scale ?? 1,
-          }
-        : undefined,
-
-      'bottom-right': args.bottomRight?.source
-        ? {
-            source: args.bottomRight.source,
-            style: args.bottomRight.style ?? 'bottom-right',
-            scale: args.bottomRight.scale ?? 1,
-          }
-        : undefined,
-    },
-  }
-}
-
 const ProfileButton = () => {
   const router = useRouter()
   const { data: session } = useSession()
 
   // 세션 있을 때만 조회
   const { data, isFetching } = useQuery({
-    queryKey: ['userProfile'], // Profile.tsx와 동일하게 맞추는 게 베스트
+    queryKey: ['userProfile'],
     queryFn: getUserProfileForButton,
     enabled: !!session?.user,
     staleTime: 1000 * 30,
@@ -86,29 +41,11 @@ const ProfileButton = () => {
     },
   })
 
-  const orders = data?.orders ?? []
-  const applied = data?.applied ?? EMPTY_APPLIED
-
-  const appliedItems = useAppliedPurchasedItems(orders, applied)
-
-  const decorations = useMemo(() => {
-    // 아직 불러오는 중이면 (깜빡임 방지) decorations는 안 넣음
-    if (isFetching || !data) return undefined
-
-    return buildAvatarDecorations({
-      border: appliedItems.border,
-      top: appliedItems.top,
-      bottomLeft: appliedItems.bottomLeft,
-      bottomRight: appliedItems.bottomRight,
-    })
-  }, [
-    isFetching,
-    data,
-    appliedItems.border,
-    appliedItems.top,
-    appliedItems.bottomLeft,
-    appliedItems.bottomRight,
-  ])
+  const decorations = useAvatarDecorations({
+    orders: data?.orders,
+    applied: data?.applied,
+    enabled: !isFetching && !!data,
+  })
 
   if (!session?.user) return null
 
