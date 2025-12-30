@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import ThemeProvider from './providers/ThemeProvider'
 import AuthProvider from './providers/AuthProvider'
 import ReactQueryProviders from './providers/ReactQueryProviders'
 import { Toaster } from '@/components/ui/sonner'
@@ -23,12 +24,10 @@ export default function RootLayout({
 (function () {
   try {
     const theme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (theme === 'dark' || (!theme && systemDark)) {
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     }
-  } catch (_) {}
+  } catch (e) {}
 })();
             `,
           }}
@@ -38,7 +37,7 @@ export default function RootLayout({
       <body>
         <ReactQueryProviders>
           <AuthProvider>
-            {children}
+            <ThemeProvider>{children}</ThemeProvider>
             <Toaster />
           </AuthProvider>
         </ReactQueryProviders>
