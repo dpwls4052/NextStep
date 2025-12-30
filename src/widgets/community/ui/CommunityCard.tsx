@@ -61,7 +61,7 @@ const CommunityCard = ({
 
       {/* 하단 영역 */}
       <div className="bg-primary flex items-center gap-12 px-4 py-14">
-        <div className="bg-accent flex h-30 w-30 items-center justify-center rounded-2xl">
+        <div className="flex h-30 w-30 items-center justify-center rounded-2xl">
           <MyProfileAvatar
             size={30}
             fallbackName={userName}
