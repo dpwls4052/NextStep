@@ -12,16 +12,8 @@ import { useThemeStore } from '@/features/theme/model'
 import { Plus } from 'lucide-react'
 import CommunityCommentSection from '@/widgets/community/comments/CommunityCommentSection'
 import { exportWorkspaceAsImage } from '@/features/community/model/exportWorkspaceAsImage'
-
-type Post = {
-  posts_id: string
-  title: string
-  nodes: any[]
-  edges: any[]
-  like_count?: number
-  users?: { name?: string | null }
-  created_at?: string
-}
+import { PostWithRoadmap } from '@/features/community/model/types'
+import CustomNode from '@/widgets/workspace/ui/CustomNode'
 
 export default function CommunityPage() {
   const { id } = useParams<{ id: string }>()
@@ -31,8 +23,8 @@ export default function CommunityPage() {
   const router = useRouter()
   const { isOpen, toggleOpen } = useOpen()
 
-  const [posts, setPosts] = useState<Post[]>([])
-  const [post, setPost] = useState<Post | null>(null)
+  const [posts, setPosts] = useState<PostWithRoadmap[]>([])
+  const [post, setPost] = useState<PostWithRoadmap | null>(null)
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [loading, setLoading] = useState(true)
   const [isActionOpen, setIsActionOpen] = useState(false)
@@ -65,11 +57,11 @@ export default function CommunityPage() {
         )
 
         const json = await res.json()
-        const list: Post[] = Array.isArray(json) ? json : []
+        const list: PostWithRoadmap[] = Array.isArray(json) ? json : []
 
         setPosts(list)
 
-        const idx = list.findIndex((p) => p.posts_id === id)
+        const idx = list.findIndex((p) => p.post_id === id)
         setCurrentIndex(idx)
         setPost(list[idx] ?? null)
       } catch (e) {
@@ -113,7 +105,7 @@ export default function CommunityPage() {
   const goPrev = () => {
     if (currentIndex > 0) {
       router.push(
-        `/community/${posts[currentIndex - 1].posts_id}?list=${resolvedListId}`
+        `/community/${posts[currentIndex - 1].post_id}?list=${resolvedListId}`
       )
     }
   }
@@ -121,7 +113,7 @@ export default function CommunityPage() {
   const goNext = () => {
     if (currentIndex < posts.length - 1) {
       router.push(
-        `/community/${posts[currentIndex + 1].posts_id}?list=${resolvedListId}`
+        `/community/${posts[currentIndex + 1].post_id}?list=${resolvedListId}`
       )
     }
   }
@@ -131,7 +123,7 @@ export default function CommunityPage() {
     const res = await fetch('/api/community/posts/like', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ postId: post.posts_id }),
+      body: JSON.stringify({ postId: post.post_id }),
     })
 
     const json = await res.json()
@@ -155,6 +147,9 @@ export default function CommunityPage() {
     })
 
     setIsCapturing(false)
+  }
+  const nodeTypes = {
+    custom: CustomNode,
   }
 
   if (loading) return <p className="py-40 text-center">불러오는 중...</p>
@@ -227,6 +222,39 @@ export default function CommunityPage() {
               </p>
             </div>
 
+            <style>
+              {`
+               .react-flow__node {
+                 padding: 0;
+                 display: flex;
+                 justify-content: center;
+                 align-items: center;
+               }
+               
+               .react-flow__handle {
+                 width: 4px;
+                 height: 4px;
+                 min-width: 4px;
+                 min-height: 4px;
+                 background-color: #000;
+                 border: none;
+               }
+               .dark .react-flow__handle {
+                 background-color: #fff;
+                 border: none;
+               }
+               .react-flow__handle-top {
+                 top: -3px;
+                 left: 50%;
+                 transform: translateX(-50%)
+               }
+               .react-flow__handle-bottom {
+                 bottom: -3px;
+                 left: 50%;
+                 transform: translateX(-50%)
+               }
+             `}
+            </style>
             <div
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
               style={{ backgroundColor: bgColor }}
@@ -234,8 +262,8 @@ export default function CommunityPage() {
               <ReactFlow
                 ref={workspaceRef}
                 onInit={setRf}
-                nodes={post.nodes ?? []}
-                edges={post.edges ?? []}
+                nodes={post.roadmap.nodes ?? []}
+                edges={post.roadmap.edges ?? []}
                 fitView
                 fitViewOptions={{ padding: 0.4 }}
                 nodesDraggable={false}
@@ -246,6 +274,7 @@ export default function CommunityPage() {
                 panOnScroll={false}
                 panOnDrag={false}
                 proOptions={{ hideAttribution: true }}
+                nodeTypes={nodeTypes}
                 className="h-full w-full"
               >
                 <Background
@@ -283,7 +312,7 @@ export default function CommunityPage() {
               )}
             </div>
 
-            <CommunityCommentSection postId={post.posts_id} />
+            <CommunityCommentSection postId={post.post_id} />
           </div>
         </div>
       </div>
