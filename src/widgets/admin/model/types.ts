@@ -18,5 +18,6 @@ export type Tech = {
   id: string
   name: string
   category: string
+  iconUrl?: string | null
   createdAt: string
 }
