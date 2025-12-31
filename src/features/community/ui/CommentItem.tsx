@@ -1,6 +1,7 @@
 'use client'
 
-import ProfileAvatar from '@/shared/ui/profile/ProfileAvatar'
+import UserAvatar from '@/features/profile/ui/UserAvatar'
+import { AvatarDecoration } from '@/features/community/model/types'
 
 interface User {
   user_id: string
@@ -10,6 +11,7 @@ interface User {
     field: string
     year: number
   }
+  decorations?: AvatarDecoration | null
 }
 
 interface Comment {
@@ -64,7 +66,6 @@ const CommentItem = ({
 }: Props) => {
   // user가 없으면 기본값 사용
   const userName = comment.user?.name || '익명'
-  const userAvatar = comment.user?.avatar || null
   const userExperience = comment.user?.experience
 
   console.log(comment.user, '커멘트')
@@ -73,10 +74,12 @@ const CommentItem = ({
     <div className="bg-secondary flex gap-12 rounded-lg p-16">
       {/* 프로필 이미지 */}
       <div className="flex-shrink-0">
-        <ProfileAvatar
-          name={userName}
-          image={userAvatar}
+        <UserAvatar
+          userId={comment.user?.user_id ?? comment.user_id}
           size={isReply ? 32 : 40}
+          fallbackName={userName}
+          fallbackImage={comment.user?.avatar ?? null}
+          decorations={comment.user?.decorations}
         />
       </div>
 

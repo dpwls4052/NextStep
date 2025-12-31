@@ -216,7 +216,7 @@ export default function CommunityPage() {
             <div className="mb-20 flex items-center justify-between">
               <p className="text-lg font-semibold">{post.title}</p>
               <p className="text-foreground-light text-right text-sm">
-                {post.users?.name ?? '익명'}
+                {post.author?.name ?? '익명'}
                 <br />
                 {post.created_at?.slice(0, 10)}
               </p>
