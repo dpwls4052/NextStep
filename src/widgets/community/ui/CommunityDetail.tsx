@@ -170,6 +170,8 @@ export default function CommunityDetail({
     custom: CustomNode,
   }
 
+  console.log(post, '포스트내용')
+
   if (loading) return <p className="py-40 text-center">불러오는 중...</p>
   if (!post) return <p className="py-40 text-center">글을 찾을 수 없습니다.</p>
 
@@ -230,12 +232,30 @@ export default function CommunityDetail({
             </div>
           </div>
 
-          <div className="p-24">
-            <div className="mb-20 flex items-center justify-between">
-              <p className="text-lg font-semibold">{post.title}</p>
-              <p className="text-foreground-light text-right text-sm">
-                {post.users?.name ?? '익명'}
-                <br />
+          <div className="relative p-24">
+            <div className="relative mb-20 flex items-center justify-between">
+              <div className="flex items-center gap-10 text-sm">
+                <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full">
+                  <img
+                    className="h-full w-full object-cover"
+                    src={post.users?.avatar}
+                    alt="profile"
+                  />
+                </div>
+                <p>{post.users?.name ?? '익명'}</p>
+                <p className="text-foreground-light text-xs">
+                  {post.users?.experiences
+                    ?.map((exp) => `${exp.field} ${exp.year}년차`)
+                    .join(', ')}
+                </p>
+              </div>
+
+              <p className="absolute inset-x-0 text-center text-lg font-semibold">
+                {post.title}
+              </p>
+
+              <p className="text-foreground-light text-sm">
+                {' '}
                 {post.created_at?.slice(0, 10)}
               </p>
             </div>
@@ -328,6 +348,10 @@ export default function CommunityDetail({
                   </button>
                 </div>
               )}
+            </div>
+
+            <div>
+              <p>{post.content}</p>
             </div>
 
             <CommunityCommentSection postId={post.post_id} />
