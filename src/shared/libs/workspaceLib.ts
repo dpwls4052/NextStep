@@ -56,6 +56,7 @@ export const createWorkspace = async (userId: string, body: any) => {
     roadmapId: roadmapId,
     title: workspace.title,
     createdAt: workspace.created_at,
+    updatedAt: workspace.updated_at,
   }
 }
 
@@ -83,6 +84,7 @@ export const updateWorkspace = async (
     workspace_id: string
     title: string
     roadmap_id: string
+    created_at: string
     updated_at: string
     roadmap: {
       roadmap_id: string
@@ -163,6 +165,7 @@ export const updateWorkspace = async (
     workspaceId: updatedWorkspace.workspace_id,
     roadmapId: roadmapId,
     title: updatedWorkspace.title,
+    createdAt: updatedWorkspace.created_at,
     updatedAt: updatedWorkspace.updated_at,
   }
 }
