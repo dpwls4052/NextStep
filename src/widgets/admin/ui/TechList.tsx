@@ -1,16 +1,52 @@
 'use client'
 
-import { useState } from 'react'
-import { techList } from '../model/dummy'
+import { useEffect, useState, useCallback } from 'react'
 import { Tech } from '../model/types'
 import TechFormModal from './TechFormModal'
 
 export default function TechList() {
-  const [list, setList] = useState<Tech[]>(techList)
+  const [list, setList] = useState<Tech[]>([])
   const [editing, setEditing] = useState<Tech | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const reload = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/techs')
+      const json = await res.json()
+
+      if (!res.ok) {
+        console.error(json)
+        setList([])
+        return
+      }
+
+      setList(Array.isArray(json) ? json : [])
+    } catch (e) {
+      console.error(e)
+      setList([])
+    }
+  }, [])
+
+  useEffect(() => {
+    const load = async () => {
+      await reload()
+      setLoading(false)
+    }
+
+    load()
+  }, [reload])
+
+  if (loading) {
+    return (
+      <div className="text-14 text-foreground-light">
+        기술 스택 불러오는 중…
+      </div>
+    )
+  }
 
   return (
     <div>
+      {/* 헤더 */}
       <div className="mb-12 flex items-center justify-between">
         <h3 className="text-16 text-foreground font-semibold">
           기술 스택 목록
@@ -23,57 +59,93 @@ export default function TechList() {
         </button>
       </div>
 
+      {/* 리스트 */}
       <div className="flex flex-col gap-8">
         {list.map((t) => (
           <div
             key={t.id}
             className="border-border bg-background-light flex items-center justify-between rounded-xl border px-16 py-12"
           >
-            <div className="text-foreground font-semibold">{t.name}</div>
+            <div className="flex items-center gap-12">
+              <div className="bg-background-light flex h-32 w-32 items-center justify-center rounded-lg">
+                {t.iconUrl ? (
+                  <img
+                    src={t.iconUrl}
+                    alt={t.name}
+                    className="h-20 w-20 object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="text-foreground-light text-xs">N/A</span>
+                )}
+              </div>
+
+              <div className="text-foreground font-semibold">{t.name}</div>
+            </div>
+
             <div className="text-foreground-light">{t.category}</div>
+
             <div className="flex gap-8">
+              {/* 수정 */}
               <button
                 className="border-border text-12 rounded-lg border px-12 py-6"
                 onClick={() => setEditing(t)}
               >
                 수정
               </button>
+
+              {/* 삭제 (Soft Delete) */}
               <button
                 className="border-border text-12 rounded-lg border px-12 py-6"
-                onClick={() =>
-                  setList((prev) => prev.filter((x) => x.id !== t.id))
-                }
+                onClick={async () => {
+                  const ok = confirm('해당 기술 스택을 삭제하시겠습니까?')
+                  if (!ok) return
+
+                  await fetch(`/api/admin/techs/${t.id}`, {
+                    method: 'DELETE',
+                  })
+
+                  reload()
+                }}
               >
                 삭제
               </button>
             </div>
           </div>
         ))}
+
+        {list.length === 0 && (
+          <div className="text-foreground-light py-20 text-center text-sm">
+            등록된 기술 스택이 없습니다.
+          </div>
+        )}
       </div>
 
+      {/* 등록 / 수정 모달 */}
       {editing && (
         <TechFormModal
           tech={editing.id ? editing : null}
           onClose={() => setEditing(null)}
-          onSave={(name, category) => {
+          onSave={async (name, category, iconUrl) => {
+            // ✏ 수정
             if (editing.id) {
-              setList((prev) =>
-                prev.map((x) =>
-                  x.id === editing.id ? { ...x, name, category } : x
-                )
-              )
-            } else {
-              setList((prev) => [
-                {
-                  id: `t_${Date.now()}`,
-                  name,
-                  category,
-                  createdAt: new Date().toISOString().slice(0, 10),
-                },
-                ...prev,
-              ])
+              await fetch(`/api/admin/techs/${editing.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, category, iconUrl }),
+              })
             }
+            // ➕ 등록
+            else {
+              await fetch('/api/admin/techs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, category, iconUrl }),
+              })
+            }
+
             setEditing(null)
+            reload()
           }}
         />
       )}
