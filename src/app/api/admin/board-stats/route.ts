@@ -8,7 +8,7 @@ export async function GET() {
       .from('posts')
       .select(
         `
-        posts_id,
+        post_id,
         list_id,
         like_count,
         created_at,
@@ -24,8 +24,8 @@ export async function GET() {
       return NextResponse.json([])
     }
 
-    // 2️⃣ 댓글 수 집계 (해당 post_id만)
-    const postIds = posts.map((p) => p.posts_id)
+    // 2️⃣ 댓글 수 집계 (post_id 기준)
+    const postIds = posts.map((p) => p.post_id)
 
     const { data: comments, error: commentError } = await supabaseAdmin
       .from('comments')
@@ -68,7 +68,7 @@ export async function GET() {
       const item = boardMap.get(boardName)!
       item.posts += 1
       item.likes += p.like_count ?? 0
-      item.comments += commentCountMap.get(p.posts_id) ?? 0
+      item.comments += commentCountMap.get(p.post_id) ?? 0
 
       if (new Date(p.created_at) > new Date(item.updatedAt)) {
         item.updatedAt = p.created_at
