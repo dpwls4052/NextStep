@@ -20,14 +20,17 @@ export async function GET() {
       .eq('status', true)
 
     if (postError) throw postError
-    if (!posts) return NextResponse.json([])
+    if (!posts || posts.length === 0) {
+      return NextResponse.json([])
+    }
 
-    // 2️⃣ 댓글 수 집계 (post_id 기준)
+    // 2️⃣ 댓글 수 집계 (해당 post_id만)
     const postIds = posts.map((p) => p.posts_id)
 
     const { data: comments, error: commentError } = await supabaseAdmin
       .from('comments')
       .select('post_id')
+      .in('post_id', postIds) // ⭐ 핵심 수정
 
     if (commentError) throw commentError
 
@@ -37,8 +40,8 @@ export async function GET() {
       commentCountMap.set(c.post_id, (commentCountMap.get(c.post_id) ?? 0) + 1)
     }
 
-    // 3️⃣ 게시판(list)별 집계
-    const map = new Map<
+    // 3️⃣ 게시판별 집계
+    const boardMap = new Map<
       string,
       {
         board: string
@@ -52,8 +55,8 @@ export async function GET() {
     for (const p of posts) {
       const boardName = p.list?.name ?? 'UNKNOWN'
 
-      if (!map.has(boardName)) {
-        map.set(boardName, {
+      if (!boardMap.has(boardName)) {
+        boardMap.set(boardName, {
           board: boardName,
           posts: 0,
           comments: 0,
@@ -62,7 +65,7 @@ export async function GET() {
         })
       }
 
-      const item = map.get(boardName)!
+      const item = boardMap.get(boardName)!
       item.posts += 1
       item.likes += p.like_count ?? 0
       item.comments += commentCountMap.get(p.posts_id) ?? 0
@@ -72,7 +75,7 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json(Array.from(map.values()))
+    return NextResponse.json(Array.from(boardMap.values()))
   } catch (e) {
     console.error('admin board-stats error:', e)
     return NextResponse.json(
