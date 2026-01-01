@@ -4,6 +4,7 @@ export type CustomNodeDataType = {
   techId: string | null
   label: string | null
   iconUrl?: string
+  completed: boolean
 }
 
 export type CustomNodeType = Node<CustomNodeDataType>

@@ -27,7 +27,7 @@ const useAddNode = () => {
           x: clientX,
           y: clientY,
         }),
-        data: { techId: null, label: null },
+        data: { techId: null, label: null, completed: false },
         style: { ...NODE_STYLE.default },
         type: 'custom',
       }

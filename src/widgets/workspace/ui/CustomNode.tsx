@@ -1,10 +1,14 @@
 import { Handle, Position } from '@xyflow/react'
 import { CustomNodeDataType } from '../model/types'
 import { useWorkspaceStore } from '../model'
+import { Check } from 'lucide-react'
 
 // 이미지가 있는 커스텀 노드
 const CustomNode = ({ data }: { data: CustomNodeDataType }) => {
   const techId = data.techId
+
+  const getNodeCompleted = useWorkspaceStore((s) => s.getNodeCompleted)
+  const completed = getNodeCompleted(techId)
 
   const hasMemo = useWorkspaceStore(
     (s) => !!techId && !!s.current.memos[techId]?.memo
@@ -18,6 +22,11 @@ const CustomNode = ({ data }: { data: CustomNodeDataType }) => {
   return (
     <div>
       <Handle type="target" position={Position.Top} className="h-3 w-3" />
+      {completed && (
+        <div className="absolute top-0 left-0 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-green-500">
+          <Check size={9} className="stroke-white" />
+        </div>
+      )}
       <div className="flex items-center justify-center gap-3">
         {data.iconUrl && (
           <img
