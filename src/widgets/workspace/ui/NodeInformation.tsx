@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react'
 import useTechRecommendation from '@/features/ai/model/useTechRecommendation'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useAddChildNode from '../model/useAddChildNode'
+import { Check } from '@/shared/ui/icon'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
@@ -31,6 +32,9 @@ const NodeInformation = ({
   const { status } = useSession()
   const isLogin = status === 'authenticated'
   const [mode, setMode] = useState<string>(NodeInformationMenu[0].key)
+  const setNodeCompleted = useWorkspaceStore((s) => s.setNodeCompleted)
+  const getNodeCompleted = useWorkspaceStore((s) => s.getNodeCompleted)
+  const completed = getNodeCompleted(selectedNode.data.techId)
   const getNodeLinks = useWorkspaceStore((s) => s.getNodeLinks)
   const getNodeTroubleshootings = useWorkspaceStore(
     (s) => s.getNodeTroubleshootings
@@ -105,7 +109,27 @@ const NodeInformation = ({
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="flex items-center justify-between px-10 py-20">
+      <div className="px-10 pt-10">
+        {completed ? (
+          <Button
+            variant="none"
+            className="bg-green-500 px-10 py-4 text-white"
+            onClick={() => setNodeCompleted(selectedNode.data.techId, false)}
+          >
+            <Check className="stroke-white" />
+            <span className="pl-5">학습 완료</span>
+          </Button>
+        ) : (
+          <Button
+            variant="none"
+            className="rounded-sm bg-white/50 px-10 py-4"
+            onClick={() => setNodeCompleted(selectedNode.data.techId, true)}
+          >
+            학습 완료로 표시
+          </Button>
+        )}
+      </div>
+      <div className="flex items-center justify-between px-10 py-10">
         <div className="flex items-center gap-10">
           <img
             src={selectedNode.data.iconUrl}

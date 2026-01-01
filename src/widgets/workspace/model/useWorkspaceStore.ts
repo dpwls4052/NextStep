@@ -44,6 +44,12 @@ type WorkspaceStore = {
   setWorkspaceTitle: (title: string) => void
 
   /* =========================
+   * Complete Node
+   ========================= */
+  setNodeCompleted: (techId: string | null, completed: boolean) => void
+  getNodeCompleted: (techId: string | null) => boolean
+
+  /* =========================
    * Snapshot
    ========================= */
   original: WorkspaceSnapshot | null
@@ -155,6 +161,31 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
     set((state) => ({
       original: structuredClone(state.current),
     })),
+
+  /* =========================
+   * Complete Node
+   ========================= */
+  setNodeCompleted: (techId, completed) => {
+    if (!techId) return
+    set((state) => ({
+      nodes: state.nodes.map((node) => {
+        if (node.data.techId !== techId) return node
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            completed,
+          },
+        }
+      }),
+    }))
+  },
+  getNodeCompleted: (techId) => {
+    if (!techId) return false
+    const node = get().nodes.find((node) => node.data.techId === techId)
+
+    return node?.data.completed ?? false
+  },
 
   /* =========================
    * Memo

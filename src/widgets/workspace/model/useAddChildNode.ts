@@ -69,7 +69,8 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
         data: {
           techId: techItem.tech_id || null,
           label: techItem.name || '새 노드',
-          iconUrl: techItem.icon_url || null,
+          iconUrl: techItem.icon_url ?? undefined,
+          completed: false,
         },
         style: { ...NODE_STYLE.default },
       }
