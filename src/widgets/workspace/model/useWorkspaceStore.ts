@@ -317,6 +317,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         links: data.links || {},
         troubleshootings: data.troubleshootings || {},
       },
+      isEdited: false,
     }),
 
   resetToEmpty: () =>
@@ -329,6 +330,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       selectedNode: null,
       original: null,
       current: emptySnapshot,
+      isEdited: false,
     }),
 
   /* =========================
