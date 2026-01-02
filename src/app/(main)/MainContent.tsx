@@ -1,6 +1,6 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
 import { Workspace } from '@/widgets/workspace/ui'
 import useGetWorkspace from '@/features/workspace/getWorkspace/model/useGetWorkspace'
@@ -13,9 +13,27 @@ export default function MainContent() {
 
   // React Query로 워크스페이스 정보 가져오기
   const { data, isLoading, error } = useGetWorkspace(workspaceId)
+  const isEdited = useWorkspaceStore((s) => s.isEdited)
 
   // store 초기화
   const { initializeWithData, resetToEmpty } = useWorkspaceStore()
+
+  const isEditedRef = useRef(isEdited)
+
+  useEffect(() => {
+    isEditedRef.current = isEdited
+  }, [isEdited])
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (!isEditedRef.current) return
+      e.preventDefault()
+      e.returnValue = '' // 필수
+    }
+
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [])
 
   useEffect(() => {
     if (!workspaceId) {
