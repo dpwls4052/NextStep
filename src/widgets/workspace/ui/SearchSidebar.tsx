@@ -125,6 +125,7 @@ const SearchSidebar = ({
               techId: techItem.tech_id ?? '', // undefined 처리
               label: techItem.name ?? '',
               iconUrl: techItem.icon_url ?? '',
+              completed: false,
             },
           }
         }
@@ -139,6 +140,7 @@ const SearchSidebar = ({
         techId: techItem.tech_id ?? '',
         label: techItem.name ?? '',
         iconUrl: techItem.icon_url ?? '',
+        completed: false,
       },
     })
   }
