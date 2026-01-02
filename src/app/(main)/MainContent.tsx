@@ -1,5 +1,5 @@
 'use client'
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { ReactFlowProvider } from '@xyflow/react'
 import { Workspace } from '@/widgets/workspace/ui'
@@ -10,6 +10,7 @@ export default function MainContent() {
   // URL에서 workspaceId 읽기
   const searchParams = useSearchParams()
   const workspaceId = searchParams.get('workspace')
+  const pathname = usePathname()
 
   // React Query로 워크스페이스 정보 가져오기
   const { data, isLoading, error } = useGetWorkspace(workspaceId)
@@ -24,16 +25,30 @@ export default function MainContent() {
     isEditedRef.current = isEdited
   }, [isEdited])
 
+  // beforeunload 이벤트 리스너 등록
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (!isEditedRef.current) return
       e.preventDefault()
-      e.returnValue = '' // 필수
+      e.returnValue = ''
     }
 
     window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
+
+    // cleanup: 컴포넌트 언마운트 시 반드시 리스너 제거
+    return () => {
+      window.removeEventListener('beforeunload', handler)
+    }
   }, [])
+
+  // 라우트 변경 감지 및 상태 초기화
+  useEffect(() => {
+    // 이 페이지를 떠날 때 워크스페이스 상태 초기화
+    return () => {
+      // MainContent가 언마운트되면 워크스페이스 상태 리셋
+      resetToEmpty()
+    }
+  }, [pathname, resetToEmpty])
 
   useEffect(() => {
     if (!workspaceId) {
