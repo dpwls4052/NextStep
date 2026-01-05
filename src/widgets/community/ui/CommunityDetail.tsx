@@ -17,6 +17,7 @@ import { PostWithRoadmap } from '@/features/community/model/types'
 import CustomNode from '@/widgets/workspace/ui/CustomNode'
 import UserAvatar from '@/features/profile/ui/UserAvatar'
 import { markQuestReady } from '@/features/user/quest/api/questClient'
+import { api } from '@/shared/libs/axios'
 
 interface CommunityDetailProps {
   postId: string
@@ -48,6 +49,27 @@ export default function CommunityDetail({
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
   const [likeLoading, setLikeLoading] = useState(false)
+
+  const handleImportWorkspace = async () => {
+    if (!post) return
+
+    try {
+      const { data } = await api.post('/workspaces', {
+        title: post.title,
+        nodes: post.roadmap.nodes ?? [],
+        edges: post.roadmap.edges ?? [],
+        snapshot: {
+          nodes: post.roadmap.nodes ?? [],
+          edges: post.roadmap.edges ?? [],
+        },
+      })
+
+      // sidebar는 workspace 목록 다시 fetch함
+      router.push(`/workspace/${data.workspace_id}`)
+    } catch (e) {
+      console.error('워크스페이스 생성 실패', e)
+    }
+  }
 
   // 좋아요 UI용 state
   const [liked, setLiked] = useState(false)
@@ -362,8 +384,11 @@ export default function CommunityDetail({
                         이미지로 저장하기
                       </button>
 
-                      <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
-                        내 워크스페이스에 불러오기
+                      <button
+                        onClick={handleImportWorkspace}
+                        className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
+                      >
+                        워크스페이스로 가져오기
                       </button>
                     </div>
                   )}
