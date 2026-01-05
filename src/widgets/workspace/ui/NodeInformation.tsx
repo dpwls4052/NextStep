@@ -185,7 +185,7 @@ const NodeInformation = ({
             onComplete={() => {}}
             handleUpdateNode={handleUpdateNode}
             onNew={handleNewTech}
-            onAddNode={addChildNode} // 훅에서 가져온 함수 사용
+            onAddNode={addChildNode}
           />
         </div>
       ) : (
