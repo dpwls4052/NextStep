@@ -290,7 +290,6 @@ const Profile = () => {
               </div>
             </section>
             <div className="mt-80 flex justify-end">
-              {' '}
               <Modal
                 open={open}
                 onOpenChange={setOpen}
@@ -299,11 +298,7 @@ const Profile = () => {
                 trigger={
                   <Button
                     className="text-16 bg-transparent font-light !text-[#ff0202] hover:underline"
-                    onClick={(e: any) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setOpen(true)
-                    }}
+                    onClick={() => setOpen(true)}
                   >
                     회원탈퇴
                   </Button>
@@ -312,11 +307,7 @@ const Profile = () => {
                   <div className="mt-10 flex w-full gap-10">
                     <Button
                       className="flex-1 rounded-sm border border-gray-200 py-10"
-                      onClick={(e: any) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setOpen(false)
-                      }}
+                      onClick={() => setOpen(false)}
                       disabled={isPending}
                     >
                       취소

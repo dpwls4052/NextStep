@@ -36,6 +36,8 @@ const CommunityCard = ({
   const nodeTypes = {
     custom: CustomNode,
   }
+  const NO_AVATAR =
+    'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
 
   return (
     <button
@@ -110,9 +112,9 @@ const CommunityCard = ({
           <UserAvatar
             userId={authorId}
             size={30}
-            fallbackName={userName}
-            fallbackImage={userImage}
-            decorations={decorations}
+            fallbackName={userName ?? '익명'}
+            fallbackImage={userImage ?? NO_AVATAR}
+            decorations={decorations ?? null}
             className="h-full"
           />
         </div>
