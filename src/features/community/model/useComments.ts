@@ -10,6 +10,7 @@ import {
   deleteComment,
   CommentType,
 } from './../api/commentApi'
+import { markQuestReady } from '@/features/user/quest/api/questClient'
 
 export const useComments = (postId: string, type: CommentType = 'news') => {
   const queryClient = useQueryClient()
@@ -48,10 +49,14 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
         post_id: postId,
         user_id: currentUserId,
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, type] })
       setNewComment('')
       toast.success('댓글이 작성되었습니다.')
+
+      if (type === 'community') {
+        await markQuestReady(3)
+      }
     },
     onError: () => {
       toast.error('댓글 작성에 실패했습니다.')

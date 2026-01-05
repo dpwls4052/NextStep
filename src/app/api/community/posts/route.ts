@@ -5,7 +5,6 @@ import { createWorkspace, updateWorkspace } from '@/shared/libs/workspaceLib'
 import { cloneRoadmapAsPublic } from '@/shared/libs/roadmapLib'
 import type { PostWithRoadmap } from '@/features/community/model/types'
 
-// ✅ 공용 유틸 (decorations + experience까지 필요하면 이걸)
 import { buildUserProfileMap } from '@/shared/libs/communityUserMap'
 
 // ================================
@@ -71,14 +70,6 @@ export const GET = async (req: NextRequest) => {
       borderScale: 0.6,
       accessoryScale: 0.7,
     })
-    console.log(
-      posts.map((p) => ({
-        post_id: p.post_id,
-        like_count: p.like_count,
-        post_likes: p.post_likes,
-        is_liked: p.post_likes?.some((l) => l.user_id === userId),
-      }))
-    )
 
     // 3) posts에 author 붙여서 반환
     const result = safePosts.map((p) => {
