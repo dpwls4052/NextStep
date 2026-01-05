@@ -290,6 +290,7 @@ const SearchSidebar = ({
                           onComplete={() => {}}
                           handleUpdateNode={handleUpdateNode}
                           onNew={handleNewTech}
+                          mode="edit"
                         />
                       </>
                     )}

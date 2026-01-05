@@ -186,6 +186,7 @@ const NodeInformation = ({
             handleUpdateNode={handleUpdateNode}
             onNew={handleNewTech}
             onAddNode={addChildNode}
+            mode="add"
           />
         </div>
       ) : (
