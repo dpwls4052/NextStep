@@ -5,7 +5,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 export const POST = async (req: NextRequest) => {
   try {
-    // ✅ 1️⃣ next-auth 세션 가져오기 (요청 안에서!)
+    // next-auth 세션 가져오기
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.userId) {
@@ -14,14 +14,14 @@ export const POST = async (req: NextRequest) => {
 
     const userId = session.user.userId
 
-    // ✅ 2️⃣ 요청 body
+    // 요청 body
     const { postId } = await req.json()
 
     if (!postId) {
       return NextResponse.json({ error: 'postId missing' }, { status: 400 })
     }
 
-    // ✅ 3️⃣ 기존 좋아요 존재 여부 확인
+    // 기존 좋아요 존재 여부 확인
     const { data: existing, error: selectError } = await supabaseAdmin
       .from('post_likes')
       .select('id')
@@ -30,21 +30,21 @@ export const POST = async (req: NextRequest) => {
       .maybeSingle()
 
     if (selectError) {
-      console.error('❌ SELECT post_likes error:', selectError)
+      console.error('SELECT post_likes error:', selectError)
       throw selectError
     }
 
     let liked = false
 
     if (existing) {
-      // ✅ 4️⃣ 좋아요 취소
+      //좋아요 취소
       const { error: deleteError } = await supabaseAdmin
         .from('post_likes')
         .delete()
         .eq('id', existing.id)
 
       if (deleteError) {
-        console.error('❌ DELETE post_likes error:', deleteError)
+        console.error('DELETE post_likes error:', deleteError)
         throw deleteError
       }
 
@@ -53,22 +53,21 @@ export const POST = async (req: NextRequest) => {
       })
 
       if (rpcError) {
-        console.error('❌ decrement_like RPC error:', rpcError)
+        console.error('decrement_like RPC error:', rpcError)
         throw rpcError
       }
 
       liked = false
     } else {
-      // ✅ 5️⃣ 좋아요 추가
       const { error: insertError } = await supabaseAdmin
         .from('post_likes')
         .insert({
           post_id: postId,
-          user_id: userId, // ⭐ public.users.user_id
+          user_id: userId,
         })
 
       if (insertError) {
-        console.error('❌ INSERT post_likes error:', insertError)
+        console.error('INSERT post_likes error:', insertError)
         throw insertError
       }
 
@@ -77,14 +76,14 @@ export const POST = async (req: NextRequest) => {
       })
 
       if (rpcError) {
-        console.error('❌ increment_like RPC error:', rpcError)
+        console.error('increment_like RPC error:', rpcError)
         throw rpcError
       }
 
       liked = true
     }
 
-    // ✅ 6️⃣ 최신 like_count 조회
+    //최신 like_count 조회
     const { data: post, error: postError } = await supabaseAdmin
       .from('posts')
       .select('like_count')
@@ -92,7 +91,7 @@ export const POST = async (req: NextRequest) => {
       .single()
 
     if (postError) {
-      console.error('❌ SELECT posts error:', postError)
+      console.error('SELECT posts error:', postError)
       throw postError
     }
 
@@ -101,7 +100,7 @@ export const POST = async (req: NextRequest) => {
       likeCount: post?.like_count ?? 0,
     })
   } catch (e) {
-    console.error('🔥 LIKE API FATAL ERROR:', e)
+    console.error('LIKE API FATAL ERROR:', e)
     return NextResponse.json({ error: 'failed' }, { status: 500 })
   }
 }
