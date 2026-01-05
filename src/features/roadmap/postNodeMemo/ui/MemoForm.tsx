@@ -11,12 +11,14 @@ const MemoForm = ({ techId }: MemoFormProps) => {
   if (!techId) return null
 
   return (
-    <textarea
-      value={memo?.memo ?? ''}
-      onChange={(e) => setNodeMemo(techId, e.target.value)}
-      placeholder="메모를 입력하세요."
-      className="bg-background-light focus:bg-background h-full w-full resize-none rounded-md p-10 outline-none"
-    />
+    <div className="h-full">
+      <textarea
+        value={memo?.memo ?? ''}
+        onChange={(e) => setNodeMemo(techId, e.target.value)}
+        placeholder="메모를 입력하세요."
+        className="bg-background-light focus:bg-background h-full w-full resize-none rounded-md p-10 outline-none"
+      />
+    </div>
   )
 }
 
