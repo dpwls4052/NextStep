@@ -53,7 +53,7 @@ export default function TechList() {
         </h3>
         <button
           onClick={() => setEditing({} as Tech)}
-          className="text-12 rounded-xl bg-[var(--color-accent)] px-14 py-8 font-semibold text-white"
+          className="text-12 cursor-pointer rounded-xl bg-[var(--color-accent)] px-14 py-8 font-semibold text-white"
         >
           + 등록
         </button>
@@ -66,7 +66,7 @@ export default function TechList() {
             key={t.id}
             className="border-border bg-background-light flex items-center justify-between rounded-xl border px-16 py-12"
           >
-            <div className="flex items-center gap-12">
+            <div className="flex w-1/5 items-center gap-12">
               <div className="bg-background-light flex h-32 w-32 items-center justify-center rounded-lg">
                 {t.iconUrl ? (
                   <img
@@ -83,12 +83,12 @@ export default function TechList() {
               <div className="text-foreground font-semibold">{t.name}</div>
             </div>
 
-            <div className="text-foreground-light">{t.category}</div>
+            <div className="text-foreground-light w-3/5">{t.category}</div>
 
             <div className="flex gap-8">
               {/* 수정 */}
               <button
-                className="border-border text-12 rounded-lg border px-12 py-6"
+                className="border-border text-12 cursor-pointer rounded-lg border px-12 py-6"
                 onClick={() => setEditing(t)}
               >
                 수정
@@ -96,7 +96,7 @@ export default function TechList() {
 
               {/* 삭제 (Soft Delete) */}
               <button
-                className="border-border text-12 rounded-lg border px-12 py-6"
+                className="border-border text-12 cursor-pointer rounded-lg border px-12 py-6"
                 onClick={async () => {
                   const ok = confirm('해당 기술 스택을 삭제하시겠습니까?')
                   if (!ok) return
