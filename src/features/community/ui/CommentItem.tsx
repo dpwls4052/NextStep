@@ -67,6 +67,8 @@ const CommentItem = ({
   // user가 없으면 기본값 사용
   const userName = comment.user?.name || '익명'
   const userExperience = comment.user?.experience
+  const NO_AVATAR =
+    'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
 
   return (
     <div className="bg-secondary flex gap-12 rounded-lg p-16">
@@ -75,9 +77,9 @@ const CommentItem = ({
         <UserAvatar
           userId={comment.user?.user_id ?? comment.user_id}
           size={isReply ? 32 : 40}
-          fallbackName={userName}
-          fallbackImage={comment.user?.avatar ?? null}
-          decorations={comment.user?.decorations}
+          fallbackName={userName ?? '익명'}
+          fallbackImage={comment.user?.avatar ?? NO_AVATAR}
+          decorations={comment.user?.decorations ?? null}
         />
       </div>
 

@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { useWorkspaceStore, NODE_STYLE } from '../model'
 import { CustomNodeType } from '../model/types'
 import { TechItem } from '@/features/ai/model/useTechRecommendation'
+import { v4 as uuidv4 } from 'uuid'
 
 // @/features/ai/model/useTechRecommendation에서 import
 
@@ -37,7 +38,7 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
       }
 
       // 1. 새로운 노드 ID 생성
-      const newId = `${nodes.length + 1}`
+      const newId = uuidv4()
 
       // 2. 위치 계산 - 아래쪽으로만 펼쳐지도록 배치
       const childIndex = childNodeCountRef.current
@@ -64,6 +65,7 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
           y: selectedNode.position.y + offsetY,
         },
         data: {
+          nodeId: newId,
           techId: techItem.tech_id || null,
           label: techItem.name || '새 노드',
           iconUrl: techItem.icon_url ?? undefined,

@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Trash = ({ size = 18 }) => {
   return (
     <svg
@@ -8,7 +6,7 @@ const Trash = ({ size = 18 }) => {
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      stroke="#FF0202"
+      stroke="#ff4343"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

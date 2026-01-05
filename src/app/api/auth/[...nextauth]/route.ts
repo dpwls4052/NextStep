@@ -56,6 +56,23 @@ export const authOptions: NextAuthOptions = {
           console.error('Supabase 신규 유저 생성 실패:', insertError.message)
           return false
         }
+        return true
+      }
+      // 있으면: 탈퇴 상태면 “처음 가입한 것처럼” 복구
+      if (existingUser.status === false) {
+        const { error: updError } = await supabaseAdmin
+          .from('users')
+          .update({
+            status: true,
+            name: user.name,
+            avatar: user.image,
+          })
+          .eq('user_id', existingUser.user_id)
+
+        if (updError) {
+          console.error('Supabase 탈퇴 유저 복구 실패:', updError.message)
+          return false
+        }
       }
 
       return true
