@@ -58,16 +58,14 @@ export const authOptions: NextAuthOptions = {
         }
         return true
       }
-      // ✅ 있으면: 탈퇴 상태면 “처음 가입한 것처럼” 복구
+      // 있으면: 탈퇴 상태면 “처음 가입한 것처럼” 복구
       if (existingUser.status === false) {
         const { error: updError } = await supabaseAdmin
           .from('users')
           .update({
             status: true,
-            name: user.name, // '익명' -> '징징이'
-            avatar: user.image, // null -> OAuth image(or 기본)
-            // point는 정책 선택:
-            // point: 0, // 탈퇴 때 이미 0으로 만들었으면 굳이 안해도 됨
+            name: user.name,
+            avatar: user.image,
           })
           .eq('user_id', existingUser.user_id)
 

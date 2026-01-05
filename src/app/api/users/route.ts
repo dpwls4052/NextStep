@@ -520,7 +520,15 @@ export async function DELETE() {
     if (user.status !== true) {
       return NextResponse.json({ message: 'User inactive' }, { status: 403 })
     }
-
+    await supabaseAdmin
+      .from('quests')
+      .update({
+        quest1: 'locked',
+        quest2: 'locked',
+        quest3: 'locked',
+        quest4: 'locked',
+      })
+      .eq('user_id', userId)
     const NO_AVATAR_URL =
       'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
 
