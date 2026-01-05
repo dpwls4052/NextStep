@@ -125,59 +125,51 @@ const TabContentDetail = ({ item, onClickPreview, onPurchased }: Props) => {
       </div>
 
       {/* 구매 버튼 클릭 -> 모달 오픈 */}
-      <Modal
-        open={open}
-        onOpenChange={setOpen}
-        title="구매하시겠습니까?"
-        className="max-w-[420px] p-30"
-        trigger={
-          <Button
-            variant="accent"
-            className="mt-15 w-full rounded-sm py-10"
-            onClick={(e: any) => {
-              e.stopPropagation()
-              setOpen(true) // trigger 클릭 시 모달 열기
-            }}
-          >
-            구매하기
-          </Button>
-        }
-        footer={
-          <div className="mt-10 flex w-full gap-10">
-            <Button
-              className="flex-1 rounded-sm border border-gray-200 py-10"
-              onClick={(e: any) => {
-                e.stopPropagation()
-                setOpen(false)
-              }}
-              disabled={purchasing}
-            >
-              취소
-            </Button>
+      <div className="w-full" onClick={(e) => e.stopPropagation()}>
+        <Modal
+          open={open}
+          onOpenChange={setOpen}
+          title="구매하시겠습니까?"
+          className="max-w-[420px] p-30"
+          trigger={
             <Button
               variant="accent"
-              className="flex-1 rounded-sm"
-              onClick={(e: any) => {
-                e.stopPropagation()
-                purchaseMutation.mutate()
-                setOpen(false)
-              }}
-              disabled={purchasing}
+              className="mt-15 w-full rounded-sm py-10"
+              onClick={() => setOpen(true)}
             >
-              {purchasing ? '구매 중...' : '구매하기'}
+              구매하기
             </Button>
+          }
+          footer={
+            <div className="mt-10 flex w-full gap-10">
+              <Button
+                className="flex-1 rounded-sm border border-gray-200 py-10"
+                onClick={() => setOpen(false)}
+                disabled={purchasing}
+              >
+                취소
+              </Button>
+              <Button
+                variant="accent"
+                className="flex-1 rounded-sm"
+                onClick={() => purchaseMutation.mutate()}
+                disabled={purchasing}
+              >
+                {purchasing ? '구매 중...' : '구매하기'}
+              </Button>
+            </div>
+          }
+        >
+          <div className="text-md my-10 text-gray-600">
+            <p>{`"${item.name}"을(를) ${item.price}P로 구매합니다.`}</p>
+            <p>
+              구매 후 아이템은{' '}
+              <span className="font-semibold">프로필 꾸미기</span>
+              에서 적용할 수 있어요.
+            </p>
           </div>
-        }
-      >
-        <div className="text-md my-10 text-gray-600">
-          <p>{`"${item.name}"을(를) ${item.price}P로 구매합니다.`}</p>
-          <p>
-            구매 후 아이템은{' '}
-            <span className="font-semibold">프로필 꾸미기</span>
-            에서 적용할 수 있어요.
-          </p>
-        </div>
-      </Modal>
+        </Modal>
+      </div>
     </div>
   )
 }
