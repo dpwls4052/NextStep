@@ -16,6 +16,7 @@ import { exportWorkspaceAsImage } from '@/features/community/model/exportWorkspa
 import { PostWithRoadmap } from '@/features/community/model/types'
 import CustomNode from '@/widgets/workspace/ui/CustomNode'
 import UserAvatar from '@/features/profile/ui/UserAvatar'
+import { markQuestReady } from '@/features/user/quest/api/questClient'
 
 interface CommunityDetailProps {
   postId: string
@@ -145,8 +146,13 @@ export default function CommunityDetail({
       })
 
       const json = await res.json()
+
       setLiked(json.liked)
       setLikeCount(json.likeCount)
+
+      if (json.liked === true) {
+        await markQuestReady(2)
+      }
     } finally {
       setLikeLoading(false)
     }

@@ -5,7 +5,6 @@ import { createWorkspace, updateWorkspace } from '@/shared/libs/workspaceLib'
 import { cloneRoadmapAsPublic } from '@/shared/libs/roadmapLib'
 import type { PostWithRoadmap } from '@/features/community/model/types'
 
-// ✅ 공용 유틸 (decorations + experience까지 필요하면 이걸)
 import { buildUserProfileMap } from '@/shared/libs/communityUserMap'
 
 // ================================
