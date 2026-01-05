@@ -47,7 +47,7 @@ const CommunityNewsList = () => {
           <button
             key={article.article_id}
             onClick={() => router.push(`/community/news/${article.article_id}`)}
-            className="flex w-full cursor-pointer items-center justify-between gap-20 py-14 text-left transition hover:bg-gray-50"
+            className="flex w-full cursor-pointer items-center justify-between gap-20 py-14 text-left transition hover:opacity-50"
           >
             <div className="text-12 w-80">
               <p className="bg-primary rounded-md py-5 text-center">
