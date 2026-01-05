@@ -174,7 +174,7 @@ export async function PATCH(req: Request) {
     }
 
     const contentType = req.headers.get('content-type') || ''
-    let body: PatchBody = {}
+    let body: PatchRequestBody = {}
     let avatarFile: File | null = null
 
     if (contentType.includes('multipart/form-data')) {
@@ -520,7 +520,7 @@ export async function DELETE() {
     if (user.status !== true) {
       return NextResponse.json({ message: 'User inactive' }, { status: 403 })
     }
-    await supabaseAdmin
+    const { error: questErr } = await supabaseAdmin
       .from('quests')
       .update({
         quest1: 'locked',
@@ -529,6 +529,25 @@ export async function DELETE() {
         quest4: 'locked',
       })
       .eq('user_id', userId)
+
+    if (questErr) throw questErr
+
+    const { error: phErr } = await supabaseAdmin
+      .from('point_history')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+
+    if (phErr) throw phErr
+
+    const { error: odErr } = await supabaseAdmin
+      .from('orders')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+
+    if (odErr) throw odErr
+
     const NO_AVATAR_URL =
       'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
 

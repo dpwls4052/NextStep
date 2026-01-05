@@ -11,6 +11,7 @@ export async function GET() {
       .from('point_history')
       .select('*')
       .eq('user_id', user.userId)
+      .eq('status', true)
       .order('created_at', { ascending: false })
 
     if (error) throw error

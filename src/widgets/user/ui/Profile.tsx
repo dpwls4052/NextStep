@@ -17,7 +17,7 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useAppliedPurchasedItems } from '@/features/user/shop/model/useAppliedPurchasedItems'
 import { Button } from '@/shared/ui'
-import { useUserDelte } from '@/features/user/updateMyInfo/model/useUserDelete'
+import { useUserDelete } from '@/features/user/updateMyInfo/model/useUserDelete'
 import Modal from '@/shared/ui/Modal'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
@@ -64,7 +64,7 @@ const Profile = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
 
-  const { withdrawAsync, isPending } = useUserDelte({
+  const { withdrawAsync, isPending } = useUserDelete({
     redirectTo: '/',
     onError: (e) => toast.error(e.message),
   })
@@ -326,7 +326,7 @@ const Profile = () => {
                   <p>
                     회원탈퇴 진행하시겠습니까?
                     <br />
-                    탈퇴 후에는 포인트가 소멸되고 계정이 비활성화됩니다.
+                    탈퇴 후에는 포인트가 소멸되고 구매한 아이템이 사라집니다.
                   </p>
                 </div>
               </Modal>

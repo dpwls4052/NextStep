@@ -9,18 +9,10 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-type Category = 'accessory' | 'border' | 'title' | 'nickname'
 type Position = 'top' | 'bottom-right' | 'bottom-left'
 
-type DecorationItem = {
-  id: string
-  name: string
-  price: number
-  category: Category
-  style: string | null
-  source: string | null
-  scale: number | null
-}
+type MenuTabProps = React.ComponentProps<typeof MenuTab>
+type DecorationItem = Parameters<MenuTabProps['onSelectPreview']>[0]
 
 type PreviewState = {
   accessory?: DecorationItem | null
@@ -135,7 +127,7 @@ const Shop = () => {
                 category="border"
                 style={preview.border.style as any}
                 source={preview.border.source}
-                scale={preview.border.scale ?? 1.2}
+                scale={(preview.border as any).scale ?? 1.2}
               />
             </div>
           )}
