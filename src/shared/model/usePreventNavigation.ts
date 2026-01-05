@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 interface UsePreventNavigationOptions {
   when: boolean
@@ -27,6 +27,8 @@ export function usePreventNavigation({
 }: UsePreventNavigationOptions) {
   const whenRef = useRef(when)
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   // 최신 when 값을 ref에 동기화
   useEffect(() => {
@@ -53,14 +55,26 @@ export function usePreventNavigation({
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!whenRef.current) return // 저장됨 → Link 기본 동작
 
+      const href = e.currentTarget.getAttribute('href')
+      if (!href) return
+
+      // 현재 URL (pathname + query)
+      const currentUrl =
+        searchParams.toString().length > 0
+          ? `${pathname}?${searchParams.toString()}`
+          : pathname
+
+      // pathname + query가 모두 같다면 아무 처리 안 함
+      if (href === currentUrl) return
+
       e.preventDefault()
+
       const confirmed = window.confirm(message)
       if (confirmed) {
-        const href = e.currentTarget.getAttribute('href')
-        if (href) router.push(href)
+        router.push(href)
       }
     },
-    [router, message]
+    [router, message, pathname, searchParams]
   )
 
   /**

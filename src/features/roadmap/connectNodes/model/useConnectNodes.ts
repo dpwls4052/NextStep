@@ -6,7 +6,12 @@ import { useCallback } from 'react'
 const useConnectNodes = () => {
   const { setEdges } = useWorkspaceStore()
   const onConnect: OnConnect = useCallback(
-    (params) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
+    (params) => {
+      // 자기 자신과 연결 시 무시
+      if (params.source === params.target) return
+
+      setEdges((eds) => addEdge({ ...params, animated: true }, eds))
+    },
     [setEdges]
   )
 
