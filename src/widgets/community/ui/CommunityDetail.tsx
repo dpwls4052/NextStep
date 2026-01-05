@@ -192,6 +192,9 @@ export default function CommunityDetail({
   if (loading) return <p className="py-40 text-center">불러오는 중...</p>
   if (!post) return <p className="py-40 text-center">글을 찾을 수 없습니다.</p>
 
+  const NO_AVATAR =
+    'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
+
   return (
     <div className="flex">
       <div className="flex w-full justify-center px-40 py-40">
@@ -259,7 +262,7 @@ export default function CommunityDetail({
                     size={40}
                     className="h-40 w-40"
                     fallbackName={post.author?.name ?? '익명'}
-                    fallbackImage={post.author?.avatar ?? null}
+                    fallbackImage={post.author?.avatar ?? NO_AVATAR}
                     decorations={post.author?.decorations ?? null}
                   />
                 </div>

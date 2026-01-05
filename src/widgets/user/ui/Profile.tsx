@@ -17,6 +17,8 @@ import type { AxiosError } from 'axios'
 import axios from 'axios'
 import { useAppliedPurchasedItems } from '@/features/user/shop/model/useAppliedPurchasedItems'
 import { Button } from '@/shared/ui'
+import { useUserDelte } from '@/features/user/updateMyInfo/model/useUserDelete'
+import Modal from '@/shared/ui/Modal'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
@@ -60,6 +62,12 @@ const Profile = () => {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+
+  const { withdrawAsync, isPending } = useUserDelte({
+    redirectTo: '/',
+    onError: (e) => toast.error(e.message),
+  })
 
   // 서버 프로필 조회 (GET /api/users)
   const { data: profile, isFetching } = useQuery({
@@ -136,6 +144,17 @@ const Profile = () => {
 
   // 훅 호출 이후 early return (Hook order 안전)
   if (!user) return null
+
+  const handleUserDelte = async () => {
+    try {
+      await withdrawAsync()
+      toast.success('회원탈퇴가 완료되었습니다.')
+      setOpen(false)
+      // signOut callbackUrl로 이동됨
+    } catch {
+      // onError에서 처리
+    }
+  }
 
   return (
     <main className="flex gap-80 px-50 pt-20">
@@ -271,9 +290,46 @@ const Profile = () => {
               </div>
             </section>
             <div className="mt-80 flex justify-end">
-              <Button className="text-16 font-light !text-[#ff0202] hover:underline">
-                회원탈퇴
-              </Button>
+              <Modal
+                open={open}
+                onOpenChange={setOpen}
+                title="탈퇴하시겠습니까?"
+                className="max-w-[420px] p-30"
+                trigger={
+                  <Button
+                    className="text-16 bg-transparent font-light !text-[#ff0202] hover:underline"
+                    onClick={() => setOpen(true)}
+                  >
+                    회원탈퇴
+                  </Button>
+                }
+                footer={
+                  <div className="mt-10 flex w-full gap-10">
+                    <Button
+                      className="flex-1 rounded-sm border border-gray-200 py-10"
+                      onClick={() => setOpen(false)}
+                      disabled={isPending}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      className="flex-1 rounded-sm !bg-[#ff0202] text-white transition hover:opacity-80"
+                      onClick={handleUserDelte}
+                      disabled={isPending}
+                    >
+                      {isPending ? '탈퇴 처리 중...' : '회원탈퇴'}
+                    </Button>
+                  </div>
+                }
+              >
+                <div className="text-md my-10 text-gray-600">
+                  <p>
+                    회원탈퇴 진행하시겠습니까?
+                    <br />
+                    탈퇴 후에는 포인트가 소멸되고 계정이 비활성화됩니다.
+                  </p>
+                </div>
+              </Modal>
             </div>
           </div>
         </div>

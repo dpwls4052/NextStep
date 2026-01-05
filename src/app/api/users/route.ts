@@ -208,7 +208,7 @@ export async function PATCH(req: Request) {
       body = (await req.json()) as PatchRequestBody
     }
 
-    // ✅ 0) 데코 적용 / 해제 요청
+    // 0) 데코 적용 / 해제 요청
     if (
       body &&
       (body as any).action &&
@@ -496,6 +496,64 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: 'Invalid year' }, { status: 400 })
     }
     console.error('PATCH /api/users error:', e)
+    return NextResponse.json(
+      { message: 'Server error', detail: e?.message ?? String(e) },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE: 회원탈퇴(soft delete) + 포인트 소멸(0) + 연관 데이터 status=false
+export async function DELETE() {
+  try {
+    const { userId } = await requireUser()
+
+    const { data: user, error: userErr } = await supabaseAdmin
+      .from('users')
+      .select('user_id, status')
+      .eq('user_id', userId)
+      .single()
+
+    if (userErr || !user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 })
+    }
+    if (user.status !== true) {
+      return NextResponse.json({ message: 'User inactive' }, { status: 403 })
+    }
+    await supabaseAdmin
+      .from('quests')
+      .update({
+        quest1: 'locked',
+        quest2: 'locked',
+        quest3: 'locked',
+        quest4: 'locked',
+      })
+      .eq('user_id', userId)
+    const NO_AVATAR_URL =
+      'https://bbzbryqbwidnavdkcypm.supabase.co/storage/v1/object/public/avatars/noavatar.png'
+
+    const { error: updErr } = await supabaseAdmin
+      .from('users')
+      .update({
+        status: false,
+        point: 0,
+        name: '익명',
+        avatar: NO_AVATAR_URL,
+        decoration_border: null,
+        decoration_title: null,
+        decoration_name_color: null,
+        decoration_top: null,
+        decoration_bottom_left: null,
+        decoration_bottom_right: null,
+      })
+      .eq('user_id', userId)
+      .eq('status', true)
+
+    if (updErr) throw updErr
+
+    return NextResponse.json({ message: 'WITHDRAW_OK' }, { status: 200 })
+  } catch (e: any) {
+    console.error('DELETE /api/users error:', e)
     return NextResponse.json(
       { message: 'Server error', detail: e?.message ?? String(e) },
       { status: 500 }

@@ -72,7 +72,6 @@ export async function buildUserDecorationMap(
       `
     )
     .in('user_id', userIds)
-    .eq('status', true)
 
   if (userError) throw userError
 
