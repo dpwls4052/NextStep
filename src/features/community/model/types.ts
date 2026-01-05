@@ -25,10 +25,16 @@ export type PostWithRoadmap = {
   post_id: string
   content: string
   title: string
-  like_count: any
+  like_count: number
   roadmap_id: string
   created_at: string
   updated_at: string
+  post_likes?: {
+    user_id: string
+  }[]
+
+  is_liked?: boolean
+
   roadmap: {
     roadmap_id: string
     user_id: string
@@ -37,6 +43,7 @@ export type PostWithRoadmap = {
     visibility: 'private' | 'public'
     status: any
   }
+
   author: {
     user_id: string
     name: string
