@@ -113,11 +113,15 @@ const PostWorkspaceModal = () => {
             value={listId ?? ''}
             onChange={(e) => setListId(e.target.value)}
           >
-            <option value="" disabled>
+            <option className="text-black" value="" disabled>
               커뮤니티를 선택해주세요.
             </option>
             {communityList?.map((list) => (
-              <option key={list.list_id} value={list.list_id}>
+              <option
+                className="text-black"
+                key={list.list_id}
+                value={list.list_id}
+              >
                 {list.name}
               </option>
             ))}
