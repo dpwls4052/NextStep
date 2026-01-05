@@ -20,9 +20,9 @@ interface NodeInformationProps {
 }
 
 const NodeInformationMenu = [
-  { key: 'memo', label: '메모' },
-  { key: 'link', label: '자료' },
-  { key: 'troubleshooting', label: '트러블슈팅' },
+  { key: 'memo', label: '메모', color: 'bg-blue-500' },
+  { key: 'link', label: '자료', color: 'bg-green-500' },
+  { key: 'troubleshooting', label: '트러블슈팅', color: 'bg-red-500' },
 ]
 
 const NodeInformation = ({
@@ -196,10 +196,11 @@ const NodeInformation = ({
               {NodeInformationMenu.map((item) => (
                 <li
                   key={item.key}
-                  className={`text-14 box-content flex h-50 w-full items-center justify-center text-center ${item.key === mode && 'border-b-accent text-accent border-b-2 font-bold'} hover:cursor-pointer`}
+                  className={`text-14 box-content flex h-50 w-full items-center justify-center text-center ${item.key === mode && 'border-b-accent text-accent border-b-2 font-bold'} gap-5 hover:cursor-pointer`}
                   onClick={() => setMode(item.key)}
                 >
-                  {item.label}
+                  <span className={`h-5 w-5 rounded-full ${item.color}`}></span>
+                  <span>{item.label}</span>
                 </li>
               ))}
             </ul>
