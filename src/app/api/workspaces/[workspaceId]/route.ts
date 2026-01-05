@@ -14,7 +14,7 @@ const groupByTechId = <T extends { tech_id: string }>(rows: T[]) =>
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { workspaceId: string } }
+  { params }: { params: Promise<{ workspaceId: string }> }
 ) {
   try {
     const { userId } = await requireUser()
@@ -182,7 +182,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { workspaceId: string } }
+  { params }: { params: Promise<{ workspaceId: string }> }
 ) {
   try {
     const { userId } = await requireUser()
@@ -206,7 +206,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { workspaceId: string } }
+  { params }: { params: Promise<{ workspaceId: string }> }
 ) {
   try {
     const { userId } = await requireUser()
