@@ -108,7 +108,7 @@ const NodeInformation = ({
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-y-auto">
       <div className="px-10 pt-10">
         {completed ? (
           <Button
