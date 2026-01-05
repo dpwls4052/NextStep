@@ -129,7 +129,7 @@ const MyProfile = ({ onApplied }: Props) => {
         {PROFILETAB_LIST.map((tab) => (
           <button
             key={tab.key}
-            className={`px-20 py-10 ${
+            className={`px-20 py-10 hover:cursor-pointer ${
               activeTab === tab.key
                 ? 'border-accent text-accent border-b-2'
                 : 'text-gray-500'

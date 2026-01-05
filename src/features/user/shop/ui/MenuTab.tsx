@@ -42,10 +42,18 @@ const MenuTab = ({ onSelectPreview, onPurchased }: Props) => {
   return (
     <Tabs value={tab} onValueChange={(v) => setTab(v as TabValue)}>
       <TabsList>
-        <TabsTrigger value="accessory">악세사리</TabsTrigger>
-        <TabsTrigger value="border">테두리</TabsTrigger>
-        <TabsTrigger value="title">칭호</TabsTrigger>
-        <TabsTrigger value="nickname">닉네임</TabsTrigger>
+        <TabsTrigger value="accessory" className="hover:cursor-pointer">
+          악세사리
+        </TabsTrigger>
+        <TabsTrigger value="border" className="hover:cursor-pointer">
+          테두리
+        </TabsTrigger>
+        <TabsTrigger value="title" className="hover:cursor-pointer">
+          칭호
+        </TabsTrigger>
+        <TabsTrigger value="nickname" className="hover:cursor-pointer">
+          닉네임
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value={tab}>
