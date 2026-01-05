@@ -17,7 +17,7 @@ import { TechItem } from '@/features/ai/model/useTechRecommendation'
 interface Props {
   data: TechItem[]
   isLoading: boolean
-  source?: 'db' | 'ai'
+  source?: 'db' | 'ai' | undefined
   onComplete?: (item: TechItem) => void
   handleUpdateNode?: (item: TechItem) => void
   onNew?: (item: TechItem) => void
