@@ -46,6 +46,8 @@ const DeleteWorkspaceModal = ({
       onOpenChange={setIsOpen}
       title="워크스페이스 삭제"
       titleClassName="text-center"
+      description={`워크스페이스를 삭제하시겠습니까?`}
+      descriptionClassName="text-center whitespace-pre-line py-5"
       className="px-10 pt-20 pb-10"
       footer={
         <>
