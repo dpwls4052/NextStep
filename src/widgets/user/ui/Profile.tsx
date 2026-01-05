@@ -271,7 +271,7 @@ const Profile = () => {
               </div>
             </section>
             <div className="mt-80 flex justify-end">
-              <Button className="text-16 font-light !text-[#ff0202] hover:underline">
+              <Button className="text-16 bg-transparent font-light !text-[#ff0202] hover:underline">
                 회원탈퇴
               </Button>
             </div>

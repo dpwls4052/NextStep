@@ -208,7 +208,7 @@ export async function PATCH(req: Request) {
       body = (await req.json()) as PatchRequestBody
     }
 
-    // ✅ 0) 데코 적용 / 해제 요청
+    // 0) 데코 적용 / 해제 요청
     if (
       body &&
       (body as any).action &&
@@ -496,6 +496,109 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ message: 'Invalid year' }, { status: 400 })
     }
     console.error('PATCH /api/users error:', e)
+    return NextResponse.json(
+      { message: 'Server error', detail: e?.message ?? String(e) },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE: 회원탈퇴(soft delete) + 포인트 소멸(0) + 연관 데이터 status=false
+export async function DELETE() {
+  try {
+    const { userId } = await requireUser()
+
+    // 1) 유저 활성 체크
+    const { data: user, error: userErr } = await supabaseAdmin
+      .from('users')
+      .select('user_id, status')
+      .eq('user_id', userId)
+      .single()
+
+    if (userErr || !user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 })
+    }
+    if (user.status !== true) {
+      return NextResponse.json({ message: 'User inactive' }, { status: 403 })
+    }
+
+    // 2) 유저 roadmaps 먼저 확보(posts/workspaces 연결용)
+    const { data: roadmaps, error: rmErr } = await supabaseAdmin
+      .from('roadmaps')
+      .select('roadmap_id')
+      .eq('user_id', userId)
+      .eq('status', true)
+
+    if (rmErr) throw rmErr
+
+    const roadmapIds = (roadmaps ?? [])
+      .map((r) => r.roadmap_id)
+      .filter(Boolean) as string[]
+
+    // 3) 연관 데이터 soft delete
+    const { error: expErr } = await supabaseAdmin
+      .from('experiences')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+    if (expErr) throw expErr
+
+    const { error: orderErr } = await supabaseAdmin
+      .from('orders')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+    if (orderErr) throw orderErr
+
+    const { error: commentErr } = await supabaseAdmin
+      .from('comments')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+    if (commentErr) throw commentErr
+
+    // roadmaps soft delete
+    const { error: rmUpdErr } = await supabaseAdmin
+      .from('roadmaps')
+      .update({ status: false })
+      .eq('user_id', userId)
+      .eq('status', true)
+    if (rmUpdErr) throw rmUpdErr
+
+    // posts / workspaces는 roadmap_id 기반으로 soft delete 가능
+    if (roadmapIds.length > 0) {
+      const { error: postErr } = await supabaseAdmin
+        .from('posts')
+        .update({ status: false })
+        .in('roadmap_id', roadmapIds)
+        .eq('status', true)
+      if (postErr) throw postErr
+
+      const { error: wsErr } = await supabaseAdmin
+        .from('workspaces')
+        .update({ status: false })
+        .in('roadmap_id', roadmapIds)
+        .eq('status', true)
+      if (wsErr) throw wsErr
+    }
+
+    // 4) 마지막으로 users 익명화 + status false + point 0
+    const { error: userUpdErr } = await supabaseAdmin
+      .from('users')
+      .update({
+        status: false,
+        point: 0,
+        name: '익명',
+        avatar: null,
+      })
+      .eq('user_id', userId)
+      .eq('status', true)
+
+    if (userUpdErr) throw userUpdErr
+
+    return NextResponse.json({ message: 'WITHDRAW_OK' }, { status: 200 })
+  } catch (e: any) {
+    console.error('DELETE /api/users error:', e)
     return NextResponse.json(
       { message: 'Server error', detail: e?.message ?? String(e) },
       { status: 500 }
