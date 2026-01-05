@@ -4,16 +4,6 @@ import { useState } from 'react'
 import TechRequestModal from './TechRequestModal'
 import { TechItem } from '@/features/ai/model/useTechRecommendation'
 
-// interface TechItem {
-//   tech_id?: string
-//   name?: string
-//   description?: string
-//   icon_url?: string
-//   usage_count?: number
-//   score?: number
-//   isNew?: boolean
-// }
-
 interface Props {
   data: TechItem[]
   isLoading: boolean
@@ -22,6 +12,7 @@ interface Props {
   handleUpdateNode?: (item: TechItem) => void
   onNew?: (item: TechItem) => void
   onAddNode?: (item: TechItem) => void
+  mode?: 'edit' | 'add'
 }
 
 const formatNumber = (num: number): string => {
@@ -42,6 +33,7 @@ const TechRecommendationList: React.FC<Props> = ({
   handleUpdateNode,
   onNew,
   onAddNode,
+  mode = 'edit',
 }) => {
   const [requestItem, setRequestItem] = useState<TechItem | null>(null)
 
@@ -118,45 +110,31 @@ const TechRecommendationList: React.FC<Props> = ({
             <div className="flex justify-between gap-10">
               {isPrimarySearch ? (
                 // 1차 DB 검색 결과
-                <>
-                  {/* <Button
-                    variant="secondary"
-                    className="h-50 w-[calc(50%-5px)]"
-                    onClick={() => onComplete && onComplete(item)}
-                  >
-                    Completed
-                  </Button> */}
-                  <Button
-                    variant="gradient"
-                    className="h-50 w-full"
-                    onClick={() => handleUpdateNode && handleUpdateNode(item)}
-                  >
-                    Save
-                  </Button>
-                </>
+                <Button
+                  variant="gradient"
+                  className="h-50 w-full"
+                  onClick={() => handleUpdateNode && handleUpdateNode(item)}
+                >
+                  Save
+                </Button>
               ) : (
                 // 2차 AI 추천 결과
                 <>
                   {!isNewTech && (
-                    <>
-                      {/* <Button
-                        variant="secondary"
-                        className="h-50 w-[calc(50%-5px)]"
-                        onClick={() => onComplete && onComplete(item)}
-                      >
-                        Completed
-                      </Button> */}
-                      <Button
-                        variant="gradient"
-                        className="h-50 w-full"
-                        // onClick={() => onAddNode && onAddNode(item)}
-                        onClick={() =>
+                    <Button
+                      variant="gradient"
+                      className="h-50 w-full"
+                      onClick={() => {
+                        //  mode에 따라 다른 동작
+                        if (mode === 'add') {
+                          onAddNode && onAddNode(item)
+                        } else {
                           handleUpdateNode && handleUpdateNode(item)
                         }
-                      >
-                        Save
-                      </Button>
-                    </>
+                      }}
+                    >
+                      Save
+                    </Button>
                   )}
 
                   {isNewTech && (
