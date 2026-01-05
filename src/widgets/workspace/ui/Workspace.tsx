@@ -1,6 +1,11 @@
 'use client'
-import { useEffect } from 'react'
-import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react'
+import { useEffect, useRef } from 'react'
+import {
+  Background,
+  BackgroundVariant,
+  ReactFlow,
+  useReactFlow,
+} from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useThemeStore } from '@/features/theme/model'
 import { useWorkspaceStore } from '../model'
@@ -16,7 +21,8 @@ import CustomNode from './CustomNode'
 import { AlertCircle } from '@/shared/ui/icon'
 
 const Workspace = () => {
-  const { nodes, onNodesChange, edges, selectedNode } = useWorkspaceStore()
+  const { nodes, onNodesChange, edges, selectedNode, workspaceId } =
+    useWorkspaceStore()
   const isEdited = useWorkspaceStore((s) => s.isEdited)
   const nodeOrigin: [number, number] = [0.5, 0]
   const {
@@ -44,6 +50,13 @@ const Workspace = () => {
 
   //   return () => observer.disconnect()
   // }, [fitView])
+
+  // 워크스페이스 이동 시 ReactFlow의 fitView
+  const { fitView } = useReactFlow()
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (wrapperRef.current) fitView()
+  }, [workspaceId, fitView])
 
   // 노드 클릭 이벤트
   const { onNodeClick } = useSelectNode()
@@ -106,7 +119,7 @@ const Workspace = () => {
       `}</style>
       <div className="relative h-full w-full">
         <ReactFlow
-          // ref={wrapperRef}
+          ref={wrapperRef}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
