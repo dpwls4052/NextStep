@@ -11,7 +11,13 @@ import Order from './Order'
 import Admin from '@/widgets/admin/ui/Admin'
 
 type TabKey = 'profile' | 'quest' | 'shop' | 'point' | 'admin'
-type SubKey = 'point' | null
+type SubKey = 'point' | 'order' | null
+
+function hasLabel(
+  tab: (typeof TAB_LIST)[number]
+): tab is (typeof TAB_LIST)[number] & { label: string } {
+  return 'label' in tab && typeof (tab as any).label === 'string'
+}
 
 const UsersTabs = () => {
   const router = useRouter()
@@ -59,7 +65,7 @@ const UsersTabs = () => {
     <div className="flex flex-col gap-20">
       {/* 탭 버튼 영역 (label 있는 것만) */}
       <div className="flex gap-20 border-b border-gray-300">
-        {TAB_LIST.filter((tab) => tab.label).map((tab) => (
+        {TAB_LIST.filter(hasLabel).map((tab) => (
           <button
             key={tab.key}
             className={`px-20 py-10 ${

@@ -174,7 +174,7 @@ export async function PATCH(req: Request) {
     }
 
     const contentType = req.headers.get('content-type') || ''
-    let body: PatchBody = {}
+    let body: PatchRequestBody = {}
     let avatarFile: File | null = null
 
     if (contentType.includes('multipart/form-data')) {
