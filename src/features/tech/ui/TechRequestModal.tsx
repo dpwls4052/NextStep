@@ -1,13 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { TechItem } from '@/features/ai/model/useTechRecommendation'
 
 interface Props {
-  initialData?: {
-    name?: string
-    description?: string
-    icon_url?: string
-  }
+  initialData?: Pick<TechItem, 'name' | 'description' | 'icon_url'>
   onClose: () => void
   onSubmit: (data: {
     name: string

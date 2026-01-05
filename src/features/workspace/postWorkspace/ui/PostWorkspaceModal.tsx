@@ -12,6 +12,7 @@ import { useWorkspaceStore } from '@/widgets/workspace/model'
 const PostWorkspaceModal = () => {
   const { isOpen, setIsOpen } = useOpen()
   const { workspaceTitle } = useWorkspaceStore()
+  const resetIsEdited = useWorkspaceStore((s) => s.resetIsEdited)
   const [titleInput, setTitleInput] = useState<string>('')
   const [contentInput, setContentInput] = useState<string>('')
   const [listId, setListId] = useState<string | null>(null)
@@ -41,6 +42,7 @@ const PostWorkspaceModal = () => {
           setIsOpen(false)
           setTitleInput('')
           setListId(null)
+          resetIsEdited()
           toast.success('워크스페이스가 게시되었습니다.')
         },
       }
@@ -111,11 +113,15 @@ const PostWorkspaceModal = () => {
             value={listId ?? ''}
             onChange={(e) => setListId(e.target.value)}
           >
-            <option value="" disabled>
+            <option className="text-black" value="" disabled>
               커뮤니티를 선택해주세요.
             </option>
             {communityList?.map((list) => (
-              <option key={list.list_id} value={list.list_id}>
+              <option
+                className="text-black"
+                key={list.list_id}
+                value={list.list_id}
+              >
                 {list.name}
               </option>
             ))}

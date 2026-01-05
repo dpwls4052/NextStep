@@ -1,6 +1,11 @@
 'use client'
-import { useEffect } from 'react'
-import { Background, BackgroundVariant, ReactFlow } from '@xyflow/react'
+import { useEffect, useRef } from 'react'
+import {
+  Background,
+  BackgroundVariant,
+  ReactFlow,
+  useReactFlow,
+} from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useThemeStore } from '@/features/theme/model'
 import { useWorkspaceStore } from '../model'
@@ -13,9 +18,12 @@ import { useConnectNodes } from '@/features/roadmap/connectNodes/model'
 import { SaveWorkspaceModal } from '@/features/workspace/saveWorkspace/ui'
 import { PostWorkspaceModal } from '@/features/workspace/postWorkspace/ui'
 import CustomNode from './CustomNode'
+import { AlertCircle } from '@/shared/ui/icon'
 
 const Workspace = () => {
-  const { nodes, onNodesChange, edges, selectedNode } = useWorkspaceStore()
+  const { nodes, onNodesChange, edges, selectedNode, workspaceId } =
+    useWorkspaceStore()
+  const isEdited = useWorkspaceStore((s) => s.isEdited)
   const nodeOrigin: [number, number] = [0.5, 0]
   const {
     isOpen: isSidebarOpen,
@@ -23,9 +31,7 @@ const Workspace = () => {
     toggleOpen: toggleSidebarOpen,
   } = useOpen()
 
-  // 테마에 따른 격자 무늬 색상 변경
-  const { theme } = useThemeStore()
-  const gridColor = theme === 'dark' ? '#2f3645' : '#e5e5e5'
+  const gridColor = 'var(--grid-color)'
 
   // 사이드바가 열렸다가 닫히면서 ReactFlow가 차지하는 영역이 달라지기 때문에
   // 그때마다 fitView로 로드맵을 재정렬
@@ -42,6 +48,13 @@ const Workspace = () => {
 
   //   return () => observer.disconnect()
   // }, [fitView])
+
+  // 워크스페이스 이동 시 ReactFlow의 fitView
+  const { fitView } = useReactFlow()
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (wrapperRef.current) fitView()
+  }, [workspaceId, fitView])
 
   // 노드 클릭 이벤트
   const { onNodeClick } = useSelectNode()
@@ -64,7 +77,13 @@ const Workspace = () => {
   return (
     <div className="flex h-full w-full overflow-x-hidden">
       <style>{`
-      .react-flow__node {
+        :root {
+          --grid-color: #e5e5e5;
+        }
+        .dark {
+          --grid-color: #2f3645;
+        }
+        .react-flow__node {
           padding: 0;
           display: flex;
           justify-content: center;
@@ -104,7 +123,7 @@ const Workspace = () => {
       `}</style>
       <div className="relative h-full w-full">
         <ReactFlow
-          // ref={wrapperRef}
+          ref={wrapperRef}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -126,9 +145,19 @@ const Workspace = () => {
         />
         <Background variant={BackgroundVariant.Lines} color={gridColor} />
         <WorkspaceList />
-        <div className="bg-primary absolute top-10 right-35 flex h-50 gap-10 rounded-md p-8">
-          <PostWorkspaceModal />
-          <SaveWorkspaceModal />
+        <div className="absolute top-10 right-35 flex items-center gap-10">
+          {isEdited && (
+            <div className="flex h-40 items-center justify-center gap-5 rounded-md border border-amber-200 bg-amber-50 p-10">
+              <AlertCircle size={16} className="stroke-amber-600" />
+              <p className="text-14 text-amber-600">
+                저장되지 않은 변경사항이 있습니다.
+              </p>
+            </div>
+          )}
+          <div className="flex h-40 gap-10 rounded-md">
+            <PostWorkspaceModal />
+            <SaveWorkspaceModal />
+          </div>
         </div>
       </div>
       <SearchSidebar

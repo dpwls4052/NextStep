@@ -20,9 +20,9 @@ interface NodeInformationProps {
 }
 
 const NodeInformationMenu = [
-  { key: 'memo', label: '메모' },
-  { key: 'link', label: '자료' },
-  { key: 'troubleshooting', label: '트러블슈팅' },
+  { key: 'memo', label: '메모', color: 'bg-blue-500' },
+  { key: 'link', label: '자료', color: 'bg-green-500' },
+  { key: 'troubleshooting', label: '트러블슈팅', color: 'bg-red-500' },
 ]
 
 const NodeInformation = ({
@@ -108,49 +108,58 @@ const NodeInformation = ({
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="px-10 pt-10">
-        {completed ? (
-          <Button
-            variant="none"
-            className="bg-green-500 px-10 py-4 text-white"
-            onClick={() => setNodeCompleted(selectedNode.data.techId, false)}
-          >
-            <Check className="stroke-white" />
-            <span className="pl-5">학습 완료</span>
-          </Button>
-        ) : (
-          <Button
-            variant="none"
-            className="rounded-sm bg-white/50 px-10 py-4"
-            onClick={() => setNodeCompleted(selectedNode.data.techId, true)}
-          >
-            학습 완료로 표시
-          </Button>
-        )}
-      </div>
+    <div className="flex h-full w-full flex-col overflow-y-auto">
+      <div className="px-10 pt-10"></div>
       <div className="flex items-center justify-between px-10 py-10">
-        <div className="flex items-center gap-10">
-          <img
-            src={selectedNode.data.iconUrl}
-            alt={selectedNode.data.label || ''}
-            className="h-30 w-30 object-cover"
-          />
-          <p className="text-20">{selectedNode.data.label}</p>
+        <div className="mb-10 flex w-full items-center justify-between gap-15">
+          <div className="flex items-center gap-10">
+            <img
+              src={selectedNode.data.iconUrl}
+              alt={selectedNode.data.label || ''}
+              className="h-30 w-30 object-cover"
+            />
+            <p className="text-20 line-clamp-2 max-w-full break-all">
+              {selectedNode.data.label}
+            </p>
+          </div>
+
+          {completed ? (
+            <Button
+              variant="none"
+              className="bg-green-500 px-10 py-4 text-white"
+              onClick={() => setNodeCompleted(selectedNode.data.techId, false)}
+            >
+              <Check className="stroke-white" />
+              <span className="pl-5">학습 완료</span>
+            </Button>
+          ) : (
+            <Button
+              variant="none"
+              className="rounded-sm bg-white/50 px-10 py-4"
+              onClick={() => setNodeCompleted(selectedNode.data.techId, true)}
+            >
+              학습 미완료
+            </Button>
+          )}
         </div>
-        <Button className="shrink-0 px-10 py-2" onClick={handleEditTech}>
-          변경
-        </Button>
       </div>
 
-      <div className="flex justify-center">
+      <div className="mx-15 flex justify-center gap-10">
         {!isRecommendMode && (
-          <Button
-            className="point-gradient px-20 py-10"
-            onClick={handleRecommendClick}
-          >
-            {selectedNode.data.label} 와(과) 연관된 하위 노드 추천받기
-          </Button>
+          <>
+            <Button
+              className="w-1/2 shrink-0 px-15 py-2"
+              onClick={handleEditTech}
+            >
+              변경
+            </Button>
+            <Button
+              className="point-gradient w-1/2 px-15 py-10 text-white"
+              onClick={handleRecommendClick}
+            >
+              하위 노드 추천받기
+            </Button>
+          </>
         )}
       </div>
 
@@ -185,7 +194,8 @@ const NodeInformation = ({
             onComplete={() => {}}
             handleUpdateNode={handleUpdateNode}
             onNew={handleNewTech}
-            onAddNode={addChildNode} // 훅에서 가져온 함수 사용
+            onAddNode={addChildNode}
+            mode="add"
           />
         </div>
       ) : (
@@ -195,10 +205,11 @@ const NodeInformation = ({
               {NodeInformationMenu.map((item) => (
                 <li
                   key={item.key}
-                  className={`text-14 box-content flex h-50 w-full items-center justify-center text-center ${item.key === mode && 'border-b-accent text-accent border-b-2 font-bold'} hover:cursor-pointer`}
+                  className={`text-14 box-content flex h-50 w-full items-center justify-center text-center ${item.key === mode && 'border-b-accent text-accent border-b-2 font-bold'} gap-5 hover:cursor-pointer`}
                   onClick={() => setMode(item.key)}
                 >
-                  {item.label}
+                  <span className={`h-5 w-5 rounded-full ${item.color}`}></span>
+                  <span>{item.label}</span>
                 </li>
               ))}
             </ul>
