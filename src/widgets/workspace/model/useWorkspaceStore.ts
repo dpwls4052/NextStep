@@ -15,6 +15,7 @@ import {
   WorkspaceData,
   WorkspaceSnapshot,
 } from './types'
+import { removeNodeCascade } from '@/features/roadmap/removeNode/model/removeNodeCascade'
 
 type WorkspaceStore = {
   /* =========================
@@ -34,6 +35,11 @@ type WorkspaceStore = {
    ========================= */
   selectedNode: CustomNodeType | null
   setSelectedNode: (node: CustomNodeType | null) => void
+
+  /* =========================
+   * Remove Node
+   ========================= */
+  removeNode: (nodeId: string) => void
 
   /* =========================
    * Workspace Meta
@@ -153,6 +159,22 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         },
       })),
     })),
+
+  /* =========================
+   * Remove Node
+   ========================= */
+  removeNode: (nodeId: string) => {
+    set((state) => {
+      const result = removeNodeCascade(nodeId, state.nodes, state.edges)
+
+      return {
+        nodes: result.nodes,
+        edges: result.edges,
+      }
+    })
+
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
   /* =========================
    * Workspace Meta

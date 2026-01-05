@@ -1,7 +1,8 @@
+import { useCallback } from 'react'
 import { NODE_STYLE, useWorkspaceStore } from '@/widgets/workspace/model'
 import { CustomNodeType } from '@/widgets/workspace/model/types'
 import { OnConnectEnd, useReactFlow } from '@xyflow/react'
-import { useCallback } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 // 엣지를 새로 그려 새로운 노드 추가
 const useAddNode = () => {
@@ -18,16 +19,22 @@ const useAddNode = () => {
       if (!fromNode) return
 
       // 새 노드 추가
-      const id = nodes.length + 1
+      // id는 uuid값으로 설정하기
+      const id = uuidv4()
       const { clientX, clientY } =
         'changedTouches' in event ? event.changedTouches[0] : event
       const newNode: CustomNodeType = {
-        id: id.toString(),
+        id: id,
         position: screenToFlowPosition({
           x: clientX,
           y: clientY,
         }),
-        data: { techId: null, label: null, completed: false },
+        data: {
+          nodeId: id,
+          techId: null,
+          label: null,
+          completed: false,
+        },
         style: { ...NODE_STYLE.default },
         type: 'custom',
       }
@@ -35,9 +42,9 @@ const useAddNode = () => {
       setNodes((nds) => nds.concat(newNode))
       setEdges((eds) =>
         eds.concat({
-          id: `e${fromNode.id}-${edges.length + 1}`,
+          id: `e${fromNode.id}-${id}`,
           source: fromNode.id,
-          target: id.toString(),
+          target: id,
           animated: true,
         })
       )
