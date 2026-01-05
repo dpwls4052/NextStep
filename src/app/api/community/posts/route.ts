@@ -15,30 +15,38 @@ export const GET = async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url)
     const listId = searchParams.get('list')
+    let userId: string | null = null
+
+    try {
+      const user = await requireUser()
+      userId = user.userId
+    } catch {
+      userId = null
+    }
 
     let query = supabase
       .from('posts')
       .select(
         `
-          post_id,
-          title,
-          content,
-          like_count,
-          roadmap_id,
-          created_at,
-          updated_at,
-          roadmap:roadmaps!inner (
-            roadmap_id,
-            user_id,
-            nodes,
-            edges,
-            visibility,
-            status
-          )
-        `
+    post_id,
+    title,
+    content,
+    like_count,
+    roadmap_id,
+    created_at,
+    updated_at,
+    post_likes ( user_id ),
+    roadmap:roadmaps(
+      roadmap_id,
+      user_id,
+      nodes,
+      edges,
+      visibility,
+      status
+    )
+    `
       )
       .eq('status', true)
-      .eq('roadmap.status', true)
       .order('created_at', { ascending: false })
 
     if (listId) query = query.eq('list_id', listId)
@@ -46,7 +54,8 @@ export const GET = async (req: NextRequest) => {
     const { data: posts, error } = await query.returns<PostWithRoadmap[]>()
     if (error) throw error
 
-    const safePosts = posts ?? []
+    const safePosts = (posts ?? []).filter((p) => p.roadmap?.status === true)
+
     if (safePosts.length === 0) return NextResponse.json([])
 
     // 1) 작성자 user_id 수집
@@ -62,6 +71,14 @@ export const GET = async (req: NextRequest) => {
       borderScale: 0.6,
       accessoryScale: 0.7,
     })
+    console.log(
+      posts.map((p) => ({
+        post_id: p.post_id,
+        like_count: p.like_count,
+        post_likes: p.post_likes,
+        is_liked: p.post_likes?.some((l) => l.user_id === userId),
+      }))
+    )
 
     // 3) posts에 author 붙여서 반환
     const result = safePosts.map((p) => {
@@ -71,6 +88,12 @@ export const GET = async (req: NextRequest) => {
         ...p,
         authorId,
         author: authorId ? (authorMap.get(authorId) ?? null) : null,
+
+        is_liked: userId
+          ? p.post_likes?.some(
+              (like: { user_id: string }) => like.user_id === userId
+            )
+          : false,
       }
     })
 

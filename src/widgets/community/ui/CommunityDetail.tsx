@@ -46,6 +46,7 @@ export default function CommunityDetail({
 
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
+  const [likeLoading, setLikeLoading] = useState(false)
 
   // 좋아요 UI용 state
   const [liked, setLiked] = useState(false)
@@ -53,7 +54,9 @@ export default function CommunityDetail({
 
   useEffect(() => {
     if (!post) return
+
     setLikeCount(post.like_count ?? 0)
+    setLiked(post.is_liked ?? false)
   }, [post])
 
   useEffect(() => {
@@ -128,18 +131,25 @@ export default function CommunityDetail({
   }
 
   const toggleLike = async () => {
-    if (!post) return
+    if (!post || likeLoading) return
+    setLikeLoading(true)
 
-    const res = await fetch('/api/community/posts/like', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ postId: post.post_id }),
-    })
+    try {
+      const res = await fetch('/api/community/posts/like', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),
+      })
 
-    const json = await res.json()
-
-    setLiked(json.liked)
-    setLikeCount((prev) => (json.liked ? prev + 1 : prev - 1))
+      const json = await res.json()
+      setLiked(json.liked)
+      setLikeCount(json.likeCount)
+    } finally {
+      setLikeLoading(false)
+    }
   }
 
   const handleExportImage = async () => {
@@ -216,6 +226,7 @@ export default function CommunityDetail({
               {/* 좋아요 버튼 */}
               <button
                 onClick={toggleLike}
+                disabled={likeLoading}
                 className={`flex items-center gap-6 rounded-lg px-12 py-4 transition ${
                   liked
                     ? 'bg-red-500 text-white'
