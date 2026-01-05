@@ -96,12 +96,9 @@ export const authOptions: NextAuthOptions = {
 
       // 유저가 없으면 토큰 버림(로그아웃 처리)
       if (error || !data?.user_id) {
-        console.warn(
-          'JWT 콜백: Supabase에 유저 없음 → 토큰 삭제(로그아웃)',
-          error?.message
-        )
-        // 여기서 null 리턴 → NextAuth가 세션을 완전히 없앰
-        return null
+        ;(token as any).disabled = true
+        delete (token as any).userId
+        return token
       }
 
       // 유저 존재하면 userId를 토큰에 실어둠

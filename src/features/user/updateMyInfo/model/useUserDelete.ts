@@ -24,7 +24,7 @@ async function withdrawUser(): Promise<WithdrawResponse> {
   return data as WithdrawResponse
 }
 
-type useUserDelteOptions = {
+type useUserDeleteOptions = {
   /**
    * 탈퇴 성공 후 이동할 주소 (기본: /)
    * signOut callbackUrl로 이동시킴
@@ -42,7 +42,7 @@ type useUserDelteOptions = {
   onError?: (error: Error) => void
 }
 
-export function useUserDelte(options?: useUserDelteOptions) {
+export function useUserDelete(options?: useUserDeleteOptions) {
   const qc = useQueryClient()
   const redirectTo = options?.redirectTo ?? '/'
 
