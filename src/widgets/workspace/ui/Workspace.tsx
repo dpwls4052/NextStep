@@ -31,9 +31,7 @@ const Workspace = () => {
     toggleOpen: toggleSidebarOpen,
   } = useOpen()
 
-  // 테마에 따른 격자 무늬 색상 변경
-  const { theme } = useThemeStore()
-  const gridColor = theme === 'dark' ? '#2f3645' : '#e5e5e5'
+  const gridColor = 'var(--grid-color)'
 
   // 사이드바가 열렸다가 닫히면서 ReactFlow가 차지하는 영역이 달라지기 때문에
   // 그때마다 fitView로 로드맵을 재정렬
@@ -79,7 +77,13 @@ const Workspace = () => {
   return (
     <div className="flex h-full w-full overflow-x-hidden">
       <style>{`
-      .react-flow__node {
+        :root {
+          --grid-color: #e5e5e5;
+        }
+        .dark {
+          --grid-color: #2f3645;
+        }
+        .react-flow__node {
           padding: 0;
           display: flex;
           justify-content: center;
