@@ -87,6 +87,9 @@ export default function CommunityDetail({
   }, [post])
 
   useEffect(() => {
+    if (listId && !resolvedListId) return
+    // ⬆️ listId가 있는데 아직 resolve 안됐으면 기다림
+
     const fetchPosts = async () => {
       try {
         setLoading(true)
@@ -114,7 +117,7 @@ export default function CommunityDetail({
     }
 
     fetchPosts()
-  }, [postId, resolvedListId])
+  }, [postId, resolvedListId, listId])
 
   useEffect(() => {
     if (!listId) {
@@ -146,14 +149,16 @@ export default function CommunityDetail({
   const goPrev = () => {
     if (currentIndex > 0) {
       const prevPost = posts[currentIndex - 1]
-      router.push(`/community/${prevPost.post_id}?list=${resolvedListId}`)
+      const query = resolvedListId ? `?list=${resolvedListId}` : ''
+      router.push(`/community/${prevPost.post_id}${query}`)
     }
   }
 
   const goNext = () => {
     if (currentIndex < posts.length - 1) {
       const nextPost = posts[currentIndex + 1]
-      router.push(`/community/${nextPost.post_id}?list=${resolvedListId}`)
+      const query = resolvedListId ? `?list=${resolvedListId}` : ''
+      router.push(`/community/${nextPost.post_id}${query}`)
     }
   }
 
