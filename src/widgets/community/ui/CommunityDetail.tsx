@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Close } from '@/shared/ui/icon'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react'
@@ -17,7 +17,8 @@ import { PostWithRoadmap } from '@/features/community/model/types'
 import CustomNode from '@/widgets/workspace/ui/CustomNode'
 import UserAvatar from '@/features/profile/ui/UserAvatar'
 import { markQuestReady } from '@/features/user/quest/api/questClient'
-import { api } from '@/shared/libs/axios'
+import saveWorkspace from '@/features/workspace/saveWorkspace/api/saveWorkspace'
+import { useRouter } from 'next/navigation'
 
 interface CommunityDetailProps {
   postId: string
@@ -33,7 +34,6 @@ export default function CommunityDetail({
   const searchParams = useSearchParams()
   const listId = searchParams.get('list')
   const [resolvedListId, setResolvedListId] = useState<string | null>(null)
-  const router = useRouter()
 
   const [posts, setPosts] = useState<PostWithRoadmap[]>([])
   const [post, setPost] = useState<PostWithRoadmap | null>(null)
@@ -49,26 +49,30 @@ export default function CommunityDetail({
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
   const [likeLoading, setLikeLoading] = useState(false)
+  const [imported, setImported] = useState(false)
 
+  const router = useRouter()
   const handleImportWorkspace = async () => {
     if (!post) return
 
-    try {
-      const { data } = await api.post('/workspaces', {
-        title: post.title,
-        nodes: post.roadmap.nodes ?? [],
-        edges: post.roadmap.edges ?? [],
-        snapshot: {
-          nodes: post.roadmap.nodes ?? [],
-          edges: post.roadmap.edges ?? [],
-        },
-      })
+    await saveWorkspace({
+      title: post.title,
+      nodes: post.roadmap.nodes ?? [],
+      edges: post.roadmap.edges ?? [],
+      snapshot: {
+        memos: {},
+        links: {},
+        troubleshootings: {},
+      },
+    })
 
-      // sidebar는 workspace 목록 다시 fetch함
-      router.push(`/workspace/${data.workspace_id}`)
-    } catch (e) {
-      console.error('워크스페이스 생성 실패', e)
-    }
+    // ✅ 저장 완료 멘트
+    setImported(true)
+
+    // 2초 뒤 자동으로 사라지게
+    setTimeout(() => {
+      setImported(false)
+    }, 2000)
   }
 
   // 좋아요 UI용 state
@@ -375,6 +379,12 @@ export default function CommunityDetail({
                   color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'}
                 />
               </ReactFlow>
+
+              {imported && (
+                <div className="absolute top-16 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-20 py-10 text-sm text-white shadow-lg">
+                  내 워크스페이스에 저장되었습니다!
+                </div>
+              )}
 
               {!isCapturing && (
                 <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
