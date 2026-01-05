@@ -19,6 +19,7 @@ import { SaveWorkspaceModal } from '@/features/workspace/saveWorkspace/ui'
 import { PostWorkspaceModal } from '@/features/workspace/postWorkspace/ui'
 import CustomNode from './CustomNode'
 import { AlertCircle } from '@/shared/ui/icon'
+import CustomEditingNode from './CustomEditingNode'
 
 const Workspace = () => {
   const { nodes, onNodesChange, edges, selectedNode, workspaceId } =
@@ -71,7 +72,7 @@ const Workspace = () => {
   }, [selectedNode])
 
   const nodeTypes = {
-    custom: CustomNode,
+    custom: CustomEditingNode,
   }
 
   return (
