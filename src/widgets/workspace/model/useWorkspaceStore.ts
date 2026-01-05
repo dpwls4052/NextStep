@@ -44,6 +44,12 @@ type WorkspaceStore = {
   setWorkspaceTitle: (title: string) => void
 
   /* =========================
+   * Complete Node
+   ========================= */
+  setNodeCompleted: (techId: string | null, completed: boolean) => void
+  getNodeCompleted: (techId: string | null) => boolean
+
+  /* =========================
    * Snapshot
    ========================= */
   original: WorkspaceSnapshot | null
@@ -82,6 +88,13 @@ type WorkspaceStore = {
    ========================= */
   initializeWithData: (data: WorkspaceData) => void
   resetToEmpty: () => void
+
+  /* =========================
+   * isEdited
+   ========================= */
+  isEdited: boolean
+  setIsEdited: () => void
+  resetIsEdited: () => void
 }
 
 const emptySnapshot: WorkspaceSnapshot = {
@@ -97,15 +110,19 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   nodes: initialNodes,
   edges: [],
 
-  setNodes: (nodes) =>
+  setNodes: (nodes) => {
     set({
       nodes: typeof nodes === 'function' ? nodes(get().nodes) : nodes,
-    }),
+    })
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
-  setEdges: (edges) =>
+  setEdges: (edges) => {
     set({
       edges: typeof edges === 'function' ? edges(get().edges) : edges,
-    }),
+    })
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
   onNodesChange: (changes) =>
     set((state) => ({
@@ -157,9 +174,35 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
     })),
 
   /* =========================
+   * Complete Node
+   ========================= */
+  setNodeCompleted: (techId, completed) => {
+    if (!techId) return
+    set((state) => ({
+      nodes: state.nodes.map((node) => {
+        if (node.data.techId !== techId) return node
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            completed,
+          },
+        }
+      }),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
+  getNodeCompleted: (techId) => {
+    if (!techId) return false
+    const node = get().nodes.find((node) => node.data.techId === techId)
+
+    return node?.data.completed ?? false
+  },
+
+  /* =========================
    * Memo
    ========================= */
-  setNodeMemo: (techId, memo) =>
+  setNodeMemo: (techId, memo) => {
     set((state) => ({
       current: {
         ...state.current,
@@ -168,7 +211,9 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
           [techId]: { ...state.current.memos[techId], memo },
         },
       },
-    })),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
   getNodeMemo: (techId) => {
     if (!techId) return null
@@ -178,7 +223,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   /* =========================
    * Links
    ========================= */
-  addNodeLink: (techId, link) =>
+  addNodeLink: (techId, link) => {
     set((state) => ({
       current: {
         ...state.current,
@@ -187,9 +232,11 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
           [techId]: [link, ...(state.current.links[techId] ?? [])],
         },
       },
-    })),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
-  removeNodeLink: (techId, nodeLinkId) =>
+  removeNodeLink: (techId, nodeLinkId) => {
     set((state) => ({
       current: {
         ...state.current,
@@ -200,7 +247,9 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
           ),
         },
       },
-    })),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
   getNodeLinks: (techId) => {
     if (!techId) return []
@@ -210,7 +259,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   /* =========================
    * Troubleshooting
    ========================= */
-  addNodeTroubleshooting: (techId, troubleshooting) =>
+  addNodeTroubleshooting: (techId, troubleshooting) => {
     set((state) => ({
       current: {
         ...state.current,
@@ -222,9 +271,11 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
           ],
         },
       },
-    })),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
-  removeNodeTroubleshooting: (techId, nodeTroubleshootingId) =>
+  removeNodeTroubleshooting: (techId, nodeTroubleshootingId) => {
     set((state) => ({
       current: {
         ...state.current,
@@ -235,7 +286,9 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
           ),
         },
       },
-    })),
+    }))
+    if (get().isEdited === false) get().setIsEdited()
+  },
 
   getNodeTroubleshootings: (techId) => {
     if (!techId) return []
@@ -264,6 +317,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         links: data.links || {},
         troubleshootings: data.troubleshootings || {},
       },
+      isEdited: false,
     }),
 
   resetToEmpty: () =>
@@ -276,7 +330,21 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       selectedNode: null,
       original: null,
       current: emptySnapshot,
+      isEdited: false,
     }),
+
+  /* =========================
+   * isEdited
+   ========================= */
+  isEdited: false,
+  setIsEdited: () =>
+    set(() => ({
+      isEdited: true,
+    })),
+  resetIsEdited: () =>
+    set(() => ({
+      isEdited: false,
+    })),
 }))
 
 export default useWorkspaceStore

@@ -1,18 +1,16 @@
-// useTechRecommendation.ts
-
 import { useState, useCallback, useRef } from 'react'
 
-interface TechItem {
-  name: string
-  description: string
-  icon_url: string | null
+export interface TechItem {
   tech_id?: string
+  name?: string
+  description?: string
+  icon_url?: string | null
   usage_count?: number
   score?: number
   isNew?: boolean
 }
 
-interface RecommendationResponse {
+export interface RecommendationResponse {
   source: 'ai_recommendation'
   data: TechItem[]
 }

@@ -114,6 +114,7 @@ const SearchSidebar = ({
   // 노드 업데이트
   const handleUpdateNode = (techItem: TechItem) => {
     if (selectedNode === null) return
+
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === selectedNode.id) {
@@ -121,22 +122,25 @@ const SearchSidebar = ({
             ...node,
             data: {
               ...node.data,
-              techId: techItem.tech_id,
-              label: techItem.name,
-              iconUrl: techItem.icon_url,
+              techId: techItem.tech_id ?? '', // undefined 처리
+              label: techItem.name ?? '',
+              iconUrl: techItem.icon_url ?? '',
+              completed: false,
             },
           }
         }
         return node
       })
     )
+
     setSelectedNode({
       ...selectedNode,
       data: {
         ...selectedNode.data,
-        techId: techItem.tech_id,
-        label: techItem.name,
-        iconUrl: techItem.icon_url,
+        techId: techItem.tech_id ?? '',
+        label: techItem.name ?? '',
+        iconUrl: techItem.icon_url ?? '',
+        completed: false,
       },
     })
   }

@@ -1,12 +1,9 @@
 import { useCallback, useRef } from 'react'
 import { useWorkspaceStore, NODE_STYLE } from '../model'
 import { CustomNodeType } from '../model/types'
+import { TechItem } from '@/features/ai/model/useTechRecommendation'
 
-interface TechItem {
-  tech_id?: string
-  name?: string
-  icon_url?: string
-}
+// @/features/ai/model/useTechRecommendation에서 import
 
 /**
  * AI 추천 결과에서 선택된 노드의 자식 노드를 추가하는 훅
@@ -69,7 +66,8 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
         data: {
           techId: techItem.tech_id || null,
           label: techItem.name || '새 노드',
-          iconUrl: techItem.icon_url || null,
+          iconUrl: techItem.icon_url ?? undefined,
+          completed: false,
         },
         style: { ...NODE_STYLE.default },
       }

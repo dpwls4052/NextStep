@@ -1,5 +1,5 @@
 interface ButtonProps {
-  variant?: 'accent' | 'primary' | 'secondary' | 'gradient'
+  variant?: 'accent' | 'primary' | 'secondary' | 'gradient' | 'none'
   className?: string
   children: React.ReactNode
   onClick?: () => void
@@ -19,6 +19,7 @@ const Button = ({
     primary: 'bg-primary text-foreground',
     secondary: 'bg-secondary text-foreground',
     gradient: 'point-gradient text-white',
+    none: '',
   }
 
   return (
