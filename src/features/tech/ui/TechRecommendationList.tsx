@@ -149,9 +149,12 @@ const TechRecommendationList: React.FC<Props> = ({
                       <Button
                         variant="gradient"
                         className="h-50 w-full"
-                        onClick={() => onAddNode && onAddNode(item)}
+                        // onClick={() => onAddNode && onAddNode(item)}
+                        onClick={() =>
+                          handleUpdateNode && handleUpdateNode(item)
+                        }
                       >
-                        New
+                        Save
                       </Button>
                     </>
                   )}
