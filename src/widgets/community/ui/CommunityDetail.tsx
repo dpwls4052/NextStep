@@ -20,6 +20,7 @@ import { markQuestReady } from '@/features/user/quest/api/questClient'
 import saveWorkspace from '@/features/workspace/saveWorkspace/api/saveWorkspace'
 import { useRouter } from 'next/navigation'
 import NodeDetailModal from '@/widgets/community/ui/NodeDetailModal'
+import { fetchCurrentUser } from '@/features/community/api/commentApi'
 
 interface CommunityDetailProps {
   postId: string
@@ -165,7 +166,6 @@ export default function CommunityDetail({
   const enrichedNodes = post
     ? (post.roadmap.nodes ?? []).map((node: any) => {
         const techId = node.data?.techId
-
         return {
           ...node,
           data: {
@@ -179,6 +179,27 @@ export default function CommunityDetail({
         }
       })
     : []
+  const didRunQuest = useRef(false)
+
+  useEffect(() => {
+    const authorId = post?.author?.user_id
+    if (!authorId) return
+
+    const runQuest = async () => {
+      if (didRunQuest.current) return
+      didRunQuest.current = true
+
+      try {
+        const me = await fetchCurrentUser()
+        if (!me || me.user_id === authorId) return
+        await markQuestReady(1)
+      } catch (e) {
+        console.error('퀘스트 처리 실패', e)
+      }
+    }
+
+    runQuest()
+  }, [post?.author?.user_id])
 
   const toggleLike = async () => {
     if (!post || likeLoading) return
