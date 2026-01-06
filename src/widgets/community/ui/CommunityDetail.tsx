@@ -14,11 +14,12 @@ import { Plus } from 'lucide-react'
 import CommunityCommentSection from '@/widgets/community/comments/CommunityCommentSection'
 import { exportWorkspaceAsImage } from '@/features/community/model/exportWorkspaceAsImage'
 import { PostWithRoadmap } from '@/features/community/model/types'
-import CustomNode from '@/widgets/workspace/ui/CustomNode'
+import CommunityCustomNode from '@/widgets/community/ui/CommunityCustomNode'
 import UserAvatar from '@/features/profile/ui/UserAvatar'
 import { markQuestReady } from '@/features/user/quest/api/questClient'
 import saveWorkspace from '@/features/workspace/saveWorkspace/api/saveWorkspace'
 import { useRouter } from 'next/navigation'
+import NodeDetailModal from '@/widgets/community/ui/NodeDetailModal'
 
 interface CommunityDetailProps {
   postId: string
@@ -41,6 +42,9 @@ export default function CommunityDetail({
   const [loading, setLoading] = useState(true)
   const [isActionOpen, setIsActionOpen] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
+
+  const [isNodeModalOpen, setIsNodeModalOpen] = useState(false)
+  const [selectedNode, setSelectedNode] = useState<any>(null)
 
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
@@ -66,10 +70,8 @@ export default function CommunityDetail({
       },
     })
 
-    // ✅ 저장 완료 멘트
     setImported(true)
 
-    // 2초 뒤 자동으로 사라지게
     setTimeout(() => {
       setImported(false)
     }, 2000)
@@ -88,7 +90,6 @@ export default function CommunityDetail({
 
   useEffect(() => {
     if (listId && !resolvedListId) return
-    // ⬆️ listId가 있는데 아직 resolve 안됐으면 기다림
 
     const fetchPosts = async () => {
       try {
@@ -161,6 +162,23 @@ export default function CommunityDetail({
       router.push(`/community/${nextPost.post_id}${query}`)
     }
   }
+  const enrichedNodes = post
+    ? (post.roadmap.nodes ?? []).map((node: any) => {
+        const techId = node.data?.techId
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            hasMemo: !!techId && (post.nodeMemos?.[techId]?.length ?? 0) > 0,
+            hasLink: !!techId && (post.nodeLinks?.[techId]?.length ?? 0) > 0,
+            hasTrouble:
+              !!techId &&
+              (post.nodeTroubleshootings?.[techId]?.length ?? 0) > 0,
+          },
+        }
+      })
+    : []
 
   const toggleLike = async () => {
     if (!post || likeLoading) return
@@ -215,7 +233,7 @@ export default function CommunityDetail({
   }
 
   const nodeTypes = {
-    custom: CustomNode,
+    custom: CommunityCustomNode,
   }
 
   console.log(post, '포스트내용')
@@ -317,37 +335,49 @@ export default function CommunityDetail({
 
             <style>
               {`
-               .react-flow__node {
-                 padding: 0;
-                 display: flex;
-                 justify-content: center;
-                 align-items: center;
-               }
-               
-               .react-flow__handle {
-                 width: 4px;
-                 height: 4px;
-                 min-width: 4px;
-                 min-height: 4px;
-                 background-color: #000;
-                 border: none;
-               }
-               .dark .react-flow__handle {
-                 background-color: #fff;
-                 border: none;
-               }
-               .react-flow__handle-top {
-                 top: -3px;
-                 left: 50%;
-                 transform: translateX(-50%)
-               }
-               .react-flow__handle-bottom {
-                 bottom: -3px;
-                 left: 50%;
-                 transform: translateX(-50%)
-               }
-             `}
+                .react-flow__node-custom {
+                  padding: 0;
+                  background: transparent !important;
+                  border: none !important;
+                  box-shadow: none !important;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                }
+
+                .react-flow__node-default {
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+
+                .react-flow__handle {
+                  width: 4px;
+                  height: 4px;
+                  min-width: 4px;
+                  min-height: 4px;
+                  background-color: #000;
+                  border: none;
+                }
+
+                .dark .react-flow__handle {
+                  background-color: #fff;
+                }
+
+                .react-flow__handle-top {
+                  top: -3px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                }
+
+                .react-flow__handle-bottom {
+                  bottom: -3px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                }
+              `}
             </style>
+
             <div
               className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
               style={{ backgroundColor: bgColor }}
@@ -355,7 +385,7 @@ export default function CommunityDetail({
               <ReactFlow
                 ref={workspaceRef}
                 onInit={setRf}
-                nodes={post.roadmap.nodes ?? []}
+                nodes={enrichedNodes}
                 edges={post.roadmap.edges ?? []}
                 fitView
                 fitViewOptions={{ padding: 0.4 }}
@@ -375,6 +405,10 @@ export default function CommunityDetail({
                 panActivationKeyCode={null}
                 nodesFocusable={false}
                 edgesFocusable={false}
+                onNodeClick={(_, node) => {
+                  setSelectedNode(node)
+                  setIsNodeModalOpen(true)
+                }}
                 className="h-full w-full"
               >
                 <Background
@@ -431,6 +465,18 @@ export default function CommunityDetail({
       </div>
 
       <CommunitySidebar isOpen={isOpen} toggleOpen={toggleOpen} />
+
+      <NodeDetailModal
+        open={isNodeModalOpen}
+        node={selectedNode}
+        nodeMemos={post.nodeMemos ?? {}}
+        nodeLinks={post.nodeLinks ?? {}}
+        nodeTroubleshootings={post.nodeTroubleshootings ?? {}}
+        onClose={() => {
+          setIsNodeModalOpen(false)
+          setSelectedNode(null)
+        }}
+      />
     </div>
   )
 }
