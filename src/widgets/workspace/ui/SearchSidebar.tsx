@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui'
 import { CustomNodeType } from '../model/types'
 import { useWorkspaceStore } from '../model'
 import NodeInformation from './NodeInformation'
+import { toast } from 'sonner'
 
 interface SearchSidebarProps {
   isOpen: boolean
@@ -32,6 +33,8 @@ const SearchSidebar = ({
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const [recommendationTechName, setRecommendationTechName] =
     useState<string>('')
+  const techIdSet = useWorkspaceStore((s) => s.techIdSet)
+  const addTechId = useWorkspaceStore((s) => s.addTechId)
 
   // // 기술 편집 기능 시작
   // const handleStartEdit = () => {
@@ -114,6 +117,12 @@ const SearchSidebar = ({
   // 노드 업데이트
   const handleUpdateNode = (techItem: TechItem) => {
     if (selectedNode === null) return
+    if (!techItem.tech_id) return
+    if (techIdSet.has(techItem.tech_id)) {
+      toast.error('이미 추가된 기술입니다.')
+      return
+    }
+    addTechId(techItem.tech_id)
 
     setNodes((nds) =>
       nds.map((node) => {
