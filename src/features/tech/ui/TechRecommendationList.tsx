@@ -90,12 +90,6 @@ const TechRecommendationList: React.FC<Props> = ({
                   {item.description || '설명이 없습니다.'}
                 </p>
 
-                {typeof item.usage_count === 'number' && (
-                  <p className="mt-4 text-xs text-gray-400">
-                    Usage | {formatNumber(item.usage_count)}
-                  </p>
-                )}
-
                 {source === 'ai' && (
                   <span
                     className={`mt-2 inline-block w-fit rounded-full px-8 py-4 text-xs font-medium ${isNewTech ? 'bg-indigo-100 text-indigo-800' : 'bg-yellow-100 text-yellow-800'}`}
