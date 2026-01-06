@@ -21,100 +21,60 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     //1. 로그인 시도할 때마다 실행
     async signIn({ user }) {
-      console.log('OAuth User:', user)
+      if (!user.email) return false
 
-      // 이메일 없으면 로그인 거부
-      if (!user.email) {
-        return false
-      }
-
-      // 1) Supabase에 해당 이메일의 유저가 있는지 확인
-      const { data: existingUser, error: selectError } = await supabaseAdmin
+      const { error } = await supabaseAdmin
         .from('users')
-        .select('*')
+        .select('user_id')
         .eq('email', user.email)
         .single()
 
-      // "no rows" 에러(PGRST116)는 그냥 '유저 없음'으로 간주
-      if (selectError && selectError.code !== 'PGRST116') {
-        console.error('Supabase 유저 조회 실패:', selectError.message)
-        // 여기서 false를 리턴하면 로그인 자체를 막음
+      // 진짜 에러만 막기
+      if (error && error.code !== 'PGRST116') {
         return false
-      }
-
-      //2) 없으면 첫 로그인 -> 회원가입 처리
-      if (!existingUser) {
-        const { error: insertError } = await supabaseAdmin
-          .from('users')
-          .insert({
-            email: user.email,
-            name: user.name ?? '새 유저',
-            avatar: user.image ?? null,
-          })
-
-        if (insertError) {
-          console.error('Supabase 신규 유저 생성 실패:', insertError.message)
-          return false
-        }
-        return true
-      }
-      // 있으면: 탈퇴 상태면 “처음 가입한 것처럼” 복구
-      if (existingUser.status === false) {
-        const { error: updError } = await supabaseAdmin
-          .from('users')
-          .update({
-            status: true,
-            name: user.name,
-            avatar: user.image,
-          })
-          .eq('user_id', existingUser.user_id)
-
-        if (updError) {
-          console.error('Supabase 탈퇴 유저 복구 실패:', updError.message)
-          return false
-        }
       }
 
       return true
     },
-
     /**
      * 2. JWT 콜백
      *    - 여기서 "이 토큰을 유지할 것인지 / 버릴 것인지" 결정
      *    - return null 하면 NextAuth가 세션을 끊음(로그아웃 처리)
      */
-    async jwt({ token, trigger, session }) {
-      // email 정보가 없으면 그냥 토큰 그대로 돌려보냄
-      if (!token?.email) return token
+    async jwt({ token }) {
+      if (!token.email) return token
 
-      // Supabase에서 해당 이메일 유저가 아직 존재하는지 확인
-      const { data, error } = await supabaseAdmin
+      const { data: user, error } = await supabaseAdmin
         .from('users')
         .select('user_id, avatar')
         .eq('email', token.email)
         .single()
 
-      // 유저가 없으면 토큰 버림(로그아웃 처리)
-      if (error || !data?.user_id) {
-        ;(token as any).disabled = true
-        delete (token as any).userId
+      // 최초 로그인 → DB가 user_id 생성
+      if (!user && error?.code === 'PGRST116') {
+        const { data: newUser, error: insertError } = await supabaseAdmin
+          .from('users')
+          .insert({
+            email: token.email,
+            name: token.name ?? '새 유저',
+            avatar: (token as any).picture ?? null,
+            status: true,
+          })
+          .select('user_id')
+          .single()
+
+        if (insertError || !newUser) return token
+
+        token.userId = newUser.user_id
         return token
       }
 
-      // 유저 존재하면 userId를 토큰에 실어둠
-      token.userId = data.user_id
-      // DB에 있는 avatar를 토큰에 싣기 (헤더가 session.user.image로 쓰도록)
-      ;(token as any).picture = data.avatar ?? (token as any).picture
+      // 기존 유저
+      token.userId = user.user_id
+      ;(token as any).picture = user.avatar ?? (token as any).picture
 
-      // 클라에서 update() 호출 시 즉시 반영
-      if (trigger === 'update' && session?.user) {
-        if ((session.user as any).image) {
-          ;(token as any).picture = (session.user as any).image
-        }
-      }
       return token
     },
-
     /**
      * 3. session 콜백
      *    - 클라이언트로 내려갈 session 객체를 조작

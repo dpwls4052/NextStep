@@ -4,7 +4,16 @@ import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from('tech_requests')
-    .select('*')
+    .select(
+      `
+    tech_request_id:id,
+    name,
+    description,
+    icon_url,
+    status,
+    created_at
+  `
+    )
     .order('created_at', { ascending: false })
 
   if (error) {
