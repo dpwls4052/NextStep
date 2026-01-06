@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
 
+type PostRow = {
+  post_id: string
+  list_id: string | null
+  like_count: number | null
+  created_at: string
+  list: {
+    name: string
+  } | null
+}
+
 export async function GET() {
   try {
     const { data: posts, error: postError } = await supabaseAdmin
@@ -17,6 +27,7 @@ export async function GET() {
       `
       )
       .eq('status', true)
+      .returns<PostRow[]>()
 
     if (postError) throw postError
     if (!posts || posts.length === 0) {
