@@ -9,7 +9,9 @@ import { useWorkspaceStore } from '../model'
 import { DeleteNodeLinkButton } from '@/features/roadmap/deleteNodeLink/ui'
 import DeleteNodeTroubleshootingButton from '@/features/roadmap/deleteNodeTroubleshooting/ui/DeleteNodeLinkButton'
 import { useSession } from 'next-auth/react'
-import useTechRecommendation from '@/features/ai/model/useTechRecommendation'
+import useTechRecommendation, {
+  TechItem,
+} from '@/features/ai/model/useTechRecommendation'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useAddChildNode from '../model/useAddChildNode'
 import { Check } from '@/shared/ui/icon'
@@ -17,6 +19,7 @@ import { Check } from '@/shared/ui/icon'
 interface NodeInformationProps {
   selectedNode: CustomNodeType
   handleEditTech: () => void
+  handleUpdateNode: (techItem: TechItem) => void
 }
 
 const NodeInformationMenu = [
@@ -28,6 +31,7 @@ const NodeInformationMenu = [
 const NodeInformation = ({
   selectedNode,
   handleEditTech,
+  handleUpdateNode,
 }: NodeInformationProps) => {
   const { status } = useSession()
   const isLogin = status === 'authenticated'
@@ -70,35 +74,6 @@ const NodeInformation = ({
 
   const handleBackToMenu = () => {
     setIsRecommendMode(false)
-  }
-
-  const handleUpdateNode = (techItem: any) => {
-    if (selectedNode === null) return
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === selectedNode.id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              techId: techItem.tech_id,
-              label: techItem.name,
-              iconUrl: techItem.icon_url,
-            },
-          }
-        }
-        return node
-      })
-    )
-    setSelectedNode({
-      ...selectedNode,
-      data: {
-        ...selectedNode.data,
-        techId: techItem.tech_id,
-        label: techItem.name,
-        iconUrl: techItem.icon_url,
-      },
-    })
   }
 
   const handleNewTech = (item: any) => {

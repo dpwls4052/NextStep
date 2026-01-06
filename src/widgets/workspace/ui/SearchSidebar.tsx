@@ -119,7 +119,7 @@ const SearchSidebar = ({
     if (selectedNode === null) return
     if (!techItem.tech_id) return
     if (techIdSet.has(techItem.tech_id)) {
-      toast.error('이미 추가된 기술입니다.')
+      toast.warning('이미 추가된 기술입니다.')
       return
     }
     addTechId(techItem.tech_id)
@@ -311,6 +311,7 @@ const SearchSidebar = ({
               <NodeInformation
                 selectedNode={selectedNode}
                 handleEditTech={() => setIsEditingMode(true)}
+                handleUpdateNode={handleUpdateNode}
               />
             )}
           </>
