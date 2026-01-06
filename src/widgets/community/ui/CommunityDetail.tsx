@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Close } from '@/shared/ui/icon'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react'
@@ -17,6 +17,8 @@ import { PostWithRoadmap } from '@/features/community/model/types'
 import CustomNode from '@/widgets/workspace/ui/CustomNode'
 import UserAvatar from '@/features/profile/ui/UserAvatar'
 import { markQuestReady } from '@/features/user/quest/api/questClient'
+import saveWorkspace from '@/features/workspace/saveWorkspace/api/saveWorkspace'
+import { useRouter } from 'next/navigation'
 
 interface CommunityDetailProps {
   postId: string
@@ -32,7 +34,6 @@ export default function CommunityDetail({
   const searchParams = useSearchParams()
   const listId = searchParams.get('list')
   const [resolvedListId, setResolvedListId] = useState<string | null>(null)
-  const router = useRouter()
 
   const [posts, setPosts] = useState<PostWithRoadmap[]>([])
   const [post, setPost] = useState<PostWithRoadmap | null>(null)
@@ -48,6 +49,31 @@ export default function CommunityDetail({
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
   const [likeLoading, setLikeLoading] = useState(false)
+  const [imported, setImported] = useState(false)
+
+  const router = useRouter()
+  const handleImportWorkspace = async () => {
+    if (!post) return
+
+    await saveWorkspace({
+      title: post.title,
+      nodes: post.roadmap.nodes ?? [],
+      edges: post.roadmap.edges ?? [],
+      snapshot: {
+        memos: {},
+        links: {},
+        troubleshootings: {},
+      },
+    })
+
+    // ✅ 저장 완료 멘트
+    setImported(true)
+
+    // 2초 뒤 자동으로 사라지게
+    setTimeout(() => {
+      setImported(false)
+    }, 2000)
+  }
 
   // 좋아요 UI용 state
   const [liked, setLiked] = useState(false)
@@ -61,6 +87,9 @@ export default function CommunityDetail({
   }, [post])
 
   useEffect(() => {
+    if (listId && !resolvedListId) return
+    // ⬆️ listId가 있는데 아직 resolve 안됐으면 기다림
+
     const fetchPosts = async () => {
       try {
         setLoading(true)
@@ -88,7 +117,7 @@ export default function CommunityDetail({
     }
 
     fetchPosts()
-  }, [postId, resolvedListId])
+  }, [postId, resolvedListId, listId])
 
   useEffect(() => {
     if (!listId) {
@@ -120,14 +149,16 @@ export default function CommunityDetail({
   const goPrev = () => {
     if (currentIndex > 0) {
       const prevPost = posts[currentIndex - 1]
-      router.push(`/community/${prevPost.post_id}?list=${resolvedListId}`)
+      const query = resolvedListId ? `?list=${resolvedListId}` : ''
+      router.push(`/community/${prevPost.post_id}${query}`)
     }
   }
 
   const goNext = () => {
     if (currentIndex < posts.length - 1) {
       const nextPost = posts[currentIndex + 1]
-      router.push(`/community/${nextPost.post_id}?list=${resolvedListId}`)
+      const query = resolvedListId ? `?list=${resolvedListId}` : ''
+      router.push(`/community/${nextPost.post_id}${query}`)
     }
   }
 
@@ -354,6 +385,12 @@ export default function CommunityDetail({
                 />
               </ReactFlow>
 
+              {imported && (
+                <div className="absolute top-16 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black/80 px-20 py-10 text-sm text-white shadow-lg">
+                  내 워크스페이스에 저장되었습니다!
+                </div>
+              )}
+
               {!isCapturing && (
                 <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
                   {isActionOpen && (
@@ -365,8 +402,11 @@ export default function CommunityDetail({
                         이미지로 저장하기
                       </button>
 
-                      <button className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg">
-                        내 워크스페이스에 불러오기
+                      <button
+                        onClick={handleImportWorkspace}
+                        className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
+                      >
+                        워크스페이스로 가져오기
                       </button>
                     </div>
                   )}
