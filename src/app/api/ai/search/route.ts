@@ -9,7 +9,7 @@ export const GET = async (req: Request) => {
     const { searchParams } = new URL(req.url)
     const keyword = searchParams.get('keyword')?.trim()
 
-    console.log('🔍 검색 요청:', keyword)
+    // console.log('🔍 검색 요청:', keyword)
 
     // keyword 없으면 early return
     if (!keyword) {
@@ -19,7 +19,7 @@ export const GET = async (req: Request) => {
     // -------------------------------
     // 1) Supabase DB 검색
     // -------------------------------
-    console.log('📊 DB 검색 시작...')
+    // console.log('📊 DB 검색 시작...')
 
     const { data: dbData, error: dbError } = await supabase
       .from('techs')
@@ -55,7 +55,7 @@ export const GET = async (req: Request) => {
         if (lowerName.startsWith(lowerKeyword)) score += 50
         if (lowerName.includes(lowerKeyword)) score += 30
         if (lowerDesc.includes(lowerKeyword)) score += 10
-        score += (item.usage_count || 0) * 0.1
+        // score += (item.usage_count || 0) * 0.1
 
         return { ...item, score }
       })
@@ -121,7 +121,7 @@ export const GET = async (req: Request) => {
         })
       }
 
-      console.log('✅ AI에서 결과 발견:', aiData.name)
+      // console.log('✅ AI에서 결과 발견:', aiData.name)
       return NextResponse.json({
         source: 'ai',
         data: [aiData],
@@ -137,7 +137,7 @@ export const GET = async (req: Request) => {
     }
   } catch (error) {
     // 예상치 못한 전체 에러만 500으로 처리
-    console.error('❌ 예상치 못한 에러:', error)
+    // console.error('❌ 예상치 못한 에러:', error)
     return NextResponse.json(
       {
         error: '서버 오류가 발생했습니다',
