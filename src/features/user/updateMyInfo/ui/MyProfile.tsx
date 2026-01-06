@@ -132,7 +132,7 @@ const MyProfile = ({ onApplied }: Props) => {
             className={`px-20 py-10 hover:cursor-pointer ${
               activeTab === tab.key
                 ? 'border-accent text-accent border-b-2'
-                : 'text-gray-500'
+                : 'text-gray-500 dark:text-white'
             }`}
             onClick={() => setActiveTab(tab.key)}
           >
