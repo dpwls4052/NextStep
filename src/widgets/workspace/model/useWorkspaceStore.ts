@@ -425,6 +425,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       workspaceId: null,
       workspaceTitle: '새 워크스페이스',
       lastSaved: null,
+      techIdSet: new Set<string>(),
       selectedNode: null,
       original: null,
       current: emptySnapshot,
