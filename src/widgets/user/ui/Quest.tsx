@@ -35,8 +35,8 @@ type PatchQuestResponse = {
 const initialQuests: QuestUI[] = [
   {
     id: 1,
-    title: '나의 로드맵 공유하기',
-    description: '로드맵을 커뮤니티에 공유해보세요.',
+    title: '게시글 조회하기',
+    description: '다른 사람의 게시글을 조회해보세요.',
     targetCount: 1,
     rewardPoint: 50,
     variant: 'locked',
@@ -62,12 +62,12 @@ const initialQuests: QuestUI[] = [
   },
   {
     id: 4,
-    title: '새로운 로드맵 추가하기',
-    description: '새로운 로드맵을 만들어보세요.',
+    title: '뉴스에 댓글 작성하기',
+    description: '뉴스 게시글에 댓글을 작성해보세요.',
     targetCount: 1,
     rewardPoint: 50,
     variant: 'locked',
-    leftIcon: <Add />,
+    leftIcon: <Comment />,
   },
 ]
 
@@ -89,7 +89,7 @@ const Quest = () => {
   const { point, setPoint } = useMyPoint() // ✅ 포인트는 전용 훅에서 관리
   const [claimingId, setClaimingId] = useState<1 | 2 | 3 | 4 | null>(null)
 
-  // ✅ 첫 진입: "퀘스트 상태만" 로드 (포인트 로드 X)
+  // 첫 진입: "퀘스트 상태만" 로드 (포인트 로드 X)
   useEffect(() => {
     const loadTodayQuestStatus = async () => {
       const res = await fetch('/api/users/quests', { method: 'GET' })
