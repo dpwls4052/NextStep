@@ -9,14 +9,19 @@ import { useWorkspaceStore } from '../model'
 import { DeleteNodeLinkButton } from '@/features/roadmap/deleteNodeLink/ui'
 import DeleteNodeTroubleshootingButton from '@/features/roadmap/deleteNodeTroubleshooting/ui/DeleteNodeLinkButton'
 import { useSession } from 'next-auth/react'
-import useTechRecommendation from '@/features/ai/model/useTechRecommendation'
+import useTechRecommendation, {
+  TechItem,
+} from '@/features/ai/model/useTechRecommendation'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useAddChildNode from '../model/useAddChildNode'
 import { Check } from '@/shared/ui/icon'
+import AlertModal from '@/shared/ui/AlertModal'
+import { useOpen } from '@/shared/model'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
   handleEditTech: () => void
+  handleUpdateNode: (techItem: TechItem) => void
 }
 
 const NodeInformationMenu = [
@@ -28,6 +33,7 @@ const NodeInformationMenu = [
 const NodeInformation = ({
   selectedNode,
   handleEditTech,
+  handleUpdateNode,
 }: NodeInformationProps) => {
   const { status } = useSession()
   const isLogin = status === 'authenticated'
@@ -72,39 +78,15 @@ const NodeInformation = ({
     setIsRecommendMode(false)
   }
 
-  const handleUpdateNode = (techItem: any) => {
-    if (selectedNode === null) return
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === selectedNode.id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              techId: techItem.tech_id,
-              label: techItem.name,
-              iconUrl: techItem.icon_url,
-            },
-          }
-        }
-        return node
-      })
-    )
-    setSelectedNode({
-      ...selectedNode,
-      data: {
-        ...selectedNode.data,
-        techId: techItem.tech_id,
-        label: techItem.name,
-        iconUrl: techItem.icon_url,
-      },
-    })
-  }
-
   const handleNewTech = (item: any) => {
     const techName = item.name
     if (!techName) return
     fetchRecommendations(techName)
+  }
+
+  const { isOpen, setIsOpen, open } = useOpen()
+  const handleEdit = () => {
+    handleEditTech()
   }
 
   return (
@@ -147,12 +129,40 @@ const NodeInformation = ({
       <div className="mx-15 flex justify-center gap-10">
         {!isRecommendMode && (
           <>
-            <Button
-              className="w-1/2 shrink-0 px-15 py-2"
-              onClick={handleEditTech}
-            >
-              변경
-            </Button>
+            {/* 기술 변경 */}
+            <AlertModal
+              open={isOpen}
+              onOpenChange={setIsOpen}
+              trigger={
+                <Button className="w-1/2 shrink-0 px-15 py-2" onClick={open}>
+                  변경
+                </Button>
+              }
+              title="기술 변경"
+              titleClassName="text-center"
+              className="px-10 pt-20 pb-10"
+              description={`다른 기술로 변경 시 기존 노드 정보는 표시되지 않습니다.\n기존 기술을 다시 설정하면 기존 노드 정보가 표시됩니다.\n진행하시겠습니까?`}
+              descriptionClassName="text-center whitespace-pre-line py-5"
+              footer={
+                <>
+                  <Button
+                    onClick={() => setIsOpen(false)}
+                    className="px-20 py-8"
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    variant="accent"
+                    onClick={handleEdit}
+                    className="px-20 py-8"
+                  >
+                    변경
+                  </Button>
+                </>
+              }
+              footerClassName="flex sm:justify-center gap-10"
+            />
+
             <Button
               className="point-gradient w-1/2 px-15 py-10 text-white"
               onClick={handleRecommendClick}

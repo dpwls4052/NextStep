@@ -3,6 +3,7 @@ import { useWorkspaceStore, NODE_STYLE } from '../model'
 import { CustomNodeType } from '../model/types'
 import { TechItem } from '@/features/ai/model/useTechRecommendation'
 import { v4 as uuidv4 } from 'uuid'
+import { toast } from 'sonner'
 
 // @/features/ai/model/useTechRecommendation에서 import
 
@@ -20,6 +21,8 @@ import { v4 as uuidv4 } from 'uuid'
  */
 const useAddChildNode = (selectedNode: CustomNodeType | null) => {
   const { nodes, edges, setNodes, setEdges } = useWorkspaceStore()
+  const techIdSet = useWorkspaceStore((s) => s.techIdSet)
+  const addTechId = useWorkspaceStore((s) => s.addTechId)
 
   // 자식 노드 개수 추적 (위치 분산용)
   const childNodeCountRef = useRef<number>(0)
@@ -36,6 +39,12 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
         console.warn('선택된 노드가 없습니다.')
         return
       }
+      if (!techItem.tech_id) return
+      if (techIdSet.has(techItem.tech_id)) {
+        toast.warning('이미 추가된 기술입니다.')
+        return
+      }
+      addTechId(techItem.tech_id)
 
       // 1. 새로운 노드 ID 생성
       const newId = uuidv4()
@@ -91,7 +100,7 @@ const useAddChildNode = (selectedNode: CustomNodeType | null) => {
 
       console.log(`하위 노드 추가: ${techItem.name} (위치: ${childIndex}번째)`)
     },
-    [selectedNode, nodes, edges, setNodes, setEdges]
+    [selectedNode, nodes, edges, setNodes, setEdges, techIdSet, addTechId]
   )
 
   return {

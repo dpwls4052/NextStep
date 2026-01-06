@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import Sidebar from '@/shared/ui/Sidebar'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useSearchSimilar from '@/features/ai/model/useSearchSimilar'
@@ -8,6 +8,7 @@ import { Button } from '@/shared/ui'
 import { CustomNodeType } from '../model/types'
 import { useWorkspaceStore } from '../model'
 import NodeInformation from './NodeInformation'
+import { toast } from 'sonner'
 
 interface SearchSidebarProps {
   isOpen: boolean
@@ -32,6 +33,9 @@ const SearchSidebar = ({
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   const [recommendationTechName, setRecommendationTechName] =
     useState<string>('')
+  const techIdSet = useWorkspaceStore((s) => s.techIdSet)
+  const addTechId = useWorkspaceStore((s) => s.addTechId)
+  const removeTechId = useWorkspaceStore((s) => s.removeTechId)
 
   // // 기술 편집 기능 시작
   // const handleStartEdit = () => {
@@ -114,6 +118,13 @@ const SearchSidebar = ({
   // 노드 업데이트
   const handleUpdateNode = (techItem: TechItem) => {
     if (selectedNode === null) return
+    if (!techItem.tech_id) return
+    if (techIdSet.has(techItem.tech_id)) {
+      toast.warning('이미 추가된 기술입니다.')
+      return
+    }
+    addTechId(techItem.tech_id)
+    if (selectedNode.data.techId) removeTechId(selectedNode.data.techId)
 
     setNodes((nds) =>
       nds.map((node) => {
@@ -302,6 +313,7 @@ const SearchSidebar = ({
               <NodeInformation
                 selectedNode={selectedNode}
                 handleEditTech={() => setIsEditingMode(true)}
+                handleUpdateNode={handleUpdateNode}
               />
             )}
           </>
