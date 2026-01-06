@@ -21,9 +21,11 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
 
-  const completeCommunityQuest = async () => {
+  const completeQuest = async () => {
     if (type === 'community') {
-      await markQuestReady(3)
+      await markQuestReady(3) // 커뮤니티 댓글 퀘스트
+    } else if (type === 'news') {
+      await markQuestReady(4) // 뉴스 댓글 퀘스트
     }
   }
 
@@ -60,7 +62,7 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
       setNewComment('')
       toast.success('댓글이 작성되었습니다.')
 
-      await completeCommunityQuest()
+      await completeQuest()
     },
     onError: () => {
       toast.error('댓글 작성에 실패했습니다.')
@@ -87,7 +89,7 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
       setReplyContent('')
       setReplyingTo(null)
       toast.success('답글이 작성되었습니다.')
-      await completeCommunityQuest()
+      await completeQuest()
     },
     onError: () => {
       toast.error('답글 작성에 실패했습니다.')
