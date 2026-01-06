@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import Sidebar from '@/shared/ui/Sidebar'
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useSearchSimilar from '@/features/ai/model/useSearchSimilar'
@@ -35,6 +35,7 @@ const SearchSidebar = ({
     useState<string>('')
   const techIdSet = useWorkspaceStore((s) => s.techIdSet)
   const addTechId = useWorkspaceStore((s) => s.addTechId)
+  const removeTechId = useWorkspaceStore((s) => s.removeTechId)
 
   // // 기술 편집 기능 시작
   // const handleStartEdit = () => {
@@ -123,6 +124,7 @@ const SearchSidebar = ({
       return
     }
     addTechId(techItem.tech_id)
+    if (selectedNode.data.techId) removeTechId(selectedNode.data.techId)
 
     setNodes((nds) =>
       nds.map((node) => {
