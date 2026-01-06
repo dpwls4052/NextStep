@@ -180,6 +180,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       return {
         nodes,
         edges,
+        selectedNode: null,
 
         current: {
           memos: Object.fromEntries(
