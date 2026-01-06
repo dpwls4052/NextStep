@@ -49,5 +49,6 @@ export const removeNodeCascade = (
   return {
     nodes: [...remainingNodes.values()],
     edges: remainingEdges,
+    deletedNodeIds: [...nodesToDelete],
   }
 }

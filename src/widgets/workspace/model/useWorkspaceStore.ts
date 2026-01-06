@@ -165,11 +165,39 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
    ========================= */
   removeNode: (nodeId: string) => {
     set((state) => {
-      const result = removeNodeCascade(nodeId, state.nodes, state.edges)
+      const { nodes, edges, deletedNodeIds } = removeNodeCascade(
+        nodeId,
+        state.nodes,
+        state.edges
+      )
+
+      // 삭제된 node들의 techId 수집
+      const deletedTechIds = state.nodes
+        .filter((n) => deletedNodeIds.includes(n.id))
+        .map((n) => n.data.techId)
+        .filter((id): id is string => Boolean(id))
 
       return {
-        nodes: result.nodes,
-        edges: result.edges,
+        nodes,
+        edges,
+
+        current: {
+          memos: Object.fromEntries(
+            Object.entries(state.current.memos).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+          links: Object.fromEntries(
+            Object.entries(state.current.links).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+          troubleshootings: Object.fromEntries(
+            Object.entries(state.current.troubleshootings).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+        },
       }
     })
 
