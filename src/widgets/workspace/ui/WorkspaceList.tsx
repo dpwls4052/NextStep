@@ -20,8 +20,6 @@ const WorkspaceList = () => {
   const searchParams = useSearchParams()
   const currentWorkspaceId = searchParams.get('workspace')
 
-  const resetToEmpty = useWorkspaceStore((s) => s.resetToEmpty)
-
   const isEdited = useWorkspaceStore((s) => s.isEdited)
   const { safeNavigate } = usePreventNavigation({
     when: isEdited,
@@ -32,12 +30,13 @@ const WorkspaceList = () => {
   // workspaceId를 쿼리에 넣는 함수
   const handleSelectWorkspace = (id: string | null) => {
     const query = new URLSearchParams(window.location.search)
+    if (id === null && currentWorkspaceId === null) return
+    if (id === currentWorkspaceId) return
     if (id) {
       query.set('workspace', id)
     } else {
       query.delete('workspace')
     }
-    resetToEmpty()
     safeNavigate(`${window.location.pathname}?${query.toString()}`)
   }
 
