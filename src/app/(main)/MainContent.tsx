@@ -48,12 +48,11 @@ export default function MainContent() {
       // MainContent가 언마운트되면 워크스페이스 상태 리셋
       resetToEmpty()
     }
-  }, [pathname, resetToEmpty])
+  }, [pathname, resetToEmpty, searchParams])
 
   useEffect(() => {
-    if (!workspaceId) {
-      resetToEmpty()
-    } else if (data) {
+    resetToEmpty()
+    if (data) {
       initializeWithData(data)
     }
   }, [workspaceId, data, initializeWithData, resetToEmpty])

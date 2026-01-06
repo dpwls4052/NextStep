@@ -20,8 +20,6 @@ const WorkspaceList = () => {
   const searchParams = useSearchParams()
   const currentWorkspaceId = searchParams.get('workspace')
 
-  const resetToEmpty = useWorkspaceStore((s) => s.resetToEmpty)
-
   const isEdited = useWorkspaceStore((s) => s.isEdited)
   const { safeNavigate } = usePreventNavigation({
     when: isEdited,
@@ -37,7 +35,6 @@ const WorkspaceList = () => {
     } else {
       query.delete('workspace')
     }
-    resetToEmpty()
     safeNavigate(`${window.location.pathname}?${query.toString()}`)
   }
 
