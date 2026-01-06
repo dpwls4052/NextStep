@@ -34,7 +34,9 @@ export type PostWithRoadmap = {
   }[]
 
   is_liked?: boolean
-
+  nodeMemos?: Record<string, any[]>
+  nodeLinks?: Record<string, any[]>
+  nodeTroubleshootings?: Record<string, any[]>
   roadmap: {
     roadmap_id: string
     user_id: string

@@ -21,6 +21,12 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
   const [editingComment, setEditingComment] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
 
+  const completeCommunityQuest = async () => {
+    if (type === 'community') {
+      await markQuestReady(3)
+    }
+  }
+
   // 댓글 목록 조회
   const {
     data: comments = [],
@@ -54,9 +60,7 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
       setNewComment('')
       toast.success('댓글이 작성되었습니다.')
 
-      if (type === 'community') {
-        await markQuestReady(3)
-      }
+      await completeCommunityQuest()
     },
     onError: () => {
       toast.error('댓글 작성에 실패했습니다.')
@@ -78,11 +82,12 @@ export const useComments = (postId: string, type: CommentType = 'news') => {
         parent_comment_id: parentId,
         user_id: currentUserId,
       }),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['comments', postId, type] })
       setReplyContent('')
       setReplyingTo(null)
       toast.success('답글이 작성되었습니다.')
+      await completeCommunityQuest()
     },
     onError: () => {
       toast.error('답글 작성에 실패했습니다.')
