@@ -15,6 +15,8 @@ import useTechRecommendation, {
 import TechRecommendationList from '@/features/tech/ui/TechRecommendationList'
 import useAddChildNode from '../model/useAddChildNode'
 import { Check } from '@/shared/ui/icon'
+import AlertModal from '@/shared/ui/AlertModal'
+import { useOpen } from '@/shared/model'
 
 interface NodeInformationProps {
   selectedNode: CustomNodeType
@@ -82,6 +84,11 @@ const NodeInformation = ({
     fetchRecommendations(techName)
   }
 
+  const { isOpen, setIsOpen, open } = useOpen()
+  const handleEdit = () => {
+    handleEditTech()
+  }
+
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto">
       <div className="px-10 pt-10"></div>
@@ -122,12 +129,40 @@ const NodeInformation = ({
       <div className="mx-15 flex justify-center gap-10">
         {!isRecommendMode && (
           <>
-            <Button
-              className="w-1/2 shrink-0 px-15 py-2"
-              onClick={handleEditTech}
-            >
-              변경
-            </Button>
+            {/* 기술 변경 */}
+            <AlertModal
+              open={isOpen}
+              onOpenChange={setIsOpen}
+              trigger={
+                <Button className="w-1/2 shrink-0 px-15 py-2" onClick={open}>
+                  변경
+                </Button>
+              }
+              title="기술 변경"
+              titleClassName="text-center"
+              className="px-10 pt-20 pb-10"
+              description={`다른 기술로 변경 시 기존 노드 정보는 표시되지 않습니다.\n기존 기술을 다시 설정하면 기존 노드 정보가 표시됩니다.\n진행하시겠습니까?`}
+              descriptionClassName="text-center whitespace-pre-line py-5"
+              footer={
+                <>
+                  <Button
+                    onClick={() => setIsOpen(false)}
+                    className="px-20 py-8"
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    variant="accent"
+                    onClick={handleEdit}
+                    className="px-20 py-8"
+                  >
+                    변경
+                  </Button>
+                </>
+              }
+              footerClassName="flex sm:justify-center gap-10"
+            />
+
             <Button
               className="point-gradient w-1/2 px-15 py-10 text-white"
               onClick={handleRecommendClick}
