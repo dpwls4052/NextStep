@@ -56,7 +56,7 @@ export async function GET() {
     const { data: user, error: userErr } = await supabaseAdmin
       .from('users')
       .select(
-        ` user_id, email, name, avatar, point, status,
+        ` user_id, email, name, avatar, point, status, role,
     decoration_border,
     decoration_title,
     decoration_name_color,
@@ -127,6 +127,7 @@ export async function GET() {
       email: user.email,
       name: user.name,
       avatar: user.avatar,
+      role: user.role ?? 'user',
       point: user.point ?? 0,
       experiences: (experiences ?? []).map((e) => ({
         experienceId: e.experience_id,

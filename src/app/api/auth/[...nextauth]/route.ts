@@ -50,6 +50,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name ?? '새 유저',
             avatar: user.image ?? null,
+            role: 'user',
           })
 
         if (insertError) {
@@ -90,7 +91,7 @@ export const authOptions: NextAuthOptions = {
       // Supabase에서 해당 이메일 유저가 아직 존재하는지 확인
       const { data, error } = await supabaseAdmin
         .from('users')
-        .select('user_id, avatar')
+        .select('user_id, avatar, role')
         .eq('email', token.email)
         .single()
 
@@ -98,6 +99,7 @@ export const authOptions: NextAuthOptions = {
       if (error || !data?.user_id) {
         ;(token as any).disabled = true
         delete (token as any).userId
+        delete (token as any).role
         return token
       }
 
@@ -105,6 +107,7 @@ export const authOptions: NextAuthOptions = {
       token.userId = data.user_id
       // DB에 있는 avatar를 토큰에 싣기 (헤더가 session.user.image로 쓰도록)
       ;(token as any).picture = data.avatar ?? (token as any).picture
+      ;(token as any).role = data.role ?? 'user'
 
       // 클라에서 update() 호출 시 즉시 반영
       if (trigger === 'update' && session?.user) {
@@ -128,6 +131,7 @@ export const authOptions: NextAuthOptions = {
           // 헤더에서 바로 쓰는 값
         ;(session.user as any).image =
           (token as any).picture ?? session.user.image
+        ;(session.user as any).role = (token as any).role ?? 'user'
       }
       return session
     },
