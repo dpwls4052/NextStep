@@ -56,6 +56,13 @@ type WorkspaceStore = {
   getNodeCompleted: (techId: string | null) => boolean
 
   /* =========================
+   * Tech Id Set
+   ========================= */
+  techIdSet: Set<string>
+  addTechId: (techId: string | null) => void
+  removeTechId: (techId: string | null) => void
+
+  /* =========================
    * Snapshot
    ========================= */
   original: WorkspaceSnapshot | null
@@ -165,11 +172,42 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
    ========================= */
   removeNode: (nodeId: string) => {
     set((state) => {
-      const result = removeNodeCascade(nodeId, state.nodes, state.edges)
+      const { nodes, edges, deletedNodeIds } = removeNodeCascade(
+        nodeId,
+        state.nodes,
+        state.edges
+      )
+
+      // 삭제된 node들의 techId 수집
+      const deletedTechIds = state.nodes
+        .filter((n) => deletedNodeIds.includes(n.id))
+        .map((n) => n.data.techId)
+        .filter((id): id is string => Boolean(id))
+      const nextTechIdSet = new Set(state.techIdSet)
+      deletedTechIds.forEach((id) => nextTechIdSet.delete(id))
 
       return {
-        nodes: result.nodes,
-        edges: result.edges,
+        nodes,
+        edges,
+        selectedNode: null,
+        techIdSet: nextTechIdSet,
+        current: {
+          memos: Object.fromEntries(
+            Object.entries(state.current.memos).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+          links: Object.fromEntries(
+            Object.entries(state.current.links).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+          troubleshootings: Object.fromEntries(
+            Object.entries(state.current.troubleshootings).filter(
+              ([techId]) => !deletedTechIds.includes(techId)
+            )
+          ),
+        },
       }
     })
 
@@ -183,6 +221,35 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   workspaceTitle: '새 워크스페이스',
   lastSaved: null,
   setWorkspaceTitle: (title) => set({ workspaceTitle: title }),
+
+  /* =========================
+   * Tech Id Set
+   ========================= */
+  techIdSet: new Set(),
+  addTechId: (techId) => {
+    if (!techId) return
+
+    set((state) => {
+      if (state.techIdSet.has(techId)) return state
+
+      const next = new Set(state.techIdSet)
+      next.add(techId)
+
+      return { techIdSet: next }
+    })
+  },
+  removeTechId: (techId) => {
+    if (!techId) return
+
+    set((state) => {
+      if (!state.techIdSet.has(techId)) return state
+
+      const next = new Set(state.techIdSet)
+      next.delete(techId)
+
+      return { techIdSet: next }
+    })
+  },
 
   /* =========================
    * Snapshot
@@ -320,7 +387,14 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   /* =========================
    * Initialize / Reset
    ========================= */
-  initializeWithData: (data) =>
+  initializeWithData: (data) => {
+    const techIds = new Set<string>()
+
+    data.nodes?.forEach((node) => {
+      const techId = node.data?.techId
+      if (techId) techIds.add(techId)
+    })
+
     set({
       workspaceId: data.workspaceId,
       workspaceTitle: data.title,
@@ -328,19 +402,21 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       edges: data.edges || [],
       lastSaved: new Date(data.updatedAt),
 
+      techIdSet: techIds,
+
       original: {
         memos: data.memos || {},
         links: data.links || {},
         troubleshootings: data.troubleshootings || {},
       },
-
       current: {
         memos: data.memos || {},
         links: data.links || {},
         troubleshootings: data.troubleshootings || {},
       },
       isEdited: false,
-    }),
+    })
+  },
 
   resetToEmpty: () =>
     set({
