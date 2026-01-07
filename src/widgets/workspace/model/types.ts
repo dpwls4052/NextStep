@@ -12,7 +12,7 @@ export type CustomNodeType = Node<CustomNodeDataType>
 
 // 워크스페이스 정보 타입
 export type WorkspaceData = {
-  workspaceId: string
+  workspaceId: string | null
   title: string
   nodes: CustomNodeType[]
   edges: Edge[]

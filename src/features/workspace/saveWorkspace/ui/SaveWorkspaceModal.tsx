@@ -7,15 +7,40 @@ import { useSaveWorkspace } from '../model'
 import { useOpen } from '@/shared/model'
 import { toast } from 'sonner'
 import { useWorkspaceStore } from '@/widgets/workspace/model'
+import { useSearchParams } from 'next/navigation'
 
 const SaveWorkspaceModal = () => {
   const { isOpen, setIsOpen } = useOpen()
-  const { workspaceTitle } = useWorkspaceStore()
+  const { workspaceTitle, nodes, edges } = useWorkspaceStore()
   const resetIsEdited = useWorkspaceStore((s) => s.resetIsEdited)
   const [titleInput, setTitleInput] = useState<string>('')
 
   const { status } = useSession()
   const { saveWorkspace, isSaving } = useSaveWorkspace()
+
+  const searchParams = useSearchParams()
+
+  const handleTemporarySave = () => {
+    if (status === 'authenticated') return
+    if (!titleInput.trim()) {
+      toast.warning('워크스페이스 이름을 입력해주세요.')
+      return
+    }
+
+    // 세션 스토리지에 저장
+    const savings = {
+      workspaceTitle: titleInput,
+      nodes,
+      edges,
+      updatedAt: new Date().toISOString(),
+    }
+    sessionStorage.setItem('workspace', JSON.stringify(savings))
+    setIsOpen(false)
+    setTitleInput('')
+    resetIsEdited()
+    toast.success('워크스페이스가 임시 저장되었습니다.')
+  }
+
   const handleSave = () => {
     // 로그인 여부 확인
     if (status !== 'authenticated') {
@@ -53,7 +78,7 @@ const SaveWorkspaceModal = () => {
       onOpenChange={handleOpenChange}
       trigger={
         <Button variant="accent" className="text-12 h-full px-20">
-          저장
+          {status !== 'authenticated' ? '임시 저장' : '저장'}
         </Button>
       }
       title="워크스페이스 저장"
@@ -64,8 +89,18 @@ const SaveWorkspaceModal = () => {
           <DialogClose asChild>
             <Button className="px-20 py-8">취소</Button>
           </DialogClose>
-          <Button variant="accent" onClick={handleSave} className="px-20 py-8">
-            {isSaving ? '저장 중...' : '저장'}
+          <Button
+            variant="accent"
+            onClick={
+              status !== 'authenticated' ? handleTemporarySave : handleSave
+            }
+            className="px-20 py-8"
+          >
+            {isSaving
+              ? '저장 중...'
+              : status !== 'authenticated'
+                ? '임시 저장'
+                : '저장'}
           </Button>
         </>
       }
