@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/shared/libs/supabaseAdmin'
 
-/**
- * ✏️ 기술 요청 수정 (이름 / 설명 / 아이콘)
- */
+// 기술 요청 수정 (이름 / 설명 / 아이콘)
 export async function PUT(
   req: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  // ✅ Next 15/16: params는 Promise
+  // Next 15/16: params는 Promise
   const { id } = await context.params
 
   const { name, description, icon_url } = await req.json()
@@ -36,7 +34,7 @@ export async function PATCH(
   const { id } = await context.params
   const { status } = await req.json()
 
-  // 1️⃣ 요청 정보 가져오기
+  // 요청 정보 가져오기
   const { data: request, error: fetchError } = await supabaseAdmin
     .from('tech_requests')
     .select('name, description, icon_url')
@@ -50,7 +48,7 @@ export async function PATCH(
     )
   }
 
-  // 2️⃣ 요청 상태 업데이트
+  // 요청 상태 업데이트
   const { error: updateError } = await supabaseAdmin
     .from('tech_requests')
     .update({ status })
@@ -60,7 +58,7 @@ export async function PATCH(
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  // 3️⃣ 승인일 때만 techs 테이블에 등록
+  // 승인일 때만 techs 테이블에 등록
   if (status === 'approved') {
     const { error: insertError } = await supabaseAdmin.from('techs').insert({
       name: request.name,

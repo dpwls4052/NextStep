@@ -19,7 +19,7 @@ export default function TechRequests() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<TechRequest | null>(null)
 
-  // 🔹 목록 불러오기
+  // 목록 불러오기
   const loadRequests = async () => {
     try {
       const res = await fetch('/api/admin/tech-requests')
@@ -38,8 +38,7 @@ export default function TechRequests() {
     loadRequests()
   }, [])
 
-  // 🔹 상태 변경
-  // 🔹 상태 변경 (수락 / 거절)
+  // 상태 변경
   const updateStatus = async (id: string, status: 'approved' | 'rejected') => {
     const res = await fetch(`/api/admin/tech-requests/${id}`, {
       method: 'PATCH',
