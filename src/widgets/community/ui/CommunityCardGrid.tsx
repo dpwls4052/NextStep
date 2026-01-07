@@ -63,20 +63,20 @@ const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
       {posts
         .filter((post) => post.author)
         .map((post) => (
-        <CommunityCard
-          key={post.post_id}
-          title={post.title}
-          nodes={post.roadmap.nodes}
-          edges={post.roadmap.edges}
-          authorId={post.author?.user_id ?? null}
-          userName={post.author?.name ?? null}
-          userImage={post.author?.avatar ?? null}
-          decorations={post.author?.decorations ?? null}
-          onClick={() => {
-            router.push(`/community/${post.post_id}?list=${listId}`)
-          }}
-        />
-      ))}
+          <CommunityCard
+            key={post.post_id}
+            title={post.title}
+            nodes={post.roadmap.nodes}
+            edges={post.roadmap.edges}
+            authorId={post.author?.user_id ?? null}
+            userName={post.author?.name ?? null}
+            userImage={post.author?.avatar ?? null}
+            decorations={post.author?.decorations ?? null}
+            onClick={() => {
+              router.push(`/community/${post.post_id}?list=${listId}`)
+            }}
+          />
+        ))}
     </div>
   )
 }
