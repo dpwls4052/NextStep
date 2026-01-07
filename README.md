@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NEXTSTEP
 
-## Getting Started
+개발자의 학습 로드맵을 **시각화·관리·공유**하는 프로젝트입니다. 개인 워크스페이스에서 기술 로드맵을 구성하고, 다른 사용자와 공유하며 피드백을 주고받을 수 있습니다.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🔥 핵심 기능
+
+- **개인 워크스페이스**
+  - 사용자별 워크스페이스 생성
+  - 기술(Tech) 기반 로드맵 구성 (트리 구조)
+  - 완료 여부 관리
+
+- **로드맵(Roadmap)**
+  - 기술 단위 로드맵 관리
+  - 부모/자식 구조 지원
+  - 학습 진행 상태 체크
+
+- **공유 & 커뮤니티**
+  - 워크스페이스 공유 게시글
+  - 좋아요 / 댓글 / 대댓글
+  - 리스트(카테고리) 기반 분류
+
+- **커스터마이징 요소**
+  - 프로필 장식 아이템(테두리, 타이틀, 컬러 등)
+  - 장식 구매(Order) 시스템
+
+---
+
+## 🛠 기술 스택
+
+### Frontend
+
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Feature-Sliced Design (FSD)
+
+### Backend / DB
+
+- Supabase (PostgreSQL)
+- Row Level Security (RLS)
+
+---
+
+## 📂 프로젝트 구조 (요약)
+
+```
+app/
+ ├─ (auth)/
+ ├─ (workspace)/
+ ├─ api/
+ └─ layout.tsx
+
+features/
+widgets/
+entities/
+shared/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> FSD 아키텍처를 기반으로 **도메인 단위 분리**를 목표로 합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧱 데이터베이스 구조
 
-## Learn More
+### 주요 테이블
 
-To learn more about Next.js, take a look at the following resources:
+- **users**: 사용자 정보 및 프로필 장식
+- **workspaces**: 개인 학습 공간
+- **roadmaps**: 기술 학습 로드맵 (트리 구조)
+- **techs**: 기술 스택 정보
+- **shared_workspaces**: 공유된 워크스페이스 게시글
+- **comments**: 댓글 / 대댓글
+- **decorations / orders**: 커스터마이징 아이템 및 구매 내역
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 실행 방법
 
-## Deploy on Vercel
+```bash
+# 의존성 설치
+npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 개발 서버 실행
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`.env.local`에 Supabase 환경변수를 설정해야 합니다.
+
+---
+
+## 📌 프로젝트 목표
+
+- 학습 과정을 **시각적으로 정리**할 수 있는 도구 제공
+- 혼자만의 기록이 아닌 **공유와 피드백 중심의 성장**
+- 프론트엔드 중심의 **실전 아키텍처 실험 프로젝트**
+
+---
+
+## 👥 팀 소개
+
+| 이름              | 역할                     | 담당 기능         |
+| ----------------- | ------------------------ | ----------------- |
+| **김근영** (팀장) | 프론트엔드 / 백엔드 / DB | AI, 뉴스          |
+| **강두연**        | 프론트엔드 / 백엔드 / DB | 메인 페이지       |
+| **이주형**        | 프론트엔드 / 백엔드 / DB | 관리자 / 커뮤니티 |
+| **배예진**        | 프론트엔드 / 백엔드 / DB | 회원 / 상점       |
+
+---
+
+## 👤 Author
+
+김근영 (팀장)
+Frontend Developer
+
+강두연
+Frontend Developer
+
+배예진
+Frontend Developer
+
+이주형
+Frontend Developer
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
