@@ -37,13 +37,20 @@ https://nextstep-kt-2025.vercel.app/
 
 - Next.js (App Router)
 - TypeScript
-- Tailwind CSS
+- Tailwind CSS / Shadcn
 - Feature-Sliced Design (FSD)
+- React Query
+- Zustand
 
 ### Backend / DB
 
 - Supabase (PostgreSQL)
 - Row Level Security (RLS)
+
+### AI
+
+- Gemini
+- Claude
 
 ---
 
@@ -73,7 +80,7 @@ shared/
 - **workspaces**: 개인 학습 공간
 - **roadmaps**: 기술 학습 로드맵 (트리 구조)
 - **techs**: 기술 스택 정보
-- **shared_workspaces**: 공유된 워크스페이스 게시글
+- **posts**: 공유된 워크스페이스 게시글
 - **comments**: 댓글 / 대댓글
 - **decorations / orders**: 커스터마이징 아이템 및 구매 내역
 
