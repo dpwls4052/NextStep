@@ -5,8 +5,10 @@ import { ReactFlowProvider } from '@xyflow/react'
 import { Workspace } from '@/widgets/workspace/ui'
 import useGetWorkspace from '@/features/workspace/getWorkspace/model/useGetWorkspace'
 import { useWorkspaceStore } from '@/widgets/workspace/model'
+import { useSession } from 'next-auth/react'
 
 export default function MainContent() {
+  const { status } = useSession()
   // URL에서 workspaceId 읽기
   const searchParams = useSearchParams()
   const workspaceId = searchParams.get('workspace')
@@ -15,6 +17,7 @@ export default function MainContent() {
   // React Query로 워크스페이스 정보 가져오기
   const { data, isLoading, error } = useGetWorkspace(workspaceId)
   const isEdited = useWorkspaceStore((s) => s.isEdited)
+  const setIsEdited = useWorkspaceStore((s) => s.setIsEdited)
 
   // store 초기화
   const { initializeWithData, resetToEmpty } = useWorkspaceStore()
@@ -52,10 +55,39 @@ export default function MainContent() {
 
   useEffect(() => {
     resetToEmpty()
-    if (data) {
+
+    if (workspaceId && data) {
+      // URL에 workspaceId가 있고 데이터를 성공적으로 가져온 경우
       initializeWithData(data)
+    } else if (!workspaceId) {
+      // URL에 workspaceId가 없는 경우 -> sessionStorage에서 가져오기
+      const saving = sessionStorage.getItem('workspace')
+      const isLogin = status === 'authenticated'
+      if (saving) {
+        try {
+          const parsed = JSON.parse(saving)
+          initializeWithData(
+            {
+              workspaceId: null,
+              title: parsed.workspaceTitle || '새 워크스페이스',
+              nodes: parsed.nodes || [],
+              edges: parsed.edges || [],
+              updatedAt: parsed.updatedAt || new Date().toISOString(),
+              memos: {},
+              links: {},
+              troubleshootings: {},
+            },
+            isLogin
+          )
+          if (isLogin) {
+            sessionStorage.removeItem('workspace')
+          }
+        } catch (e) {
+          console.error('sessionStorage 파싱 실패:', e)
+        }
+      }
     }
-  }, [workspaceId, data, initializeWithData, resetToEmpty])
+  }, [workspaceId, data, initializeWithData, resetToEmpty, status])
 
   if (isLoading) {
     return (

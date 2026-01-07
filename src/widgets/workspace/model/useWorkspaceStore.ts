@@ -99,7 +99,7 @@ type WorkspaceStore = {
   /* =========================
    * Initialize / Reset
    ========================= */
-  initializeWithData: (data: WorkspaceData) => void
+  initializeWithData: (data: WorkspaceData, isEdited?: boolean) => void
   resetToEmpty: () => void
 
   /* =========================
@@ -387,7 +387,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   /* =========================
    * Initialize / Reset
    ========================= */
-  initializeWithData: (data) => {
+  initializeWithData: (data, isEdited = false) => {
     const techIds = new Set<string>()
 
     data.nodes?.forEach((node) => {
@@ -414,7 +414,7 @@ const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         links: data.links || {},
         troubleshootings: data.troubleshootings || {},
       },
-      isEdited: false,
+      isEdited,
     })
   },
 
