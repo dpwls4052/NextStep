@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import CommunityCard from './CommunityCard'
 import { PostWithRoadmap } from '@/features/community/model/types'
 import { useSession } from 'next-auth/react'
-
-type SortType = 'latest' | 'likes'
+import { SortType } from '@/features/community/model/types'
 
 interface CommunityCardGridProps {
   listId?: string | null

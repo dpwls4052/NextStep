@@ -7,6 +7,7 @@ import CommunityTabs from '@/features/community/ui/CommunityTabs'
 import CommunityNewsList from '@/widgets/community/ui/CommunityNewsList'
 import { useSearchParams } from 'next/navigation'
 import CommunitySortFilter from '@/features/community/ui/CommunitySortFilter'
+import { SortType } from '@/features/community/model/types'
 
 const SIDEBAR_WIDTH = 300
 const HEADER_HEIGHT = 80
@@ -17,8 +18,6 @@ export default function CommunityPageContent() {
 
   const tab = searchParams.get('tab') || 'post'
   const listId = searchParams.get('list')
-
-  type SortType = 'latest' | 'likes' | 'comments'
 
   const sort = (searchParams.get('sort') as SortType) ?? 'latest'
 

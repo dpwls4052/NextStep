@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-type SortType = 'latest' | 'likes' | 'comments'
+import { SortType } from '@/features/community/model/types'
 
 const SORT_LABEL: Record<SortType, string> = {
   latest: '최신순',

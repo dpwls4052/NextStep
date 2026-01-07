@@ -1,5 +1,7 @@
 export type CommunityTabKey = 'post' | 'news'
 
+export type SortType = 'latest' | 'likes' | 'comments'
+
 type AccessoryPosition = 'top' | 'bottom-left' | 'bottom-right'
 
 export type AvatarDecoration = {
