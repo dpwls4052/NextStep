@@ -1,1 +1,1 @@
-export { default as findDescendants } from './findDescendants'
+export { default as findAncestors } from './findAncestors'
