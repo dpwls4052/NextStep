@@ -7,6 +7,7 @@ import Nav from './Nav'
 import { ThemeToggleButton } from '@/features/theme/ui'
 import LoginButton from '@/features/login/ui/LoginButton'
 import { useThemeStore } from '@/features/theme/model'
+import { Suspense } from 'react'
 
 const Header = () => {
   const { theme } = useThemeStore()
@@ -28,11 +29,15 @@ const Header = () => {
           />
         </div>
 
-        <Nav />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Nav />
+        </Suspense>
       </div>
       <div className="flex gap-10">
-        <LoginButton />
-        <ThemeToggleButton />
+        <Suspense fallback={<div>Loading...</div>}>
+          <LoginButton />
+          <ThemeToggleButton />
+        </Suspense>
       </div>
     </header>
   )

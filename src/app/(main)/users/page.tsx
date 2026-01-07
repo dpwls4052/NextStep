@@ -1,11 +1,18 @@
-import UsersTabs from '@/widgets/user/ui/UsersTabs'
+import { Suspense } from 'react'
+import UsersContent from './UsersContent'
 
-const Users = () => {
+export default function UsersPage() {
   return (
-    <div className="p-20">
-      <UsersTabs />
-    </div>
+    <Suspense fallback={<UsersLoadingFallback />}>
+      <UsersContent />
+    </Suspense>
   )
 }
 
-export default Users
+function UsersLoadingFallback() {
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="animate-pulse">마이페이지 준비 중...</div>
+    </div>
+  )
+}
