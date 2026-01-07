@@ -6,28 +6,31 @@ import CommunityCard from './CommunityCard'
 import { PostWithRoadmap } from '@/features/community/model/types'
 import { useSession } from 'next-auth/react'
 
+type SortType = 'latest' | 'likes'
+
 interface CommunityCardGridProps {
   listId?: string | null
+  sort: SortType
 }
 
-const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
+const CommunityCardGrid = ({ listId, sort }: CommunityCardGridProps) => {
   const router = useRouter()
   const [posts, setPosts] = useState<PostWithRoadmap[]>([])
   const [loading, setLoading] = useState(true)
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true)
 
-        const res = await fetch(
-          listId
-            ? `/api/community/posts?list=${listId}`
-            : `/api/community/posts`
-        )
+        const query = new URLSearchParams()
+        if (listId) query.set('list', listId)
+        if (sort) query.set('sort', sort)
 
+        const res = await fetch(`/api/community/posts?${query.toString()}`)
         const json = await res.json()
+
         setPosts(Array.isArray(json) ? json : [])
       } catch (e) {
         console.error(e)
@@ -38,7 +41,7 @@ const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
     }
 
     fetchPosts()
-  }, [listId])
+  }, [listId, sort])
 
   if (loading) {
     return (
@@ -75,7 +78,11 @@ const CommunityCardGrid = ({ listId }: CommunityCardGridProps) => {
                 return
               }
 
-              router.push(`/community/${post.post_id}?list=${listId}`)
+              const query = new URLSearchParams()
+              if (listId) query.set('list', listId)
+              if (sort) query.set('sort', sort)
+
+              router.push(`/community/${post.post_id}?${query.toString()}`)
             }}
           />
         ))}

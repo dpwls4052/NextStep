@@ -44,6 +44,8 @@ export default function CommunityDetail({
   const [isActionOpen, setIsActionOpen] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
 
+  const sort = searchParams.get('sort') ?? 'latest'
+
   const [isNodeModalOpen, setIsNodeModalOpen] = useState(false)
   const [selectedNode, setSelectedNode] = useState<any>(null)
 
@@ -96,12 +98,11 @@ export default function CommunityDetail({
       try {
         setLoading(true)
 
-        const res = await fetch(
-          resolvedListId
-            ? `/api/community/posts?list=${resolvedListId}`
-            : `/api/community/posts`
-        )
+        const query = new URLSearchParams()
+        if (resolvedListId) query.set('list', resolvedListId)
+        if (sort) query.set('sort', sort)
 
+        const res = await fetch(`/api/community/posts?${query.toString()}`)
         const json = await res.json()
         const list: PostWithRoadmap[] = Array.isArray(json) ? json : []
 
@@ -110,16 +111,13 @@ export default function CommunityDetail({
         const idx = list.findIndex((p) => p.post_id === postId)
         setCurrentIndex(idx)
         setPost(list[idx] ?? null)
-      } catch (e) {
-        console.error(e)
-        setPost(null)
       } finally {
         setLoading(false)
       }
     }
 
     fetchPosts()
-  }, [postId, resolvedListId, listId])
+  }, [postId, resolvedListId, listId, sort]) // ✅ sort 추가
 
   useEffect(() => {
     if (!listId) {
@@ -151,16 +149,22 @@ export default function CommunityDetail({
   const goPrev = () => {
     if (currentIndex > 0) {
       const prevPost = posts[currentIndex - 1]
-      const query = resolvedListId ? `?list=${resolvedListId}` : ''
-      router.push(`/community/${prevPost.post_id}${query}`)
+      const query = new URLSearchParams()
+      if (resolvedListId) query.set('list', resolvedListId)
+      if (sort) query.set('sort', sort)
+
+      router.push(`/community/${prevPost.post_id}?${query.toString()}`)
     }
   }
 
   const goNext = () => {
     if (currentIndex < posts.length - 1) {
       const nextPost = posts[currentIndex + 1]
-      const query = resolvedListId ? `?list=${resolvedListId}` : ''
-      router.push(`/community/${nextPost.post_id}${query}`)
+      const query = new URLSearchParams()
+      if (resolvedListId) query.set('list', resolvedListId)
+      if (sort) query.set('sort', sort)
+
+      router.push(`/community/${nextPost.post_id}?${query.toString()}`)
     }
   }
   const enrichedNodes = post
@@ -246,11 +250,13 @@ export default function CommunityDetail({
 
   // 닫기 버튼 핸들러 (뉴스와 동일한 로직)
   const handleClose = () => {
-    if (resolvedListId) {
-      router.push(`/community?list=${resolvedListId}&tab=post`)
-    } else {
-      router.push('/community?tab=post')
-    }
+    const query = new URLSearchParams()
+
+    if (resolvedListId) query.set('list', resolvedListId)
+    if (sort) query.set('sort', sort)
+    query.set('tab', 'post')
+
+    router.push(`/community?${query.toString()}`)
   }
 
   const nodeTypes = {

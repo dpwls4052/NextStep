@@ -11,6 +11,7 @@ export const GET = async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url)
     const listId = searchParams.get('list')
+    const sort = searchParams.get('sort') ?? 'latest'
 
     let userId: string | null = null
     try {
@@ -25,28 +26,38 @@ export const GET = async (req: NextRequest) => {
       .from('posts')
       .select(
         `
-        post_id,
-        title,
-        content,
-        like_count,
-        roadmap_id,
-        created_at,
-        updated_at,
-        post_likes ( user_id ),
-        roadmap:roadmaps(
+          post_id,
+          title,
+          content,
+          like_count,
           roadmap_id,
-          user_id,
-          nodes,
-          edges,
-          visibility,
-          status
-        )
-      `
+          created_at,
+          updated_at,
+          post_likes ( user_id ),
+          roadmap:roadmaps(
+            roadmap_id,
+            user_id,
+            nodes,
+            edges,
+            visibility,
+            status
+          )
+        `
       )
       .eq('status', true)
-      .order('created_at', { ascending: false })
 
-    if (listId) query = query.eq('list_id', listId)
+    // 1️⃣ list 먼저 필터
+    if (listId) {
+      query = query.eq('list_id', listId)
+    }
+
+    // 2️⃣ 정렬은 sort 기준
+    if (sort === 'likes') {
+      query = query.order('like_count', { ascending: false })
+    } else {
+      // latest 기본
+      query = query.order('created_at', { ascending: false })
+    }
 
     const { data: posts, error } = await query.returns<PostWithRoadmap[]>()
     if (error) throw error
