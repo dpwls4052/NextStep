@@ -58,7 +58,6 @@ app/
 
 features/
 widgets/
-entities/
 shared/
 ```
 
