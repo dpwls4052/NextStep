@@ -1,4 +1,4 @@
-import findAncestors from '@/widgets/workspace/lib/findAncestors'
+import { findAncestors } from '@/widgets/workspace/lib'
 import { useWorkspaceStore } from '@/widgets/workspace/model'
 import { addEdge, OnConnect } from '@xyflow/react'
 import { useCallback } from 'react'
