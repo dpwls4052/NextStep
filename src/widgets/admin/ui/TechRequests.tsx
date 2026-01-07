@@ -6,7 +6,7 @@ import TechFormModal from './TechFormModal'
 import { Tech } from '../model/types'
 
 interface TechRequest {
-  id: string
+  tech_request_id: string
   name: string
   description: string
   icon_url: string | null
@@ -19,11 +19,12 @@ export default function TechRequests() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<TechRequest | null>(null)
 
-  // 🔹 목록 불러오기
+  // 목록 불러오기
   const loadRequests = async () => {
     try {
       const res = await fetch('/api/admin/tech-requests')
       const data = await res.json()
+      console.log('tech_requests sample', data)
       setList(Array.isArray(data) ? data : [])
     } catch (e) {
       console.error(e)
@@ -37,13 +38,19 @@ export default function TechRequests() {
     loadRequests()
   }, [])
 
-  // 🔹 상태 변경
+  // 상태 변경
   const updateStatus = async (id: string, status: 'approved' | 'rejected') => {
-    await fetch(`/api/admin/techs/${id}`, {
-      method: 'PUT',
+    const res = await fetch(`/api/admin/tech-requests/${id}`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
     })
+
+    if (!res.ok) {
+      console.error(await res.text())
+      return
+    }
+
     loadRequests()
   }
 
@@ -60,7 +67,7 @@ export default function TechRequests() {
       <div className="flex flex-col gap-8">
         {list.map((r) => (
           <div
-            key={r.id}
+            key={r.tech_request_id}
             className="border-border bg-background-light flex items-center justify-between rounded-xl border px-16 py-12"
           >
             <div className="flex items-center gap-12">
@@ -85,13 +92,13 @@ export default function TechRequests() {
               </button>
               <button
                 className="border-border text-12 rounded-lg border px-12 py-6"
-                onClick={() => updateStatus(r.id, 'approved')}
+                onClick={() => updateStatus(r.tech_request_id, 'approved')}
               >
                 수락
               </button>
               <button
                 className="border-border text-12 rounded-lg border px-12 py-6"
-                onClick={() => updateStatus(r.id, 'rejected')}
+                onClick={() => updateStatus(r.tech_request_id, 'rejected')}
               >
                 거절
               </button>
@@ -110,7 +117,7 @@ export default function TechRequests() {
         <TechFormModal
           tech={
             {
-              id: editing.id,
+              id: editing.tech_request_id,
               name: editing.name,
               category: editing.description,
               iconUrl: editing.icon_url ?? '',
@@ -118,7 +125,7 @@ export default function TechRequests() {
           }
           onClose={() => setEditing(null)}
           onSave={async (name, category, iconUrl) => {
-            await fetch(`/api/admin/tech-requests/${editing.id}`, {
+            await fetch(`/api/admin/tech-requests/${editing.tech_request_id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
