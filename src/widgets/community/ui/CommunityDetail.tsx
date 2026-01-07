@@ -49,7 +49,7 @@ export default function CommunityDetail({
 
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
-  const bgColor = isDark ? '#1f2937' : '#e5e5e5'
+  const gridColor = 'var(--grid-color)'
 
   const workspaceRef = useRef<HTMLDivElement>(null)
   const [rf, setRf] = useState<ReactFlowInstance | null>(null)
@@ -238,7 +238,6 @@ export default function CommunityDetail({
       container: workspaceRef.current,
       rf,
       fileName: post.title,
-      backgroundColor: bgColor,
     })
 
     setIsCapturing(false)
@@ -356,6 +355,12 @@ export default function CommunityDetail({
 
             <style>
               {`
+                :root {
+                  --grid-color: #e5e5e5;
+                }
+                .dark {
+                  --grid-color: #2f3645;
+                }
                 .react-flow__node-custom {
                   padding: 0;
                   background: transparent !important;
@@ -399,10 +404,7 @@ export default function CommunityDetail({
               `}
             </style>
 
-            <div
-              className="relative mb-24 h-420 w-full overflow-hidden rounded-xl"
-              style={{ backgroundColor: bgColor }}
-            >
+            <div className="bg-background relative mb-24 h-420 w-full overflow-hidden rounded-xl">
               <ReactFlow
                 ref={workspaceRef}
                 onInit={setRf}
@@ -436,7 +438,7 @@ export default function CommunityDetail({
                   variant={BackgroundVariant.Lines}
                   gap={24}
                   size={1}
-                  color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)'}
+                  color={gridColor}
                 />
               </ReactFlow>
 
