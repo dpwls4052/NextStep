@@ -1,6 +1,6 @@
 'use client'
-
 import type { ReactFlowInstance } from '@xyflow/react'
+import domToImage from 'dom-to-image-more'
 
 type ExportWorkspaceAsImageArgs = {
   container: HTMLElement
@@ -24,9 +24,7 @@ export const exportWorkspaceAsImage = async ({
   // fitView 렌더 반영 대기
   await new Promise((r) => setTimeout(r, 50))
 
-  const domtoimage = await import('dom-to-image-more')
-
-  const dataUrl = await domtoimage.toPng(container, {
+  const dataUrl = await domToImage.toPng(container, {
     cacheBust: true,
     pixelRatio: 2,
 
@@ -36,7 +34,7 @@ export const exportWorkspaceAsImage = async ({
 
     // ❗ SVG(격자/엣지)는 건드리지 않고
     // UI 버튼만 캡처에서 제외
-    filter: (node) => {
+    filter: (node: any) => {
       const el = node as HTMLElement
       if (el.classList?.contains('workspace-action')) return false
       return true
