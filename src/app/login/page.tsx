@@ -9,19 +9,17 @@ import githubIcon from '@/shared/assets/github.svg'
 import googleIcon from '@/shared/assets/google.svg'
 import ThemeProvider from '../providers/ThemeProvider'
 import { ThemeToggleButton } from '@/features/theme/ui'
-import { useThemeStore } from '@/features/theme/model'
 
 const LoginPage = () => {
-  const { theme } = useThemeStore()
   const handleGithubLogin = () => {
     signIn('github', {
-      callbackUrl: '/', // 로그인 후 돌아갈 주소
+      callbackUrl: '/',
     })
   }
 
   const handleGoogleLogin = () => {
     signIn('google', {
-      callbackUrl: '/', // 로그인 후 돌아갈 주소
+      callbackUrl: '/',
     })
   }
 
@@ -32,12 +30,20 @@ const LoginPage = () => {
       </div>
       <main className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center">
-          <Image
-            src={theme === 'dark' ? mainLogowhite : mainLogo}
-            alt="메인 로고"
-            width={300}
-            height={100}
-          />
+          <div className="relative h-[100px] w-[300px]">
+            <Image
+              src={mainLogo}
+              alt="메인 로고"
+              fill
+              className="object-contain dark:hidden"
+            />
+            <Image
+              src={mainLogowhite}
+              alt="메인 로고"
+              fill
+              className="hidden object-contain dark:block"
+            />
+          </div>
 
           <div className="mt-50 flex flex-col gap-10">
             <button

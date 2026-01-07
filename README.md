@@ -2,6 +2,10 @@
 
 개발자의 학습 로드맵을 **시각화·관리·공유**하는 프로젝트입니다. 개인 워크스페이스에서 기술 로드맵을 구성하고, 다른 사용자와 공유하며 피드백을 주고받을 수 있습니다.
 
+## 배포 주소
+
+https://nextstep-kt-2025.vercel.app/
+
 ---
 
 ## 🔥 핵심 기능
@@ -33,13 +37,20 @@
 
 - Next.js (App Router)
 - TypeScript
-- Tailwind CSS
+- Tailwind CSS / Shadcn
 - Feature-Sliced Design (FSD)
+- React Query
+- Zustand
 
 ### Backend / DB
 
 - Supabase (PostgreSQL)
 - Row Level Security (RLS)
+
+### AI
+
+- Gemini
+- Claude
 
 ---
 
@@ -54,7 +65,6 @@ app/
 
 features/
 widgets/
-entities/
 shared/
 ```
 
@@ -70,7 +80,7 @@ shared/
 - **workspaces**: 개인 학습 공간
 - **roadmaps**: 기술 학습 로드맵 (트리 구조)
 - **techs**: 기술 스택 정보
-- **shared_workspaces**: 공유된 워크스페이스 게시글
+- **posts**: 공유된 워크스페이스 게시글
 - **comments**: 댓글 / 대댓글
 - **decorations / orders**: 커스터마이징 아이템 및 구매 내역
 
