@@ -51,9 +51,8 @@ export default function MainContent() {
   }, [pathname, resetToEmpty])
 
   useEffect(() => {
-    if (!workspaceId) {
-      resetToEmpty()
-    } else if (data) {
+    resetToEmpty()
+    if (data) {
       initializeWithData(data)
     }
   }, [workspaceId, data, initializeWithData, resetToEmpty])

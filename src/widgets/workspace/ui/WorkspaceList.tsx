@@ -30,6 +30,8 @@ const WorkspaceList = () => {
   // workspaceId를 쿼리에 넣는 함수
   const handleSelectWorkspace = (id: string | null) => {
     const query = new URLSearchParams(window.location.search)
+    if (id === null && currentWorkspaceId === null) return
+    if (id === currentWorkspaceId) return
     if (id) {
       query.set('workspace', id)
     } else {
