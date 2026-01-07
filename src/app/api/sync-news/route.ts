@@ -1,6 +1,6 @@
-import { serve } from 'https://deno.land/std@0.192.0/http/server.ts'
-import Parser from 'https://esm.sh/rss-parser@3.13.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { NextRequest, NextResponse } from 'next/server'
+import Parser from 'rss-parser'
+import { createClient } from '@supabase/supabase-js'
 
 const parser = new Parser({
   customFields: {
@@ -12,11 +12,11 @@ const parser = new Parser({
   },
 })
 
-serve(async () => {
+export async function GET(request: NextRequest) {
   try {
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY
 
     if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
       throw new Error('Supabase env missing')
@@ -32,7 +32,7 @@ serve(async () => {
     console.log('📋 Lists loaded:', lists?.length)
 
     const listMap = new Map<string, string>()
-    lists?.forEach((l) => {
+    lists?.forEach((l: { name: string; list_id: string }) => {
       listMap.set(l.name, l.list_id)
       console.log(`  - ${l.name} -> ${l.list_id}`)
     })
@@ -58,21 +58,16 @@ serve(async () => {
       console.error('Naver sync failed:', e)
     }
 
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        timestamp: new Date().toISOString(),
-        ...results,
-      }),
-      {
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return NextResponse.json({
+      ok: true,
+      timestamp: new Date().toISOString(),
+      ...results,
+    })
   } catch (e) {
     console.error('SYNC ERROR:', e)
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500 })
+    return NextResponse.json({ error: String(e) }, { status: 500 })
   }
-})
+}
 
 async function syncKoreanTech(
   supabase: any,
@@ -143,14 +138,6 @@ async function syncKoreanTech(
       for (const item of items) {
         if (!item.title || !item.link) continue
 
-        // 📅 날짜 디버깅
-        console.log('📅 Date fields:', {
-          pubDate: item.pubDate,
-          isoDate: item.isoDate,
-          date: item.date,
-          published: item.published,
-        })
-
         // 중복 체크
         const { data: exists } = await supabase
           .from('articles')
@@ -163,15 +150,14 @@ async function syncKoreanTech(
           continue
         }
 
-        // 📅 날짜 파싱 (여러 필드 시도)
-        const publishedAt =
-          item.pubDate || item.isoDate || item.date || item.published
+        // 📅 날짜 파싱
+        const publishedAt = item.pubDate || item.isoDate
         const publishedAtISO = publishedAt
           ? new Date(publishedAt).toISOString()
           : null
 
         // 🖼️ 이미지 추출
-        const imageUrl = extractImageUrl(item)
+        const imageUrl = await extractImageUrl(item)
 
         // 🤖 AI로 카테고리 + 키워드 분석
         let category = null
@@ -199,7 +185,6 @@ async function syncKoreanTech(
             )
           }
         } else {
-          // AI 없으면 기존 키워드 매칭 + 자동 키워드 추출
           category = classify(item.title + ' ' + (item.contentSnippet || ''))
           keywords = extractKeywords(
             item.title + ' ' + (item.contentSnippet || '')
@@ -216,7 +201,6 @@ async function syncKoreanTech(
 
         const listId = listMap.get(category)
 
-        // listId 없으면 스킵
         if (!listId) {
           noCategory++
           console.log(
@@ -239,9 +223,6 @@ async function syncKoreanTech(
         if (error) {
           console.error(`❌ Insert error:`, error.message)
         } else {
-          console.log(
-            `✅ [${category}] ${item.title.substring(0, 40)}... | 🖼️ ${imageUrl ? 'Y' : 'N'} | 📅 ${publishedAtISO || 'NO_DATE'}`
-          )
           inserted++
         }
       }
@@ -291,22 +272,18 @@ async function syncNaverNews(
       return { inserted, skipped, no_category: noCategory }
     }
 
-    // 인코딩 감지 및 디코딩
     const buffer = await rssRes.arrayBuffer()
     let text = ''
 
-    // UTF-8 시도
     try {
       const decoder = new TextDecoder('utf-8', { fatal: true })
       text = decoder.decode(buffer)
     } catch {
-      // UTF-8 실패시 EUC-KR 시도
       try {
         const decoder = new TextDecoder('euc-kr')
         text = decoder.decode(buffer)
         console.log('📝 Naver: Using EUC-KR encoding')
       } catch {
-        // 둘 다 실패시 기본 디코딩
         const decoder = new TextDecoder()
         text = decoder.decode(buffer)
         console.log('📝 Naver: Using default encoding')
@@ -322,7 +299,6 @@ async function syncNaverNews(
     for (const item of items) {
       if (!item.title || !item.link) continue
 
-      // 중복 체크
       const { data: exists } = await supabase
         .from('articles')
         .select('article_id')
@@ -334,15 +310,12 @@ async function syncNaverNews(
         continue
       }
 
-      // 📅 날짜 파싱
       const publishedAt = item.pubDate
         ? new Date(item.pubDate).toISOString()
         : null
 
-      // 🖼️ 이미지 추출
-      const imageUrl = extractImageUrl(item)
+      const imageUrl = await extractImageUrl(item)
 
-      // 🤖 AI로 카테고리 + 키워드 분석
       let category = null
       let keywords: string[] = []
 
@@ -362,11 +335,9 @@ async function syncNaverNews(
           category = classify(item.title + ' ' + (item.contentSnippet || ''))
         }
       } else {
-        // AI 없으면 기존 키워드 매칭
         category = classify(item.title + ' ' + (item.contentSnippet || ''))
       }
 
-      // 카테고리 없으면 스킵
       if (!category) {
         noCategory++
         console.log(`⏭️  No category: ${item.title.substring(0, 40)}...`)
@@ -375,7 +346,6 @@ async function syncNaverNews(
 
       const listId = listMap.get(category)
 
-      // listId 없으면 스킵
       if (!listId) {
         noCategory++
         console.log(
@@ -398,9 +368,6 @@ async function syncNaverNews(
       if (error) {
         console.error(`❌ Insert error:`, error.message)
       } else {
-        console.log(
-          `✅ [${category}] ${item.title.substring(0, 40)}... | 🖼️ ${imageUrl ? 'Y' : 'N'} | 📅 ${publishedAt}`
-        )
         inserted++
       }
     }
@@ -416,7 +383,6 @@ async function syncNaverNews(
 function classify(text: string): string | null {
   const lowerText = text.toLowerCase()
 
-  // DB lists 테이블의 이름과 정확히 일치
   const categories = {
     Frontend: [
       'react',
@@ -578,13 +544,10 @@ function classify(text: string): string | null {
     }
   }
 
-  // 최소 1개 이상 키워드 매칭되어야 분류
   return maxScore > 0 ? bestCategory : null
 }
 
-// 🖼️ 이미지 URL 추출 (RSS + Jina 본문)
 async function extractImageUrl(item: any): Promise<string | null> {
-  // 1단계: RSS에서 먼저 찾기 (빠름)
   if (item.enclosure?.url) {
     return item.enclosure.url
   }
@@ -602,17 +565,15 @@ async function extractImageUrl(item: any): Promise<string | null> {
     if (imgMatch) return imgMatch[1]
   }
 
-  // 2단계: RSS에 없으면 Jina로 본문 스크래핑 (느림)
   if (item.link) {
     try {
       const jinaUrl = `https://r.jina.ai/${item.link}`
       const response = await fetch(jinaUrl, {
-        headers: { 'X-Timeout': '5' }, // 5초 타임아웃
+        headers: { 'X-Timeout': '5' },
       })
 
       if (response.ok) {
         const markdown = await response.text()
-        // 마크다운에서 첫 이미지 찾기
         const imgMatch = markdown.match(/!\[.*?\]\((https?:\/\/[^\)]+)\)/)
         if (imgMatch) {
           console.log(`🖼️  Jina found image: ${imgMatch[1]}`)
@@ -627,12 +588,10 @@ async function extractImageUrl(item: any): Promise<string | null> {
   return null
 }
 
-// 🔍 키워드 자동 추출 (AI 없을 때)
 function extractKeywords(text: string): string[] {
   const keywords: string[] = []
   const lowerText = text.toLowerCase()
 
-  // 기술 스택 키워드
   const techKeywords = [
     'react',
     'vue',
@@ -677,10 +636,9 @@ function extractKeywords(text: string): string[] {
     }
   }
 
-  return keywords.slice(0, 5) // 최대 5개
+  return keywords.slice(0, 5)
 }
 
-// 🤖 AI로 카테고리 + 키워드 분석
 async function analyzeWithAI(
   title: string,
   summary: string,
@@ -736,7 +694,6 @@ JSON 형식으로만 응답해주세요:
     const data = await response.json()
     const text = data.content[0].text
 
-    // JSON 파싱 (백틱 제거)
     const jsonText = text.replace(/```json\n?|```\n?/g, '').trim()
     const result = JSON.parse(jsonText)
 
