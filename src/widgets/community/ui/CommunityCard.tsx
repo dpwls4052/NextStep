@@ -30,8 +30,7 @@ const CommunityCard = ({
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
 
-  const bgColor = isDark ? '#1f2937' : '#e5e5e5'
-  const gridColor = isDark ? '#374151' : '#d1d5db'
+  const gridColor = 'var(--grid-color)'
 
   const nodeTypes = {
     custom: CustomNode,
@@ -43,12 +42,17 @@ const CommunityCard = ({
     <button
       type="button"
       onClick={onClick}
-      className="bg-primary flex h-300 flex-col overflow-hidden rounded-2xl text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-      style={{ backgroundColor: bgColor }}
+      className="bg-background flex h-300 flex-col overflow-hidden rounded-2xl text-left shadow-sm shadow-gray-300/60 transition hover:-translate-y-1 hover:shadow-md dark:shadow-gray-50/20"
     >
       {/* 상단 워크스페이스 미리보기 */}
       <style>
         {`
+          :root {
+            --grid-color: #e5e5e5;
+          }
+          .dark {
+            --grid-color: #2f3645;
+          }
           .react-flow__node {
             padding: 0;
             display: flex;
