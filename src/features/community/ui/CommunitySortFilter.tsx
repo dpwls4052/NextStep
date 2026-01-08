@@ -7,7 +7,6 @@ import { SortType } from '@/features/community/model/types'
 const SORT_LABEL: Record<SortType, string> = {
   latest: '최신순',
   likes: '좋아요순',
-  comments: '댓글순',
 }
 
 export default function CommunitySortFilter() {
