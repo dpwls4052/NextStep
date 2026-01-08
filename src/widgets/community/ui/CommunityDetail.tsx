@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { ChevronLeft, ChevronRight, Close } from '@/shared/ui/icon'
+import { ChevronLeft, ChevronRight, Close, Heart } from '@/shared/ui/icon'
 import CommunitySidebar from '@/widgets/community/ui/CommunitySidebar'
 import { ReactFlow, Background, BackgroundVariant } from '@xyflow/react'
 import type { ReactFlowInstance } from '@xyflow/react'
@@ -314,7 +314,13 @@ export default function CommunityDetail({
                     : 'bg-secondary text-foreground hover:bg-secondary/70'
                 }`}
               >
-                <span className="text-m">{liked ? '❤️' : '🤍'}</span>
+                <span className="text-m">
+                  {liked ? (
+                    <Heart className="fill-red-500 stroke-white" />
+                  ) : (
+                    <Heart className="stroke-black" />
+                  )}
+                </span>
                 <span className="text-sm font-semibold">{likeCount}</span>
               </button>
 
