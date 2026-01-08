@@ -458,12 +458,12 @@ export default function CommunityDetail({
                 <div className="workspace-action absolute right-12 bottom-16 flex flex-col items-end gap-8">
                   {isActionOpen && (
                     <div className="flex flex-col gap-8">
-                      <button
+                      {/* <button
                         onClick={handleExportImage}
                         className="bg-accent rounded-lg px-16 py-8 text-sm text-white shadow-lg"
                       >
                         이미지로 저장하기
-                      </button>
+                      </button> */}
 
                       <button
                         onClick={handleImportWorkspace}
