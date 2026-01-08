@@ -1,6 +1,6 @@
 export type CommunityTabKey = 'post' | 'news'
 
-export type SortType = 'latest' | 'likes' | 'comments'
+export type SortType = 'latest' | 'likes'
 
 type AccessoryPosition = 'top' | 'bottom-left' | 'bottom-right'
 
