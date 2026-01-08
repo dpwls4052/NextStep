@@ -142,7 +142,7 @@ export function middleware(request: NextRequest) {
       <body>
         <div class="container">
           <div class="logo-container">
-            LOGO
+            NEXT STEP
           </div>
           
           <div class="icon">🖥️</div>
