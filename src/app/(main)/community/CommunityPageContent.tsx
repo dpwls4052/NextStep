@@ -6,6 +6,8 @@ import useOpen from '@/shared/model/useOpen'
 import CommunityTabs from '@/features/community/ui/CommunityTabs'
 import CommunityNewsList from '@/widgets/community/ui/CommunityNewsList'
 import { useSearchParams } from 'next/navigation'
+import CommunitySortFilter from '@/features/community/ui/CommunitySortFilter'
+import { SortType } from '@/features/community/model/types'
 
 const SIDEBAR_WIDTH = 300
 const HEADER_HEIGHT = 80
@@ -17,6 +19,8 @@ export default function CommunityPageContent() {
   const tab = searchParams.get('tab') || 'post'
   const listId = searchParams.get('list')
 
+  const sort = (searchParams.get('sort') as SortType) ?? 'latest'
+
   return (
     <div className="relative flex w-full overflow-x-hidden">
       {/* 메인 영역 */}
@@ -25,10 +29,17 @@ export default function CommunityPageContent() {
 
         <div className="flex justify-center py-60">
           <div className="w-full max-w-[1200px] px-24">
+            {/* 상단 정렬 영역 */}
+            {tab === 'post' && (
+              <div className="mb-16 flex justify-end">
+                <CommunitySortFilter />
+              </div>
+            )}
+
             {tab === 'news' ? (
               <CommunityNewsList />
             ) : (
-              <CommunityCardGrid listId={listId} />
+              <CommunityCardGrid listId={listId} sort={sort} />
             )}
           </div>
         </div>
