@@ -1,0 +1,38 @@
+import { CustomNodeType } from './types'
+
+export const START_NODE_STYLE = {
+  default: {
+    background: 'var(--color-primary)',
+    borderRadius: '5px',
+    fontSize: '12px',
+    border: '1px solid var(--color-primary)',
+    width: '80px',
+    height: '30px',
+  },
+}
+
+export const NODE_STYLE = {
+  default: {
+    background: 'var(--color-primary)',
+    color: 'var(--foreground)',
+    borderRadius: '5px',
+    fontSize: '12px',
+    border: '1px solid var(--color-primary)',
+    width: 'auto',
+    minWidth: '80px',
+    height: '40px',
+    padding: '0px 5px',
+  },
+  selected: {
+    border: '1px solid var(--color-accent)',
+  },
+}
+
+export const initialNodes: CustomNodeType[] = [
+  {
+    id: '1',
+    data: { nodeId: '1', techId: 'start', label: 'Start', completed: false },
+    position: { x: 0, y: 0 },
+    style: { ...START_NODE_STYLE.default },
+  },
+]

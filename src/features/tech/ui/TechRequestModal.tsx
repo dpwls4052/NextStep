@@ -1,0 +1,98 @@
+'use client'
+
+import { useState } from 'react'
+import { TechItem } from '@/features/ai/model/useTechRecommendation'
+
+interface Props {
+  initialData?: Pick<TechItem, 'name' | 'description' | 'icon_url'>
+  onClose: () => void
+  onSubmit: (data: {
+    name: string
+    description: string
+    icon_url: string
+  }) => void
+}
+
+export default function TechRequestModal({
+  initialData,
+  onClose,
+  onSubmit,
+}: Props) {
+  const [form, setForm] = useState(() => ({
+    name: initialData?.name ?? '',
+    description: initialData?.description ?? '',
+    iconUrl: initialData?.icon_url ?? '',
+  }))
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-background w-[420px] rounded-2xl p-24">
+        <h3 className="text-16 mb-16 font-semibold">기술 스택 관리자 요청</h3>
+
+        <div className="flex flex-col gap-12">
+          <input
+            placeholder="기술 이름"
+            value={form.name}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, name: e.target.value }))
+            }
+            className="rounded-xl border px-14 py-10 text-sm"
+          />
+
+          <textarea
+            placeholder="기술 설명"
+            value={form.description}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, description: e.target.value }))
+            }
+            rows={3}
+            className="rounded-xl border px-14 py-10 text-sm"
+          />
+
+          <input
+            placeholder="아이콘 URL (선택)"
+            value={form.iconUrl}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, iconUrl: e.target.value }))
+            }
+            className="rounded-xl border px-14 py-10 text-sm"
+          />
+
+          {form.iconUrl && (
+            <div className="flex items-center gap-12">
+              <span className="text-xs text-gray-400">미리보기</span>
+              <img
+                src={form.iconUrl}
+                alt="icon preview"
+                className="h-24 w-24 object-contain"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="mt-20 flex justify-end gap-8">
+          <button onClick={onClose} className="px-12 py-8 text-sm">
+            취소
+          </button>
+          <button
+            onClick={() => {
+              if (!form.name.trim()) {
+                alert('기술 이름은 필수입니다')
+                return
+              }
+
+              onSubmit({
+                name: form.name,
+                description: form.description,
+                icon_url: form.iconUrl,
+              })
+            }}
+            className="rounded-lg bg-purple-600 px-14 py-8 text-sm text-white"
+          >
+            관리자에게 요청하기
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
